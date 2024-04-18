@@ -5,7 +5,7 @@ import com.ssonzm.userservcie.common.util.SecurityConfigUtil;
 import com.ssonzm.userservcie.domain.user.UserRepository;
 import com.ssonzm.userservcie.domain.user.UserRole;
 import com.ssonzm.userservcie.domain.user.Users;
-import com.ssonzm.userservcie.dto.user.UserLoginResDto;
+import com.ssonzm.userservcie.dto.user.UserResponseDto.UserLoginRespDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.User;
@@ -41,8 +41,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserLoginResDto getLoginUserDetailsByEmail(String email) {
+    public UserLoginRespDto getLoginUserDetailsByEmail(String email) {
         Users findUser = userRepository.findByEmail(email).orElseThrow(() -> new CommonBadRequestException("notFoundUser"));
-        return new ModelMapper().map(findUser, UserLoginResDto.class);
+        return new ModelMapper().map(findUser, UserLoginRespDto.class);
     }
 }

@@ -3,7 +3,6 @@ package com.ssonzm.userservcie.config.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.userservcie.common.util.SecurityConfigUtil;
 import com.ssonzm.userservcie.domain.user.UserRole;
-import com.ssonzm.userservcie.dto.user.UserLoginResDto;
 import com.ssonzm.userservcie.service.user.UserService;
 import com.ssonzm.userservcie.vo.user.UserLoginVo;
 import io.jsonwebtoken.Jwts;
@@ -28,6 +27,8 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+
+import static com.ssonzm.userservcie.dto.user.UserResponseDto.*;
 
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -70,7 +71,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) throws IOException, ServletException {
         String username = ((User) authResult.getPrincipal()).getUsername();
-        UserLoginResDto userLoginResDto = userService.getLoginUserDetailsByEmail(username);
+        UserLoginRespDto userLoginRespDto = userService.getLoginUserDetailsByEmail(username);
 
         byte[] secretKeyBytes = Base64.getEncoder().encode(env.getProperty("token.secret").getBytes());
 
@@ -79,13 +80,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         Instant now = Instant.now();
 
         String token = Jwts.builder()
-                .setSubject(String.valueOf(userLoginResDto.getId()))
+                .setSubject(String.valueOf(userLoginRespDto.getId()))
                 .setExpiration(Date.from(now.plusMillis(Long.parseLong(env.getProperty("token.expiration_time")))))
                 .setIssuedAt(Date.from(now))
                 .signWith(secretKey)
                 .compact();
 
         response.addHeader("token", token);
-        response.addHeader("userId", String.valueOf(userLoginResDto.getId()));
+        response.addHeader("userId", String.valueOf(userLoginRespDto.getId()));
     }
 }
