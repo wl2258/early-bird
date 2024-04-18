@@ -1,16 +1,37 @@
 version: '3.1'
 
 services:
-  mariadb:
+  user_mariadb:
+    container_name: user_mariadb
     image: mariadb
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_user
       TZ: Asia/Seoul
     ports:
-      - "3307:3306"
+        - 3308:3306
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - early_bird_user_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
+  user_redis:
+    container_name: user_redis
+    image: redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_user_data:/data
+    networks:
+      - early-bird-network
 
 volumes:
-  mariadb_data:
+    early_bird_user_data:
+    redis_user_data:
+
+networks:
+    early-bird-network:
+
+
+
