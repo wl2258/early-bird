@@ -1,8 +1,11 @@
 package com.ssonzm.userservcie.config.security;
 
+import com.ssonzm.userservcie.config.security.filter.AuthenticationFilter;
+import com.ssonzm.userservcie.config.security.filter.AuthorizationFilter;
 import com.ssonzm.userservcie.domain.user.UserRole;
 import com.ssonzm.userservcie.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -14,6 +17,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Slf4j
 @Configuration
@@ -21,12 +25,14 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final Environment env;
     private final UserService userService;
+    private final MessageSource messageSource;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public SecurityConfig(Environment env, UserService userService,
-                          BCryptPasswordEncoder bCryptPasswordEncoder) {
+                          MessageSource messageSource, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.env = env;
         this.userService = userService;
+        this.messageSource = messageSource;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -43,16 +49,21 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/api/auth/**").authenticated()
-                                .requestMatchers("/admin/**").hasRole("" + UserRole.ADMIN)
+                                .requestMatchers(new AntPathRequestMatcher("/api/authz/**")).authenticated()
+                                .requestMatchers(new AntPathRequestMatcher ("/admin/**")).hasRole("" + UserRole.ADMIN)
                                 .anyRequest().permitAll()
                 )
                 .addFilter(getAuthenticationFilter(authenticationManager))
+                .addFilter(getAuthorizationFilter(authenticationManager))
                 .authenticationManager(authenticationManager)
                 .build();
     }
 
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
         return new AuthenticationFilter(authenticationManager, env);
+    }
+
+    private AuthorizationFilter getAuthorizationFilter(AuthenticationManager authenticationManager) {
+        return new AuthorizationFilter(authenticationManager, env, messageSource);
     }
 }

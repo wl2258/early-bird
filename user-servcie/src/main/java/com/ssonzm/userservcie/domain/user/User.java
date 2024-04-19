@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static com.ssonzm.userservcie.dto.user.UserRequestDto.*;
+
 @Getter
 @Entity
 @Table(name = "Users")
@@ -51,5 +53,14 @@ public class User extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.role = role;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateUserInfo(UserUpdateReqDto userUpdateReqDto) {
+        this.phoneNumber = userUpdateReqDto.getPhoneNumber();
+        this.address = userUpdateReqDto.getAddress();
     }
 }

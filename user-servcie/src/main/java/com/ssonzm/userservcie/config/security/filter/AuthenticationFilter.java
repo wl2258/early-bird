@@ -1,6 +1,8 @@
-package com.ssonzm.userservcie.config.security;
+package com.ssonzm.userservcie.config.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssonzm.userservcie.config.security.PrincipalDetails;
+import com.ssonzm.userservcie.domain.user.User;
 import com.ssonzm.userservcie.dto.user.UserRequestDto.UserLoginReqDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -16,7 +18,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.crypto.SecretKey;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
@@ -43,7 +44,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
             return getAuthenticationManager().authenticate(authenticationToken);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -59,15 +60,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         Instant now = Instant.now();
 
-        String userId = String.valueOf(principalDetails.getUser().getId());
+        User user = principalDetails.getUser();
         String token = Jwts.builder()
-                .setSubject(userId)
+                .setSubject(String.valueOf(user.getId()))
+                .claim("id", user.getId())
+                .claim("role", user.getRole().toString())
                 .setExpiration(Date.from(now.plusMillis(Long.parseLong(env.getProperty("token.expiration_time")))))
                 .setIssuedAt(Date.from(now))
                 .signWith(secretKey)
                 .compact();
 
         response.addHeader("token", token);
-        response.addHeader("userId", userId);
+        response.addHeader("userId", String.valueOf(user.getId()));
     }
 }
