@@ -1,10 +1,6 @@
 package com.ssonzm.userservcie.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 public class UserRequestDto {
@@ -40,9 +36,9 @@ public class UserRequestDto {
 
     @Data
     public static class UserUpdateReqDto {
-        @JsonInclude
+        @Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다 ex) 010-1234-5678")
         private String phoneNumber;
-        @JsonInclude
+        @Pattern(regexp = "^[a-zA-Z0-9가-힣\\s-_.]{1,100}$", message = "주소 형식이 올바르지 않습니다")
         private String address;
     }
 

@@ -29,3 +29,7 @@ failSendEmail:
 notValidVerifyCode:
   code: "-4005"
   msg: "유효하지 않은 인증 코드입니다"
+
+failValidation:
+  code: "-4006"
+  msg: "유효성 검사를 실패했습니다"
