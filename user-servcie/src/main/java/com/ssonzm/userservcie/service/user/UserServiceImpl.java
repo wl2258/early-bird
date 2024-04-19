@@ -8,7 +8,6 @@ import com.ssonzm.userservcie.domain.user.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,8 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User findUser = userRepository.findByEmail(username)
-                .orElseThrow(() -> new InternalAuthenticationServiceException("인증 실패"));
-
+                .orElseThrow(() -> new UsernameNotFoundException("notFoundUser"));
         return new PrincipalDetails(findUser);
     }
 
@@ -58,12 +56,38 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    @Transactional
+    public void updatePassword(Long userId, UserUpdatePwReqDto userUpdatePwReqDto) {
+        User findUser = findByIdOrElseThrow(userId, "notFoundUser");
+
+        String encodedPw = bCryptPasswordEncoder.encode(userUpdatePwReqDto.getPassword());
+        findUser.updatePassword(encodedPw);
+    }
+
+    @Override
+    @Transactional
+    public void updateUserInfo(Long userId, UserUpdateReqDto userUpdateReqDto) {
+        User findUser = findByIdOrElseThrow(userId, "notFoundUser");
+
+        findUser.updateUserInfo(userUpdateReqDto);
+    }
+
+    private User findByIdOrElseThrow(Long userId, String msg) {
+
+        return userRepository.findById(userId).orElseThrow(() -> {
+            String messageSource = this.messageSource.getMessage(msg + ".msg", null, LocaleContextHolder.getLocale());
+            log.error(messageSource);
+            return new CommonBadRequestException(messageSource);
+        });
+    }
+
     private User findByEmailOrElseThrow(String email, String msg) {
 
         return userRepository.findByEmail(email).orElseThrow(() -> {
             String messageSource = this.messageSource.getMessage(msg + ".msg", null, LocaleContextHolder.getLocale());
             log.error(messageSource);
-            throw new CommonBadRequestException(messageSource);
+            return new CommonBadRequestException(messageSource);
         });
     }
 }

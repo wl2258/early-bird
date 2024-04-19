@@ -7,4 +7,8 @@ import static com.ssonzm.userservcie.dto.user.UserRequestDto.*;
 
 public interface UserService extends UserDetailsService {
     void signUp(UserSignUpReqDto userSignUpReqDto);
+
+    void updatePassword(Long userId, UserUpdatePwReqDto userUpdatePwReqDto);
+
+    void updateUserInfo(Long userId, UserUpdateReqDto userUpdateReqDto);
 }
