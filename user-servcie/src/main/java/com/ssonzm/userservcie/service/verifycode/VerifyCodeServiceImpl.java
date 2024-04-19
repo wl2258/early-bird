@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Service
 public class VerifyCodeServiceImpl implements VerifyCodeService {
-
+    private final int VERIFY_CODE_SIZE = 7;
     private final MailService mailService;
     private final VerifyCodeRepository verifyCodeRepository;
 
@@ -22,11 +22,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 
     @Override
     public String sendVerifyCode(String email) {
-        VerifyCode verifyCode = verifyCodeRepository.findByEmail(email).orElse(null);
-        if (verifyCode != null) throw new CommonBadRequestException("failSendEmail");
-
-        String randomCode = UUID.randomUUID().toString().substring(0, 7);
-
+        String randomCode = generatedRandomCode();
         try {
             MailMessage mailMessage = MailMessage.builder()
                     .toAddress(email)
@@ -40,6 +36,10 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 
         verifyCodeRepository.save(new VerifyCode(email, randomCode));
         return randomCode;
+    }
+
+    private String generatedRandomCode() {
+        return UUID.randomUUID().toString().substring(0, VERIFY_CODE_SIZE);
     }
 
     @Override
