@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import static com.ssonzm.userservcie.dto.user.UserRequestDto.*;
+import static com.ssonzm.userservcie.dto.user.UserResponseDto.*;
 
 @Slf4j
 @RestController
@@ -57,6 +58,17 @@ public class UserController {
         userService.updateUserInfo(loginUser.getId(), userUpdateReqDto);
 
         ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/authz/users")
+    public ResponseEntity<?> getUserDetails() {
+        User loginUser = securityConfigUtil.getLoginUser().getUser();
+        UserDetailsDto userDetails = userService.getUserDetails(loginUser.getId());
+
+        ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(userDetails);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

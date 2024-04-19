@@ -5,7 +5,9 @@ import com.ssonzm.userservcie.config.security.PrincipalDetails;
 import com.ssonzm.userservcie.domain.user.UserRepository;
 import com.ssonzm.userservcie.domain.user.UserRole;
 import com.ssonzm.userservcie.domain.user.User;
+import com.ssonzm.userservcie.dto.user.UserResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.ssonzm.userservcie.dto.user.UserRequestDto.*;
+import static com.ssonzm.userservcie.dto.user.UserResponseDto.*;
 
 @Slf4j
 @Service
@@ -71,6 +74,13 @@ public class UserServiceImpl implements UserService {
         User findUser = findByIdOrElseThrow(userId, "notFoundUser");
 
         findUser.updateUserInfo(userUpdateReqDto);
+    }
+
+    @Override
+    public UserDetailsDto getUserDetails(Long userId) {
+        User findUser = findByIdOrElseThrow(userId, "notFoundUser");
+
+        return new ModelMapper().map(findUser, UserDetailsDto.class);
     }
 
     private User findByIdOrElseThrow(Long userId, String msg) {
