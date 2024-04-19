@@ -72,4 +72,11 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    @PostMapping("/authz/logout")
+    public ResponseEntity<?> logout() {
+        ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }
