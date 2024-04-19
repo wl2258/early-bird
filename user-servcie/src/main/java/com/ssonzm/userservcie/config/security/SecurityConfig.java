@@ -1,7 +1,6 @@
-package com.ssonzm.userservcie.config;
+package com.ssonzm.userservcie.config.security;
 
-import com.ssonzm.userservcie.common.util.SecurityConfigUtil;
-import com.ssonzm.userservcie.config.filter.AuthenticationFilter;
+import com.ssonzm.userservcie.domain.user.UserRole;
 import com.ssonzm.userservcie.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -20,22 +19,16 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private Environment env;
-    private UserService userService;
-    private SecurityConfigUtil securityConfigUtil;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final Environment env;
+    private final UserService userService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public SecurityConfig(Environment env, UserService userService, SecurityConfigUtil securityConfigUtil,
+    public SecurityConfig(Environment env, UserService userService,
                           BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.env = env;
         this.userService = userService;
-        this.securityConfigUtil = securityConfigUtil;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
-
-    private static final String[] PATH_LIST = {
-            "/**",
-    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -50,7 +43,9 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers(PATH_LIST).permitAll()
+                                .requestMatchers("/api/auth/**").authenticated()
+                                .requestMatchers("/admin/**").hasRole("" + UserRole.ADMIN)
+                                .anyRequest().permitAll()
                 )
                 .addFilter(getAuthenticationFilter(authenticationManager))
                 .authenticationManager(authenticationManager)
@@ -58,7 +53,6 @@ public class SecurityConfig {
     }
 
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new AuthenticationFilter(authenticationManager, env, userService, securityConfigUtil);
+        return new AuthenticationFilter(authenticationManager, env);
     }
-
 }

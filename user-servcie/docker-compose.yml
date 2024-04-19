@@ -10,7 +10,7 @@ services:
       MYSQL_DATABASE: early_bird_user
       TZ: Asia/Seoul
     ports:
-        - 3308:3306
+        - "3308:3306"
     volumes:
       - early_bird_user_data:/var/lib/mysql
     networks:
