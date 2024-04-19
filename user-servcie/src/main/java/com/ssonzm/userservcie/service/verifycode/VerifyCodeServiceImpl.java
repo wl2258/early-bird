@@ -3,6 +3,7 @@ package com.ssonzm.userservcie.service.verifycode;
 import com.ssonzm.userservcie.common.exception.CommonBadRequestException;
 import com.ssonzm.userservcie.common.mail.MailMessage;
 import com.ssonzm.userservcie.common.mail.MailService;
+import com.ssonzm.userservcie.common.util.AesUtil;
 import com.ssonzm.userservcie.domain.verifycode.VerifyCode;
 import com.ssonzm.userservcie.domain.verifycode.VerifyCodeRepository;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,12 @@ import java.util.UUID;
 @Service
 public class VerifyCodeServiceImpl implements VerifyCodeService {
     private final int VERIFY_CODE_SIZE = 7;
+    private final AesUtil aesUtil;
     private final MailService mailService;
     private final VerifyCodeRepository verifyCodeRepository;
 
-    public VerifyCodeServiceImpl(MailService mailService, VerifyCodeRepository verifyCodeRepository) {
+    public VerifyCodeServiceImpl(AesUtil aesUtil, MailService mailService, VerifyCodeRepository verifyCodeRepository) {
+        this.aesUtil = aesUtil;
         this.mailService = mailService;
         this.verifyCodeRepository = verifyCodeRepository;
     }
@@ -34,7 +37,8 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
             throw new CommonBadRequestException("failSendEmail");
         }
 
-        verifyCodeRepository.save(new VerifyCode(email, randomCode));
+        String encodedEmail = aesUtil.encodeUnique(email);
+        verifyCodeRepository.save(new VerifyCode(encodedEmail, randomCode));
         return randomCode;
     }
 
@@ -44,7 +48,8 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
 
     @Override
     public boolean checkVerifyCode(String email, String verifyCode) {
-        VerifyCode findVerifyCode = verifyCodeRepository.findByEmail(email)
+        String encodedEmail = aesUtil.encodeUnique(email);
+        VerifyCode findVerifyCode = verifyCodeRepository.findByEmail(encodedEmail)
                 .orElseThrow(() -> new CommonBadRequestException("notValidVerifyCode"));
 
         return verifyCode.equals(findVerifyCode.getVerifyCode());
