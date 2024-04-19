@@ -1,0 +1,31 @@
+successResult:
+  code: "0"
+  msg: "성공하였습니다"
+
+failResult:
+  code: "-1"
+  msg: "실패하였습니다"
+
+notFoundUser:
+  code: "-4000"
+  msg: "일치하는 회원정보가 없습니다"
+
+notValidAccessUrl:
+  code: "-4001"
+  msg: "유효하지 않은 접근경로입니다"
+
+duplicationUser:
+  code: "-4002"
+  msg: "이미 가입된 아이디(이메일)입니다"
+
+invalidLoginInfo:
+  code: "-4003"
+  msg: "잘못된 아이디 또는 비밀번호입니다"
+
+failSendEmail:
+  code: "-4004"
+  msg: "이메일 발송에 실패하였습니다"
+
+notValidVerifyCode:
+  code: "-4005"
+  msg: "유효하지 않은 인증 코드입니다"

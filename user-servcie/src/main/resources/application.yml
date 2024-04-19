@@ -1,4 +1,4 @@
-server:
+가server:
   port: 8080
 
 spring:
@@ -7,10 +7,10 @@ spring:
   application:
     name: user-service
   messages:
-    basename: i18n/exception
     encoding: UTF-8
+    basename: i18n/exception
   datasource:
-    url: jdbc:mariadb://localhost:3307/earlybird
+    url: jdbc:mariadb://localhost:3308/early_bird_user
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
     password: ${database.password}
@@ -19,6 +19,20 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    redis:
+      host: localhost
+      port: 6380
 
 logging:
   level:

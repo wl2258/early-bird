@@ -1,48 +1,69 @@
 package com.ssonzm.userservcie.service.user;
 
 import com.ssonzm.userservcie.common.exception.CommonBadRequestException;
-import com.ssonzm.userservcie.common.util.SecurityConfigUtil;
+import com.ssonzm.userservcie.config.security.PrincipalDetails;
 import com.ssonzm.userservcie.domain.user.UserRepository;
 import com.ssonzm.userservcie.domain.user.UserRole;
-import com.ssonzm.userservcie.domain.user.Users;
-import com.ssonzm.userservcie.dto.user.UserLoginResDto;
+import com.ssonzm.userservcie.domain.user.User;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import static com.ssonzm.userservcie.dto.user.UserRequestDto.*;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
+    private final MessageSource messageSource;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private UserRepository userRepository;
-    private SecurityConfigUtil securityConfigUtil;
-
-    public UserServiceImpl(UserRepository userRepository, SecurityConfigUtil securityConfigUtil) {
+    public UserServiceImpl(MessageSource messageSource, UserRepository userRepository,
+                           BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.messageSource = messageSource;
         this.userRepository = userRepository;
-        this.securityConfigUtil = securityConfigUtil;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users findUser = userRepository.findByEmail(username).orElseThrow(() -> new CommonBadRequestException("notFoundUser"));
+        User findUser = userRepository.findByEmail(username)
+                .orElseThrow(() -> new InternalAuthenticationServiceException("인증 실패"));
 
-        return new User(findUser.getEmail(), findUser.getPassword(),
-                true, true, true, true,
-                securityConfigUtil.getUserRoleList(findUser.getRole()));
+        return new PrincipalDetails(findUser);
     }
 
     @Override
-    public UserRole getUserRole(String email) {
-        Users findUser = userRepository.findByEmail(email).orElseThrow(() -> new CommonBadRequestException("notFoundUser"));
-        return findUser.getRole();
+    @Transactional
+    public void signUp(UserSignUpReqDto userSignUpReqDto) {
+        if (userRepository.existsByEmail(userSignUpReqDto.getEmail()))
+            throw new CommonBadRequestException("duplicationUser");
+
+        User user = User.builder()
+                .username(userSignUpReqDto.getName())
+                .email(userSignUpReqDto.getEmail())
+                .password(bCryptPasswordEncoder.encode(userSignUpReqDto.getPassword()))
+                .phoneNumber(userSignUpReqDto.getPhoneNumber())
+                .address(userSignUpReqDto.getAddress())
+                .role(UserRole.USER)
+                .build();
+
+        userRepository.save(user);
     }
 
-    @Override
-    public UserLoginResDto getLoginUserDetailsByEmail(String email) {
-        Users findUser = userRepository.findByEmail(email).orElseThrow(() -> new CommonBadRequestException("notFoundUser"));
-        return new ModelMapper().map(findUser, UserLoginResDto.class);
+    private User findByEmailOrElseThrow(String email, String msg) {
+
+        return userRepository.findByEmail(email).orElseThrow(() -> {
+            String messageSource = this.messageSource.getMessage(msg + ".msg", null, LocaleContextHolder.getLocale());
+            log.error(messageSource);
+            throw new CommonBadRequestException(messageSource);
+        });
     }
 }
