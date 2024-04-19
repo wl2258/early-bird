@@ -1,6 +1,6 @@
 package com.ssonzm.userservcie.common.util;
 
-import com.ssonzm.userservcie.dto.user.UserRequestDto.UserLoginReqDto;
+import com.ssonzm.userservcie.config.security.PrincipalDetails;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +17,7 @@ public class SecurityConfigUtil {
                 .map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
     }
 
-    public UserLoginReqDto getLoginUser() {
-        return (UserLoginReqDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public PrincipalDetails getLoginUser() {
+        return (PrincipalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
