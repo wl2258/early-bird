@@ -40,7 +40,6 @@ public class VerifyCodeController {
         boolean isEqual = verifyCodeService.checkVerifyCode(email, verifyCode);
 
         ResponseDto<Boolean> responseDto = ResponseUtil.setResponseDto(messageSource, isEqual);
-        responseDto.setBody(isEqual);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
