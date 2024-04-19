@@ -43,8 +43,8 @@ public class UserController {
 
     @PatchMapping("/authz/users/pw")
     public ResponseEntity<?> updatePw(@RequestBody @Valid UserUpdatePwReqDto userUpdatePwReqDto,
-                                      @AuthenticationPrincipal PrincipalDetails principalDetails,
-                                      BindingResult bindingResult) {
+                                      BindingResult bindingResult,
+                                      @AuthenticationPrincipal PrincipalDetails principalDetails) {
         userService.updatePassword(principalDetails.getUser().getId(), userUpdatePwReqDto);
 
         ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
@@ -54,8 +54,8 @@ public class UserController {
 
     @PatchMapping("/authz/users")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UserUpdateReqDto userUpdateReqDto,
-                                        @AuthenticationPrincipal PrincipalDetails principalDetails,
-                                        BindingResult bindingResult) {
+                                        BindingResult bindingResult,
+                                        @AuthenticationPrincipal PrincipalDetails principalDetails) {
         userService.updateUserInfo(principalDetails.getUser().getId(), userUpdateReqDto);
 
         ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
