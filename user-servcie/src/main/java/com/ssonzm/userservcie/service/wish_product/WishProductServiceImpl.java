@@ -33,27 +33,25 @@ public class WishProductServiceImpl implements WishProductService {
         long productId = product.getId();
 
         WishProduct wishProduct = wishProductRepository.findByUserIdAndProductId(userId, productId)
-                .orElseGet(() -> WishProduct.builder().build());
-
-        if (wishProduct.getId() == null) {
-            wishProduct = WishProduct.builder()
-                    .productId(product.getId())
-                    .userId(userId)
-                    .quantity(quantity)
-                    .price(quantity * product.getPrice())
-                    .build();
-            wishProductRepository.save(wishProduct);
-        } else {
-            updateWishProduct(wishProduct,
-                    wishProduct.getQuantity() + quantity,
-                    wishProduct.getPrice() + (quantity * product.getPrice()));
-        }
+                .map(wp -> updateWishProduct(wp, wp.getQuantity() + quantity, wp.getPrice() + (quantity * product.getPrice())))
+                .orElseGet(() -> saveWishProduct(userId, productId, quantity, quantity * product.getPrice()));
 
         return wishProduct.getId();
     }
+    private WishProduct saveWishProduct(Long userId, Long productId, int quantity, int price) {
+        WishProduct wishProduct = WishProduct.builder()
+                .productId(productId)
+                .userId(userId)
+                .quantity(quantity)
+                .price(quantity * price)
+                .build();
 
-    private void updateWishProduct(WishProduct wishProduct, int quantity, int price) {
+        return wishProductRepository.save(wishProduct);
+    }
+
+    private WishProduct updateWishProduct(WishProduct wishProduct, int quantity, int price) {
         wishProduct.updateQuantityAndPrice(quantity, price);
+        return wishProduct;
     }
 
     @Override
