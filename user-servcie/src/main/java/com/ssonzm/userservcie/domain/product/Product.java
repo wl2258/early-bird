@@ -1,27 +1,30 @@
 package com.ssonzm.userservcie.domain.product;
 
+import com.ssonzm.userservcie.domain.common.BaseEntity;
 import com.ssonzm.userservcie.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
+@Getter
 @Entity
-@Table(name = "Products")
+@Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product {
+public class Product extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long id;
 
-    @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.LAZY)
     @Column(nullable = false)
-    private User user;
+    private Long userId;
 
-    @Column(name = "product_name", nullable = false)
+    @Column(name = "product_name", nullable = false, length = 50)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -41,10 +44,10 @@ public class Product {
     private int price;
 
     @Builder
-    public Product(Long id, User user, String name, ProductCategory category,
+    public Product(Long id, Long userId, String name, ProductCategory category,
                    String description, ProductStatus status, int quantity, int price) {
         this.id = id;
-        this.user = user;
+        this.userId = userId;
         this.name = name;
         this.category = category;
         this.description = description;

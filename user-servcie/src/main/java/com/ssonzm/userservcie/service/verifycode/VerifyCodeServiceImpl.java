@@ -4,8 +4,8 @@ import com.ssonzm.userservcie.common.exception.CommonBadRequestException;
 import com.ssonzm.userservcie.common.mail.MailMessage;
 import com.ssonzm.userservcie.common.mail.MailService;
 import com.ssonzm.userservcie.common.util.AesUtil;
-import com.ssonzm.userservcie.domain.verifycode.VerifyCode;
-import com.ssonzm.userservcie.domain.verifycode.VerifyCodeRepository;
+import com.ssonzm.userservcie.domain.verify_code.VerifyCode;
+import com.ssonzm.userservcie.domain.verify_code.VerifyCodeRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

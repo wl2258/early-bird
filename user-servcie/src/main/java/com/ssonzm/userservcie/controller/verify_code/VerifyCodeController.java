@@ -1,4 +1,4 @@
-package com.ssonzm.userservcie.controller.verifycode;
+package com.ssonzm.userservcie.controller.verify_code;
 
 import com.ssonzm.userservcie.common.util.ResponseUtil;
 import com.ssonzm.userservcie.dto.common.ResponseDto;
@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import static com.ssonzm.userservcie.dto.verifycode.VerifyCodeDto.*;
+import static com.ssonzm.userservcie.dto.verify_code.VerifyCodeDto.*;
 
 @RestController
 @RequestMapping("/api/verify-code")

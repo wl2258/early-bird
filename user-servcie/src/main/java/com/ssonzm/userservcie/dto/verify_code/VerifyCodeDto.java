@@ -1,4 +1,4 @@
-package com.ssonzm.userservcie.dto.verifycode;
+package com.ssonzm.userservcie.dto.verify_code;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
