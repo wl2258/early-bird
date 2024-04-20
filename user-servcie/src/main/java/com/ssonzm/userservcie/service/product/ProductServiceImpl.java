@@ -7,10 +7,13 @@ import com.ssonzm.userservcie.domain.product.ProductStatus;
 import com.ssonzm.userservcie.domain.user.User;
 import com.ssonzm.userservcie.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.ssonzm.userservcie.dto.product.ProductRequestDto.*;
+import static com.ssonzm.userservcie.vo.product.ProductResponseVo.*;
 
 @Slf4j
 @Service
@@ -44,5 +47,10 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
 
         return product.getId();
+    }
+
+    @Override
+    public Page<ProductListRespVo> getProductList(Pageable pageable) {
+        return productRepository.getProductList(pageable);
     }
 }
