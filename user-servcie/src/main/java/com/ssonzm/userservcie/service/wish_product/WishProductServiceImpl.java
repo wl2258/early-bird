@@ -74,4 +74,11 @@ public class WishProductServiceImpl implements WishProductService {
         return wishProductRepository.findById(wishProductId)
                 .orElseThrow(() -> new CommonBadRequestException("notFoundProduct"));
     }
+
+    @Override
+    @Transactional
+    public void deleteWishProduct(Long wishProductId) {
+        WishProduct findWishProduct = findWishProductOrThrow(wishProductId);
+        wishProductRepository.delete(findWishProduct);
+    }
 }

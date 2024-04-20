@@ -63,4 +63,12 @@ public class WishProductController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    @DeleteMapping("/authz/wish-products/{wishProductId}")
+    public ResponseEntity<?> deleteWishProduct(@PathVariable Long wishProductId) {
+        wishProductService.deleteWishProduct(wishProductId);
+        ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }

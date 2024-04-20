@@ -15,4 +15,6 @@ public interface WishProductService {
     void updateQuantity(WishProductUpdateReqDto wishProductUpdateReqDto);
 
     WishProduct findWishProductOrThrow(Long wishProductId);
+
+    void deleteWishProduct(Long wishProductId);
 }
