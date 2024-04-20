@@ -1,16 +1,16 @@
 package com.ssonzm.userservcie.service.wish_product;
 
+import com.ssonzm.userservcie.common.exception.CommonBadRequestException;
 import com.ssonzm.userservcie.domain.product.Product;
 import com.ssonzm.userservcie.domain.wish_product.WishProduct;
 import com.ssonzm.userservcie.domain.wish_product.WishProductRepository;
 import com.ssonzm.userservcie.dto.wish_product.WishProductRequestDto.WishProductSaveReqDto;
+import com.ssonzm.userservcie.dto.wish_product.WishProductRequestDto.WishProductUpdateReqDto;
 import com.ssonzm.userservcie.service.product.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.ssonzm.userservcie.vo.wish_product.WishProductResponseVo.*;
 
@@ -44,29 +44,37 @@ public class WishProductServiceImpl implements WishProductService {
                     .build();
             wishProductRepository.save(wishProduct);
         } else {
-            updateWishProduct(wishProduct, quantity, product.getPrice());
+            // 현재 수량 + 1
+            updateWishProduct(wishProduct,
+                    wishProduct.getQuantity() + quantity,
+                    wishProduct.getPrice() + (quantity * product.getPrice()));
         }
 
         return wishProduct.getId();
     }
 
-    private void saveNewWishProduct(Product product, Long userId, int quantity) {
-        WishProduct wishProduct = WishProduct.builder()
-                .productId(product.getId())
-                .userId(userId)
-                .quantity(quantity)
-                .price(quantity * product.getPrice())
-                .build();
-        wishProductRepository.save(wishProduct);
-    }
-
-    private void updateWishProduct(WishProduct wishProduct, int quantity, int productPrice) {
-        wishProduct.addQuantity(quantity);
-        wishProduct.addPrice(quantity * productPrice);
+    private void updateWishProduct(WishProduct wishProduct, int quantity, int price) {
+        wishProduct.updateQuantityAndPrice(quantity, price);
     }
 
     @Override
     public Page<WishProductListRespVo> findWishProductList(Long userId, Pageable pageable) {
         return wishProductRepository.findWishProductList(userId, pageable);
+    }
+
+    @Override
+    @Transactional
+    public void updateQuantity(WishProductUpdateReqDto wishProductUpdateReqDto) {
+        WishProduct findWishProduct = findWishProductOrThrow(wishProductUpdateReqDto.getWishProductId());
+        Product findProduct = productService.findProductByIdOrElseThrow(wishProductUpdateReqDto.getProductId());
+
+        int quantity = wishProductUpdateReqDto.getQuantity();
+        updateWishProduct(findWishProduct, quantity, quantity * findProduct.getPrice());
+    }
+
+    @Override
+    public WishProduct findWishProductOrThrow(Long wishProductId) {
+        return wishProductRepository.findById(wishProductId)
+                .orElseThrow(() -> new CommonBadRequestException("notFoundProduct"));
     }
 }
