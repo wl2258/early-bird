@@ -1,5 +1,6 @@
 package com.ssonzm.userservcie.service.product;
 
+import com.ssonzm.userservcie.domain.product.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,4 +14,6 @@ public interface ProductService {
     Page<ProductListRespVo> getProductList(Pageable pageable);
 
     ProductDetailsRespDto getProductDetails(Long productId);
+
+    Product findProductByIdOrElseThrow(Long productId);
 }

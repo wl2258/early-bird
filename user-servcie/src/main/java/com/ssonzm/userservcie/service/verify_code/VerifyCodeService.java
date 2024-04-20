@@ -1,4 +1,4 @@
-package com.ssonzm.userservcie.service.verifycode;
+package com.ssonzm.userservcie.service.verify_code;
 
 public interface VerifyCodeService {
     String sendVerifyCode(String email);
