@@ -3,6 +3,7 @@ package com.ssonzm.userservcie.controller.controller;
 import com.ssonzm.userservcie.common.util.ResponseUtil;
 import com.ssonzm.userservcie.config.security.PrincipalDetails;
 import com.ssonzm.userservcie.dto.common.ResponseDto;
+import com.ssonzm.userservcie.dto.product.ProductResponseDto;
 import com.ssonzm.userservcie.service.product.ProductService;
 import com.ssonzm.userservcie.vo.product.ProductResponseVo.ProductListRespVo;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import static com.ssonzm.userservcie.dto.product.ProductRequestDto.*;
+import static com.ssonzm.userservcie.dto.product.ProductResponseDto.*;
 
 @Slf4j
 @RestController
@@ -53,6 +55,16 @@ public class ProductController {
 
         ResponseDto<Page<ProductListRespVo>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<?> getProductDetails(@PathVariable Long productId) {
+        ProductDetailsRespDto productDetails = productService.getProductDetails(productId);
+
+        ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(productDetails);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

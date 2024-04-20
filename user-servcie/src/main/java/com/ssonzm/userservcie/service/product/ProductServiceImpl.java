@@ -1,5 +1,6 @@
 package com.ssonzm.userservcie.service.product;
 
+import com.ssonzm.userservcie.common.exception.CommonBadRequestException;
 import com.ssonzm.userservcie.domain.product.Product;
 import com.ssonzm.userservcie.domain.product.ProductCategory;
 import com.ssonzm.userservcie.domain.product.ProductRepository;
@@ -9,11 +10,13 @@ import com.ssonzm.userservcie.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.ssonzm.userservcie.dto.product.ProductRequestDto.*;
 import static com.ssonzm.userservcie.vo.product.ProductResponseVo.*;
+import static com.ssonzm.userservcie.dto.product.ProductResponseDto.*;
 
 @Slf4j
 @Service
@@ -52,5 +55,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductListRespVo> getProductList(Pageable pageable) {
         return productRepository.getProductList(pageable);
+    }
+
+    @Override
+    public ProductDetailsRespDto getProductDetails(Long productId) {
+        Product findProduct = productRepository.findById(productId).orElseThrow(
+                () -> new CommonBadRequestException("notFoundProduct"));
+
+        return new ModelMapper().map(findProduct, ProductDetailsRespDto.class);
     }
 }
