@@ -55,4 +55,12 @@ public class WishProductController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @PatchMapping("/authz/wish-products")
+    public ResponseEntity<?> updateWishProductQuantity(@RequestBody @Valid WishProductUpdateReqDto wishProductUpdateReqDto,
+                                                       BindingResult bindingResult) {
+        wishProductService.updateQuantity(wishProductUpdateReqDto);
+        ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 }
