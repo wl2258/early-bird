@@ -44,7 +44,6 @@ public class WishProductServiceImpl implements WishProductService {
                     .build();
             wishProductRepository.save(wishProduct);
         } else {
-            // 현재 수량 + 1
             updateWishProduct(wishProduct,
                     wishProduct.getQuantity() + quantity,
                     wishProduct.getPrice() + (quantity * product.getPrice()));
