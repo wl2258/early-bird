@@ -1,4 +1,4 @@
-package com.ssonzm.userservcie.service.verifycode;
+package com.ssonzm.userservcie.service.verify_code;
 
 import com.ssonzm.userservcie.common.exception.CommonBadRequestException;
 import com.ssonzm.userservcie.common.mail.MailMessage;

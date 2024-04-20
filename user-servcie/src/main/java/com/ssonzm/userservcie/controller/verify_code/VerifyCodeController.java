@@ -2,7 +2,7 @@ package com.ssonzm.userservcie.controller.verify_code;
 
 import com.ssonzm.userservcie.common.util.ResponseUtil;
 import com.ssonzm.userservcie.dto.common.ResponseDto;
-import com.ssonzm.userservcie.service.verifycode.VerifyCodeService;
+import com.ssonzm.userservcie.service.verify_code.VerifyCodeService;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
