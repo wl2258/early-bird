@@ -1,4 +1,4 @@
-package com.ssonzm.userservcie.domain.verifycode;
+package com.ssonzm.userservcie.domain.verify_code;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

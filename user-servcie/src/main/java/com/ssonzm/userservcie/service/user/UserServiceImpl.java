@@ -5,7 +5,6 @@ import com.ssonzm.userservcie.config.security.PrincipalDetails;
 import com.ssonzm.userservcie.domain.user.UserRepository;
 import com.ssonzm.userservcie.domain.user.UserRole;
 import com.ssonzm.userservcie.domain.user.User;
-import com.ssonzm.userservcie.dto.user.UserResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.MessageSource;
@@ -62,7 +61,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updatePassword(Long userId, UserUpdatePwReqDto userUpdatePwReqDto) {
-        User findUser = findByIdOrElseThrow(userId, "notFoundUser");
+        User findUser = findByIdOrElseThrow(userId);
 
         String encodedPw = bCryptPasswordEncoder.encode(userUpdatePwReqDto.getPassword());
         findUser.updatePassword(encodedPw);
@@ -71,22 +70,23 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUserInfo(Long userId, UserUpdateReqDto userUpdateReqDto) {
-        User findUser = findByIdOrElseThrow(userId, "notFoundUser");
+        User findUser = findByIdOrElseThrow(userId);
 
         findUser.updateUserInfo(userUpdateReqDto);
     }
 
     @Override
     public UserDetailsDto getUserDetails(Long userId) {
-        User findUser = findByIdOrElseThrow(userId, "notFoundUser");
+        User findUser = findByIdOrElseThrow(userId);
 
         return new ModelMapper().map(findUser, UserDetailsDto.class);
     }
 
-    private User findByIdOrElseThrow(Long userId, String msg) {
+    @Override
+    public User findByIdOrElseThrow(Long userId) {
 
         return userRepository.findById(userId).orElseThrow(() -> {
-            String messageSource = this.messageSource.getMessage(msg + ".msg", null, LocaleContextHolder.getLocale());
+            String messageSource = this.messageSource.getMessage( "notFoundUser.msg", null, LocaleContextHolder.getLocale());
             log.error(messageSource);
             return new CommonBadRequestException(messageSource);
         });

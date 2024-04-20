@@ -12,7 +12,7 @@ import static com.ssonzm.userservcie.dto.user.UserRequestDto.*;
 
 @Getter
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
     @Id
