@@ -23,14 +23,26 @@ public class WishProduct extends BaseEntity {
     @Column(nullable = false)
     private Long productId;
 
-    @Column(name = "product_quantity", nullable = false)
+    @Column(name = "wish_product_quantity", nullable = false)
     private int quantity;
 
+    @Column(name = "wish_product_price", nullable = false)
+    private int price;
+
     @Builder
-    public WishProduct(Long id, Long userId, Long productId, int quantity) {
+    public WishProduct(Long id, Long userId, Long productId, int quantity, int price) {
         this.id = id;
         this.userId = userId;
         this.productId = productId;
         this.quantity = quantity;
+        this.price = price;
+    }
+
+    public void addQuantity(int quantity) {
+        this.quantity += quantity;
+    }
+
+    public void addPrice(int price) {
+        this.price += price;
     }
 }
