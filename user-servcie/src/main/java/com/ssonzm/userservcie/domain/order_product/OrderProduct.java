@@ -1,5 +1,6 @@
 package com.ssonzm.userservcie.domain.order_product;
 
+import com.ssonzm.userservcie.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Entity
 @Table(name = "order_products")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderProduct {
+public class OrderProduct extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_product_id")
