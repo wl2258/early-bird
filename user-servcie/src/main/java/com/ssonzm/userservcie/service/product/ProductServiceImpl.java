@@ -67,6 +67,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product findProductByIdOrElseThrow(Long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new CommonBadRequestException("notFoundProduct"));
+                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
     }
 }
