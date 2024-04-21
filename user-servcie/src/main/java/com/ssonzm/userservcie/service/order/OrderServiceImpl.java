@@ -65,7 +65,6 @@ public class OrderServiceImpl implements OrderService {
                 .productId(orderSaveReqDto.getProductId())
                 .quantity(quantity)
                 .price(quantity * product.getPrice())
-                .expectedDeliveryDate(LocalDateTime.now().plusDays(1))
                 .build();
     }
 

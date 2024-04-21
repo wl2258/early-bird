@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Entity
 @Table(name = "order_products")
@@ -30,20 +28,12 @@ public class OrderProduct {
     @Column(name = "ordered_product_price", nullable = false)
     private int price;
 
-    private LocalDateTime expectedDeliveryDate;
-
     @Builder
-    public OrderProduct(Long id, Long orderId, Long productId, int quantity, int price,
-                        LocalDateTime expectedDeliveryDate) {
+    public OrderProduct(Long id, Long orderId, Long productId, int quantity, int price) {
         this.id = id;
         this.orderId = orderId;
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
-        this.expectedDeliveryDate = expectedDeliveryDate;
-    }
-
-    public void updateExpectedDeliveryDate(LocalDateTime expectedDeliveryDate) {
-        this.expectedDeliveryDate = expectedDeliveryDate;
     }
 }
