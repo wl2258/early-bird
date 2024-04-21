@@ -42,4 +42,8 @@ public class OrderProduct {
         this.price = price;
         this.expectedDeliveryDate = expectedDeliveryDate;
     }
+
+    public void updateExpectedDeliveryDate(LocalDateTime expectedDeliveryDate) {
+        this.expectedDeliveryDate = expectedDeliveryDate;
+    }
 }

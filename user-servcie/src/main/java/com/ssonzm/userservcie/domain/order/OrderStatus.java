@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum OrderStatus {
 
-    CREATED("신규주문"), CANCELLED("주문취소");
+    CREATED("신규주문"), CANCELED("주문취소");
     private String value;
 
 }

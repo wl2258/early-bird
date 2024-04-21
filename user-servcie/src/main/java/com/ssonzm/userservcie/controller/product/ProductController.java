@@ -1,9 +1,8 @@
-package com.ssonzm.userservcie.controller.controller;
+package com.ssonzm.userservcie.controller.product;
 
 import com.ssonzm.userservcie.common.util.ResponseUtil;
 import com.ssonzm.userservcie.config.security.PrincipalDetails;
 import com.ssonzm.userservcie.dto.common.ResponseDto;
-import com.ssonzm.userservcie.dto.product.ProductResponseDto;
 import com.ssonzm.userservcie.service.product.ProductService;
 import com.ssonzm.userservcie.vo.product.ProductResponseVo.ProductListRespVo;
 import jakarta.validation.Valid;
