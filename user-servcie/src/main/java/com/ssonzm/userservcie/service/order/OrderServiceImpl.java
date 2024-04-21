@@ -1,5 +1,6 @@
 package com.ssonzm.userservcie.service.order;
 
+import com.ssonzm.userservcie.common.exception.CommonBadRequestException;
 import com.ssonzm.userservcie.domain.order.Order;
 import com.ssonzm.userservcie.domain.order.OrderRepository;
 import com.ssonzm.userservcie.domain.order.OrderStatus;
@@ -38,6 +39,19 @@ public class OrderServiceImpl implements OrderService {
         savedOrder.updateTotalPrice(totalPrice);
 
         return savedOrder.getId();
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order findOrder = findOrderByIdOrElseThrow(orderId);
+        findOrder.updateOrderStatus(OrderStatus.CANCELED);
+    }
+
+    @Override
+    public Order findOrderByIdOrElseThrow(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
     }
 
     private Order createOrder(Long userId) {

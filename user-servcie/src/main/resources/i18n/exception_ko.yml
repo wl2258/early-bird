@@ -34,6 +34,6 @@ failValidation:
   code: "-4006"
   msg: "유효성 검사를 실패했습니다"
 
-notFoundProduct:
+notFoundData:
   code: "-4007"
-  msg: "등록되지 않은 상품입니다"
+  msg: "등록되지 않은 데이터입니다"
