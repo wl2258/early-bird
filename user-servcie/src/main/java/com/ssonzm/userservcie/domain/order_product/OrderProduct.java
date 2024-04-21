@@ -1,18 +1,17 @@
 package com.ssonzm.userservcie.domain.order_product;
 
+import com.ssonzm.userservcie.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Entity
 @Table(name = "order_products")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderProduct {
+public class OrderProduct extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_product_id")
@@ -30,16 +29,12 @@ public class OrderProduct {
     @Column(name = "ordered_product_price", nullable = false)
     private int price;
 
-    private LocalDateTime expectedDeliveryDate;
-
     @Builder
-    public OrderProduct(Long id, Long orderId, Long productId, int quantity, int price,
-                        LocalDateTime expectedDeliveryDate) {
+    public OrderProduct(Long id, Long orderId, Long productId, int quantity, int price) {
         this.id = id;
         this.orderId = orderId;
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
-        this.expectedDeliveryDate = expectedDeliveryDate;
     }
 }
