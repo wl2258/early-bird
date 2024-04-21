@@ -10,9 +10,9 @@ notFoundUser:
   code: "-4000"
   msg: "일치하는 회원정보가 없습니다"
 
-notValidAccessUrl:
+failValidTest:
   code: "-4001"
-  msg: "유효하지 않은 접근경로입니다"
+  msg: "유효성 검사에 실패했습니다"
 
 duplicationUser:
   code: "-4002"

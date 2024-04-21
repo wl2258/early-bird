@@ -24,6 +24,13 @@ public class ResponseUtil {
         return responseDto;
     }
 
+    public static ResponseDto<String> setResponseDto(MessageSource messageSource, String exception) {
+        ResponseDto<String> responseDto = new ResponseDto<>();
+        responseDto.setCode(Integer.parseInt(messageSource.getMessage(exception + ".code", null, LocaleContextHolder.getLocale())));
+        responseDto.setMsg(messageSource.getMessage(exception + ".msg", null, LocaleContextHolder.getLocale()));
+        return responseDto;
+    }
+
     public static void success(HttpServletResponse response, MessageSource messageSource, Object dto) {
         try {
             ObjectMapper om = new ObjectMapper();
@@ -38,10 +45,10 @@ public class ResponseUtil {
         }
     }
 
-    public static void fail(HttpServletResponse response, MessageSource messageSource, HttpStatus httpStatus) {
+    public static void fail(HttpServletResponse response, MessageSource messageSource, HttpStatus httpStatus, String exception) {
         try {
             ObjectMapper om = new ObjectMapper();
-            ResponseDto<Object> responseDto = setResponseDto(messageSource, false);
+            ResponseDto<String> responseDto = setResponseDto(messageSource, exception);
             String responseBody = om.writeValueAsString(responseDto);
             response.setContentType("application/json; charset=utf-8");
             response.setStatus(httpStatus.value());
