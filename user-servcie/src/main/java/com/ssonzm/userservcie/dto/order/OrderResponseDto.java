@@ -2,6 +2,7 @@ package com.ssonzm.userservcie.dto.order;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ssonzm.userservcie.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
+import com.ssonzm.userservcie.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,7 +13,7 @@ public class OrderResponseDto {
     @Data
     @Builder
     public static class OrderDetailsRespDto {
-        private String orderStatus;
+        private List<OrderProductDetailsRespDto> orderStatus;
         private List<DeliveryDetailsRespDto> deliveryStatus;
         private int totalPrice;
         @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")

@@ -41,16 +41,6 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @PostMapping("/authz/orders/{orderId}")
-    public ResponseEntity<?> cancelOrder(@PathVariable Long orderId) {
-
-        orderService.cancelOrder(orderId);
-
-        ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
     @GetMapping("/authz/orders/{orderId}")
     public ResponseEntity<?> getOrderDetails(@PathVariable Long orderId) {
 

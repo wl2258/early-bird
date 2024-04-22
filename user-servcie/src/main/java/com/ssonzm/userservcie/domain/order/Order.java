@@ -20,24 +20,15 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private Long userId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "order_status", nullable = false)
-    private OrderStatus status;
-
     private int totalPrice;
 
     @Builder
-    public Order(Long id, Long userId, OrderStatus status) {
+    public Order(Long id, Long userId) {
         this.id = id;
         this.userId = userId;
-        this.status = status;
     }
 
     public void updateTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
-    }
-
-    public void updateOrderStatus(OrderStatus status) {
-        this.status = status;
     }
 }
