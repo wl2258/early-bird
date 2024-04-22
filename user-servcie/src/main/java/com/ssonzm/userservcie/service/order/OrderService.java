@@ -5,10 +5,14 @@ import com.ssonzm.userservcie.dto.order.OrderRequestDto.OrderSaveReqDto;
 
 import java.util.List;
 
+import static com.ssonzm.userservcie.dto.order.OrderResponseDto.*;
+
 public interface OrderService {
     Long saveOrder(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList);
 
     void cancelOrder(Long orderId);
 
     Order findOrderByIdOrElseThrow(Long orderId);
+
+    OrderDetailsRespDto getOrderDetail(Long orderId);
 }
