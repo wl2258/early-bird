@@ -3,6 +3,7 @@ package com.ssonzm.userservcie.domain.payment;
 import com.ssonzm.userservcie.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,12 @@ public class Payment extends BaseEntity {
 
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus status;
+
+    @Builder
+    public Payment(Long id, Long userId, Long orderId, PaymentStatus status) {
+        this.id = id;
+        this.userId = userId;
+        this.orderId = orderId;
+        this.status = status;
+    }
 }
