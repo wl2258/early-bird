@@ -52,7 +52,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             setAuthenticationFromAccessToken(jwtToken);
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            ResponseUtil.fail(response, messageSource, HttpStatus.BAD_REQUEST, e.getMessage());
+            ResponseUtil.fail(response, messageSource, HttpStatus.BAD_REQUEST);
         }
     }
 

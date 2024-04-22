@@ -61,7 +61,12 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     private void updateDeliveryStatus(List<Long> orderProductIds, DeliveryStatus deliveryStatus) {
-        List<Delivery> deliveryList = deliveryRepository.findDeliveryByOrderProductIds(orderProductIds);
+        List<Delivery> deliveryList = findDeliveryByOrderProductIds(orderProductIds);
         deliveryList.forEach(d -> d.updateDeliveryStatus(deliveryStatus));
+    }
+
+    @Override
+    public List<Delivery> findDeliveryByOrderProductIds(List<Long> orderProductIds) {
+        return deliveryRepository.findDeliveryByOrderProductIds(orderProductIds);
     }
 }

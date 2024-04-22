@@ -20,7 +20,6 @@ public class DeliveryStatusSchedulerImpl {
      * 이틀 전 주문: 배송 상태 DELIVERED
      */
     @Scheduled(cron = "0 0 2 * * ?")
-    @Scheduled(fixedDelay = 100000000)
     public void updateScheduleToShipped() {
         deliveryService.updateAllDeliveryStatusToShipped();
         deliveryService.updateAllDeliveryStatusToDelivered();

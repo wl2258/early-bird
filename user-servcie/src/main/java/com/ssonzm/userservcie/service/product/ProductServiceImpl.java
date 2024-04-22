@@ -37,7 +37,15 @@ public class ProductServiceImpl implements ProductService {
         User findUser = userService.findByIdOrElseThrow(userId);
 
         int quantity = productSaveReqDto.getQuantity();
-        Product product = Product.builder()
+        Product product = createProduct(productSaveReqDto, findUser, quantity);
+
+        productRepository.save(product);
+
+        return product.getId();
+    }
+
+    private static Product createProduct(ProductSaveReqDto productSaveReqDto, User findUser, int quantity) {
+        return Product.builder()
                 .userId(findUser.getId())
                 .name(productSaveReqDto.getProductName())
                 .category(ProductCategory.valueOf(productSaveReqDto.getCategory()))
@@ -46,10 +54,6 @@ public class ProductServiceImpl implements ProductService {
                 .price(productSaveReqDto.getPrice())
                 .quantity(quantity)
                 .build();
-
-        productRepository.save(product);
-
-        return product.getId();
     }
 
     @Override

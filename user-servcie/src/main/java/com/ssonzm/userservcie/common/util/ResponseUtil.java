@@ -45,10 +45,10 @@ public class ResponseUtil {
         }
     }
 
-    public static void fail(HttpServletResponse response, MessageSource messageSource, HttpStatus httpStatus, String exception) {
+    public static void fail(HttpServletResponse response, MessageSource messageSource, HttpStatus httpStatus) {
         try {
             ObjectMapper om = new ObjectMapper();
-            ResponseDto<String> responseDto = setResponseDto(messageSource, exception);
+            ResponseDto<String> responseDto = setResponseDto(messageSource, false);
             String responseBody = om.writeValueAsString(responseDto);
             response.setContentType("application/json; charset=utf-8");
             response.setStatus(httpStatus.value());

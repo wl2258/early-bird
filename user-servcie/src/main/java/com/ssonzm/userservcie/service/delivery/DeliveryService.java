@@ -2,8 +2,12 @@ package com.ssonzm.userservcie.service.delivery;
 
 import com.ssonzm.userservcie.domain.delivery.Delivery;
 
+import java.util.List;
+
 public interface DeliveryService {
     Delivery findDeliveryByOrderProductIdOrElseThrow(Long deliveryId);
+
+    List<Delivery> findDeliveryByOrderProductIds(List<Long> orderProductIds);
 
     void updateAllDeliveryStatusToShipped();
 
