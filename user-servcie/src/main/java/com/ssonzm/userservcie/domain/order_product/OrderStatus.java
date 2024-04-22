@@ -1,4 +1,4 @@
-package com.ssonzm.userservcie.domain.order;
+package com.ssonzm.userservcie.domain.order_product;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

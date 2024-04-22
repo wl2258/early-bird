@@ -12,4 +12,6 @@ public interface OrderProductService {
     List<OrderProduct> findAllBetweenYesterdayAndToday();
 
     List<OrderProduct> findAllBetweenTwoDaysAgoAndYesterday();
+
+    void cancelOrderProduct(Long orderProductId);
 }

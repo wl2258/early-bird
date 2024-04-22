@@ -29,12 +29,21 @@ public class OrderProduct extends BaseEntity {
     @Column(name = "ordered_product_price", nullable = false)
     private int price;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus status;
+
     @Builder
-    public OrderProduct(Long id, Long orderId, Long productId, int quantity, int price) {
+    public OrderProduct(Long id, Long orderId, Long productId, int quantity, int price, OrderStatus status) {
         this.id = id;
         this.orderId = orderId;
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
+        this.status = status;
+    }
+
+    public void updateOrderStatus(OrderStatus status) {
+        this.status = status;
     }
 }

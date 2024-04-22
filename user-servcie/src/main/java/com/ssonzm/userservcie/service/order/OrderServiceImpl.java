@@ -6,9 +6,9 @@ import com.ssonzm.userservcie.domain.delivery.DeliveryRepository;
 import com.ssonzm.userservcie.domain.delivery.DeliveryStatus;
 import com.ssonzm.userservcie.domain.order.Order;
 import com.ssonzm.userservcie.domain.order.OrderRepository;
-import com.ssonzm.userservcie.domain.order.OrderStatus;
 import com.ssonzm.userservcie.domain.order_product.OrderProduct;
 import com.ssonzm.userservcie.domain.order_product.OrderProductRepository;
+import com.ssonzm.userservcie.domain.order_product.OrderStatus;
 import com.ssonzm.userservcie.domain.product.Product;
 import com.ssonzm.userservcie.dto.order.OrderRequestDto.OrderSaveReqDto;
 import com.ssonzm.userservcie.service.delivery.DeliveryService;
@@ -21,6 +21,7 @@ import java.util.List;
 
 import static com.ssonzm.userservcie.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
 import static com.ssonzm.userservcie.dto.order.OrderResponseDto.OrderDetailsRespDto;
+import static com.ssonzm.userservcie.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
 
 @Service
 @Transactional(readOnly = true)
@@ -75,44 +76,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
-    public void cancelOrder(Long orderId) {
-        Order findOrder = findOrderByIdOrElseThrow(orderId);
-
-        List<OrderProduct> orderProductList = orderProductService.findAllByOrderIdOrElseThrow(orderId);
-
-        // 배송 중인 상품이 있는 경우: 주문 취소 불가
-        checkDeliveryStatus(orderProductList);
-        // 상품 재고 복구
-        restoreProductQuantity(orderProductList);
-        // 주문 상태 변경
-        findOrder.updateOrderStatus(OrderStatus.CANCELED);
-    }
-
-    private void restoreProductQuantity(List<OrderProduct> orderProductList) {
-        for (OrderProduct op : orderProductList) {
-            Product findProduct = productService.findProductByIdOrElseThrow(op.getProductId());
-            findProduct.updateQuantity(op.getQuantity());
-        }
-    }
-
-    private void checkDeliveryStatus(List<OrderProduct> orderProductList) {
-        List<Long> orderProductIds = orderProductList.stream()
-                .map(OrderProduct::getId)
-                .toList();
-
-        List<Delivery> deliveryList = deliveryService.findDeliveryByOrderProductIds(orderProductIds);
-
-        deliveryList.forEach(d -> {
-            if (!d.getStatus().equals(DeliveryStatus.READY_FOR_SHIPMENT)) {
-                throw new CommonBadRequestException("failCancelOrder");
-            }
-        });
-
-        deliveryList.forEach(d -> d.updateDeliveryStatus(DeliveryStatus.CANCELED));
-    }
-
-    @Override
     public Order findOrderByIdOrElseThrow(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
@@ -122,15 +85,22 @@ public class OrderServiceImpl implements OrderService {
     public OrderDetailsRespDto getOrderDetail(Long orderId) {
         Order findOrder = findOrderByIdOrElseThrow(orderId);
 
-        List<Long> orderProductIds = getOrderProductIds(orderId);
+        List<OrderProduct> orderProductList = orderProductService.findAllByOrderIdOrElseThrow(orderId);
+        List<Long> orderProductIds = getOrderProductIds(orderProductList);
 
         List<DeliveryDetailsRespDto> deliveryRespDtos = getDeliveryDetailsRespDtos(orderProductIds);
+        List<OrderProductDetailsRespDto> orderDetailsRespDtos = getOrderDetailsRespDtos(orderProductList);
 
-        return getOrderDetailsRespDto(findOrder, deliveryRespDtos);
+        return getOrderDetailsRespDto(findOrder, deliveryRespDtos, orderDetailsRespDtos);
     }
 
-    private List<Long> getOrderProductIds(Long orderId) {
-        List<OrderProduct> orderProductList = orderProductService.findAllByOrderIdOrElseThrow(orderId);
+    private List<OrderProductDetailsRespDto> getOrderDetailsRespDtos(List<OrderProduct> orderProductList) {
+        return orderProductList.stream()
+                .map(op -> new OrderProductDetailsRespDto(op.getId(), String.valueOf(op.getStatus())))
+                .toList();
+    }
+
+    private List<Long> getOrderProductIds(List<OrderProduct> orderProductList) {
         return orderProductList.stream()
                 .map(OrderProduct::getId)
                 .toList();
@@ -143,10 +113,12 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
     }
 
-    private static OrderDetailsRespDto getOrderDetailsRespDto(Order findOrder, List<DeliveryDetailsRespDto> deliveryRespDtos) {
+    private static OrderDetailsRespDto getOrderDetailsRespDto(Order findOrder,
+                                                              List<DeliveryDetailsRespDto> deliveryRespDtos,
+                                                              List<OrderProductDetailsRespDto> orderDetailsRespDtos) {
         return OrderDetailsRespDto.builder()
-                .orderStatus(String.valueOf(findOrder.getStatus()))
                 .deliveryStatus(deliveryRespDtos)
+                .orderStatus(orderDetailsRespDtos)
                 .createdDate(findOrder.getCreatedDate())
                 .totalPrice(findOrder.getTotalPrice())
                 .build();
@@ -156,7 +128,6 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(
                 Order.builder()
                         .userId(userId)
-                        .status(OrderStatus.CREATED)
                         .build());
     }
 
@@ -176,6 +147,7 @@ public class OrderServiceImpl implements OrderService {
                 .productId(orderSaveReqDto.getProductId())
                 .quantity(quantity)
                 .price(quantity * product.getPrice())
+                .status(OrderStatus.CREATED)
                 .build();
     }
 
