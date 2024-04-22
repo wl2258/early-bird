@@ -1,6 +1,9 @@
 package com.ssonzm.userservcie.service.order;
 
 import com.ssonzm.userservcie.common.exception.CommonBadRequestException;
+import com.ssonzm.userservcie.domain.delivery.Delivery;
+import com.ssonzm.userservcie.domain.delivery.DeliveryRepository;
+import com.ssonzm.userservcie.domain.delivery.DeliveryStatus;
 import com.ssonzm.userservcie.domain.order.Order;
 import com.ssonzm.userservcie.domain.order.OrderRepository;
 import com.ssonzm.userservcie.domain.order.OrderStatus;
@@ -9,6 +12,7 @@ import com.ssonzm.userservcie.domain.order_product.OrderProductRepository;
 import com.ssonzm.userservcie.domain.product.Product;
 import com.ssonzm.userservcie.dto.order.OrderRequestDto.OrderSaveReqDto;
 import com.ssonzm.userservcie.service.product.ProductService;
+import com.ssonzm.userservcie.service.schedule.DeliveryStatusSchedulerImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,31 +24,52 @@ public class OrderServiceImpl implements OrderService {
 
     private final ProductService productService;
     private final OrderRepository orderRepository;
+    private final DeliveryRepository deliveryRepository;
     private final OrderProductRepository orderProductRepository;
+    private final DeliveryStatusSchedulerImpl deliveryStatusScheduler;
 
-    public OrderServiceImpl(ProductService productService, OrderRepository orderRepository, OrderProductRepository orderProductRepository) {
+    public OrderServiceImpl(ProductService productService, OrderRepository orderRepository, DeliveryRepository deliveryRepository, OrderProductRepository orderProductRepository, DeliveryStatusSchedulerImpl deliveryStatusScheduler) {
         this.productService = productService;
         this.orderRepository = orderRepository;
+        this.deliveryRepository = deliveryRepository;
         this.orderProductRepository = orderProductRepository;
+        this.deliveryStatusScheduler = deliveryStatusScheduler;
     }
 
     @Override
     @Transactional
     public Long saveOrder(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList) {
         Order savedOrder = createOrder(userId);
-        List<OrderProduct> orderProducts = createOrderProducts(orderSaveReqDtoList, savedOrder);
-        int totalPrice = calculateTotalPrice(orderProducts);
+        List<OrderProduct> orderProductList = createOrderProducts(orderSaveReqDtoList, savedOrder);
+        int totalPrice = calculateTotalPrice(orderProductList);
 
-        orderProductRepository.saveAll(orderProducts);
+        orderProductRepository.saveAll(orderProductList);
         savedOrder.updateTotalPrice(totalPrice);
 
+        saveDeliveryList(orderProductList);
+
         return savedOrder.getId();
+    }
+
+    private void saveDeliveryList(List<OrderProduct> orderProductList) {
+        List<Delivery> deliveryList = orderProductList.stream()
+                .map(this::createDelivery)
+                .toList();
+        deliveryRepository.saveAll(deliveryList);
+    }
+
+    private Delivery createDelivery(OrderProduct orderProduct) {
+        return Delivery.builder()
+                .orderProductId(orderProduct.getId())
+                .status(DeliveryStatus.READY_FOR_SHIPMENT)
+                .build();
     }
 
     @Override
     @Transactional
     public void cancelOrder(Long orderId) {
         Order findOrder = findOrderByIdOrElseThrow(orderId);
+        // TODO 배송 중인 상품인 경우 주문 취소 불가능, 취소 후 재고 복구
         findOrder.updateOrderStatus(OrderStatus.CANCELED);
     }
 
