@@ -39,7 +39,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @PatchMapping("/authz/orders/{orderId}")
+    @PostMapping("/authz/orders/{orderId}")
     public ResponseEntity<?> cancelOrder(@PathVariable Long orderId) {
         orderService.cancelOrder(orderId);
 

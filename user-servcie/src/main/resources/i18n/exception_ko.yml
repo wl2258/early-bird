@@ -37,3 +37,7 @@ failValidation:
 notFoundData:
   code: "-4007"
   msg: "등록되지 않은 데이터입니다"
+
+failCancelOrder:
+  code: "-4008"
+  msg: "취소할 수 없는 주문입니다"

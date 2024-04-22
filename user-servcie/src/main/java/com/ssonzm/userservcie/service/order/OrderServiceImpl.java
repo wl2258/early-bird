@@ -11,8 +11,9 @@ import com.ssonzm.userservcie.domain.order_product.OrderProduct;
 import com.ssonzm.userservcie.domain.order_product.OrderProductRepository;
 import com.ssonzm.userservcie.domain.product.Product;
 import com.ssonzm.userservcie.dto.order.OrderRequestDto.OrderSaveReqDto;
+import com.ssonzm.userservcie.service.delivery.DeliveryService;
+import com.ssonzm.userservcie.service.order_product.OrderProductService;
 import com.ssonzm.userservcie.service.product.ProductService;
-import com.ssonzm.userservcie.service.schedule.DeliveryStatusSchedulerImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,17 +24,21 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final ProductService productService;
+    private final DeliveryService deliveryService;
     private final OrderRepository orderRepository;
     private final DeliveryRepository deliveryRepository;
+    private final OrderProductService orderProductService;
     private final OrderProductRepository orderProductRepository;
-    private final DeliveryStatusSchedulerImpl deliveryStatusScheduler;
 
-    public OrderServiceImpl(ProductService productService, OrderRepository orderRepository, DeliveryRepository deliveryRepository, OrderProductRepository orderProductRepository, DeliveryStatusSchedulerImpl deliveryStatusScheduler) {
+    public OrderServiceImpl(ProductService productService, DeliveryService deliveryService,
+                            OrderRepository orderRepository, DeliveryRepository deliveryRepository,
+                            OrderProductService orderProductService, OrderProductRepository orderProductRepository) {
         this.productService = productService;
+        this.deliveryService = deliveryService;
         this.orderRepository = orderRepository;
         this.deliveryRepository = deliveryRepository;
+        this.orderProductService = orderProductService;
         this.orderProductRepository = orderProductRepository;
-        this.deliveryStatusScheduler = deliveryStatusScheduler;
     }
 
     @Override
@@ -41,12 +46,13 @@ public class OrderServiceImpl implements OrderService {
     public Long saveOrder(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList) {
         Order savedOrder = createOrder(userId);
         List<OrderProduct> orderProductList = createOrderProducts(orderSaveReqDtoList, savedOrder);
-        int totalPrice = calculateTotalPrice(orderProductList);
 
         orderProductRepository.saveAll(orderProductList);
+
+        int totalPrice = calculateTotalPrice(orderProductList);
         savedOrder.updateTotalPrice(totalPrice);
 
-        saveDeliveryList(orderProductList);
+        saveDeliveryList(orderProductList); // 배송 준비 중 상태로 Delivery 저장
 
         return savedOrder.getId();
     }
@@ -69,8 +75,38 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void cancelOrder(Long orderId) {
         Order findOrder = findOrderByIdOrElseThrow(orderId);
-        // TODO 배송 중인 상품인 경우 주문 취소 불가능, 취소 후 재고 복구
+
+        List<OrderProduct> orderProductList = orderProductService.findAllByOrderIdOrElseThrow(orderId);
+
+        // 배송 중인 상품이 있는 경우: 주문 취소 불가
+        checkDeliveryStatus(orderProductList);
+        // 상품 재고 복구
+        restoreProductQuantity(orderProductList);
+        // 주문 상태 변경
         findOrder.updateOrderStatus(OrderStatus.CANCELED);
+    }
+
+    private void restoreProductQuantity(List<OrderProduct> orderProductList) {
+        for (OrderProduct op : orderProductList) {
+            Product findProduct = productService.findProductByIdOrElseThrow(op.getProductId());
+            findProduct.updateQuantity(op.getQuantity());
+        }
+    }
+
+    private void checkDeliveryStatus(List<OrderProduct> orderProductList) {
+        List<Long> orderProductIds = orderProductList.stream()
+                .map(OrderProduct::getId)
+                .toList();
+
+        List<Delivery> deliveryList = deliveryService.findDeliveryByOrderProductIds(orderProductIds);
+
+        deliveryList.forEach(d -> {
+            if (!d.getStatus().equals(DeliveryStatus.READY_FOR_SHIPMENT)) {
+                throw new CommonBadRequestException("failCancelOrder");
+            }
+        });
+
+        deliveryList.forEach(d -> d.updateDeliveryStatus(DeliveryStatus.CANCELED));
     }
 
     @Override
