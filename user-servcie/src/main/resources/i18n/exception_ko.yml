@@ -41,3 +41,7 @@ notFoundData:
 failCancelOrder:
   code: "-4008"
   msg: "취소할 수 없는 주문입니다"
+
+failReturn:
+  code: "-4009"
+  msg: "반품이 불가능합니다"
