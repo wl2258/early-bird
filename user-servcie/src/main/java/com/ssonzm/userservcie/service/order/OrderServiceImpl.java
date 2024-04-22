@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.ssonzm.userservcie.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
+import static com.ssonzm.userservcie.dto.order.OrderResponseDto.OrderDetailsRespDto;
+
 @Service
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
@@ -115,6 +118,40 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
     }
 
+    @Override
+    public OrderDetailsRespDto getOrderDetail(Long orderId) {
+        Order findOrder = findOrderByIdOrElseThrow(orderId);
+
+        List<Long> orderProductIds = getOrderProductIds(orderId);
+
+        List<DeliveryDetailsRespDto> deliveryRespDtos = getDeliveryDetailsRespDtos(orderProductIds);
+
+        return getOrderDetailsRespDto(findOrder, deliveryRespDtos);
+    }
+
+    private List<Long> getOrderProductIds(Long orderId) {
+        List<OrderProduct> orderProductList = orderProductService.findAllByOrderIdOrElseThrow(orderId);
+        return orderProductList.stream()
+                .map(OrderProduct::getId)
+                .toList();
+    }
+
+    private List<DeliveryDetailsRespDto> getDeliveryDetailsRespDtos(List<Long> orderProductIds) {
+        List<Delivery> deliveryList = deliveryService.findDeliveryByOrderProductIds(orderProductIds);
+        return deliveryList.stream()
+                .map(d -> new DeliveryDetailsRespDto(d.getId(), String.valueOf(d.getStatus())))
+                .toList();
+    }
+
+    private static OrderDetailsRespDto getOrderDetailsRespDto(Order findOrder, List<DeliveryDetailsRespDto> deliveryRespDtos) {
+        return OrderDetailsRespDto.builder()
+                .orderStatus(String.valueOf(findOrder.getStatus()))
+                .deliveryStatus(deliveryRespDtos)
+                .createdDate(findOrder.getCreatedDate())
+                .totalPrice(findOrder.getTotalPrice())
+                .build();
+    }
+
     private Order createOrder(Long userId) {
         return orderRepository.save(
                 Order.builder()
@@ -144,7 +181,7 @@ public class OrderServiceImpl implements OrderService {
 
     private int calculateTotalPrice(List<OrderProduct> orderProducts) {
         return orderProducts.stream()
-                .mapToInt(orderProduct -> orderProduct.getQuantity() * orderProduct.getPrice())
+                .mapToInt(OrderProduct::getPrice)
                 .sum();
     }
 }

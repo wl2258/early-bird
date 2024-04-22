@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.ssonzm.userservcie.dto.order.OrderResponseDto.OrderDetailsRespDto;
+
 @RestController
 @RequestMapping("/api")
 public class OrderController {
@@ -41,9 +43,21 @@ public class OrderController {
 
     @PostMapping("/authz/orders/{orderId}")
     public ResponseEntity<?> cancelOrder(@PathVariable Long orderId) {
+
         orderService.cancelOrder(orderId);
 
         ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/authz/orders/{orderId}")
+    public ResponseEntity<?> getOrderDetails(@PathVariable Long orderId) {
+
+        OrderDetailsRespDto orderDetails = orderService.getOrderDetail(orderId);
+
+        ResponseDto<OrderDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(orderDetails);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
