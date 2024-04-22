@@ -11,7 +11,7 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Long
 
     List<OrderProduct> findByOrderId(Long orderId);
 
-    @Query("select op from OrderProduct op where op.createdDate between :prevDay and :nextDay")
+    @Query("select op from OrderProduct op where op.lastModifiedDate between :prevDay and :nextDay")
     List<OrderProduct> findAllBetweenPrevDayAndToday(@Param("prevDay")LocalDateTime prevDay,
                                                      @Param("nextDay")LocalDateTime nextDay);
 }
