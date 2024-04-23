@@ -10,4 +10,15 @@ public class OrderProductResponseDto {
         private Long id;
         private String orderStatus;
     }
+
+    @Data
+    @AllArgsConstructor
+    public static class OrderProductUserRespDto {
+        private Long orderProductId;
+        private String productName;
+        private int quantity;
+        private int price;
+        private String orderStatus;
+        private String deliveryStatus;
+    }
 }

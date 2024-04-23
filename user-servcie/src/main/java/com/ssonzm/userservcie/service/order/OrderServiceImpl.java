@@ -49,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Long saveOrder(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList) {
         Order savedOrder = createOrder(userId);
-        List<OrderProduct> orderProductList = createOrderProducts(orderSaveReqDtoList, savedOrder);
+        List<OrderProduct> orderProductList = createOrderProducts(userId, orderSaveReqDtoList, savedOrder);
 
         orderProductRepository.saveAll(orderProductList);
 
@@ -116,12 +116,7 @@ public class OrderServiceImpl implements OrderService {
     private static OrderDetailsRespDto getOrderDetailsRespDto(Order findOrder,
                                                               List<DeliveryDetailsRespDto> deliveryRespDtos,
                                                               List<OrderProductDetailsRespDto> orderDetailsRespDtos) {
-        return OrderDetailsRespDto.builder()
-                .deliveryStatus(deliveryRespDtos)
-                .orderStatus(orderDetailsRespDtos)
-                .createdDate(findOrder.getCreatedDate())
-                .totalPrice(findOrder.getTotalPrice())
-                .build();
+        return new OrderDetailsRespDto(findOrder, deliveryRespDtos, orderDetailsRespDtos);
     }
 
     private Order createOrder(Long userId) {
@@ -131,19 +126,21 @@ public class OrderServiceImpl implements OrderService {
                         .build());
     }
 
-    private List<OrderProduct> createOrderProducts(List<OrderSaveReqDto> orderSaveReqDtoList, Order savedOrder) {
+    private List<OrderProduct> createOrderProducts(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList, Order savedOrder) {
         return orderSaveReqDtoList.stream()
                 .map(dto -> {
                     Product product = productService.findProductByIdOrElseThrow(dto.getProductId());
-                    return createOrderProduct(dto, product, savedOrder);
+                    return createOrderProduct(userId, dto, product, savedOrder);
                 })
                 .toList();
     }
 
-    private OrderProduct createOrderProduct(OrderSaveReqDto orderSaveReqDto, Product product, Order savedOrder) {
+    private OrderProduct createOrderProduct(Long userId, OrderSaveReqDto orderSaveReqDto,
+                                            Product product, Order savedOrder) {
         int quantity = orderSaveReqDto.getQuantity();
         return OrderProduct.builder()
-                .orderId(savedOrder.getId())
+                .order(savedOrder)
+                .userId(userId)
                 .productId(orderSaveReqDto.getProductId())
                 .quantity(quantity)
                 .price(quantity * product.getPrice())

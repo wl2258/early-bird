@@ -1,6 +1,7 @@
 package com.ssonzm.userservcie.domain.wish_product;
 
 import com.ssonzm.userservcie.domain.common.BaseEntity;
+import com.ssonzm.userservcie.domain.product.Product;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,8 +21,9 @@ public class WishProduct extends BaseEntity {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
-    private Long productId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @Column(name = "wish_product_quantity", nullable = false)
     private int quantity;
@@ -30,10 +32,10 @@ public class WishProduct extends BaseEntity {
     private int price;
 
     @Builder
-    public WishProduct(Long id, Long userId, Long productId, int quantity, int price) {
+    public WishProduct(Long id, Long userId, Product product, int quantity, int price) {
         this.id = id;
         this.userId = userId;
-        this.productId = productId;
+        this.product = product;
         this.quantity = quantity;
         this.price = price;
     }

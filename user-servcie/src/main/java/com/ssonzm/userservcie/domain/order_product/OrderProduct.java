@@ -1,6 +1,7 @@
 package com.ssonzm.userservcie.domain.order_product;
 
 import com.ssonzm.userservcie.domain.common.BaseEntity;
+import com.ssonzm.userservcie.domain.order.Order;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,7 +19,11 @@ public class OrderProduct extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long orderId;
+    private Long userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @Column(nullable = false)
     private Long productId;
@@ -34,9 +39,10 @@ public class OrderProduct extends BaseEntity {
     private OrderStatus status;
 
     @Builder
-    public OrderProduct(Long id, Long orderId, Long productId, int quantity, int price, OrderStatus status) {
+    public OrderProduct(Long id, Long userId, Order order, Long productId, int quantity, int price, OrderStatus status) {
         this.id = id;
-        this.orderId = orderId;
+        this.userId = userId;
+        this.order = order;
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
