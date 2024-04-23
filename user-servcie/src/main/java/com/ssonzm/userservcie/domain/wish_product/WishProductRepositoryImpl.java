@@ -28,14 +28,14 @@ public class WishProductRepositoryImpl implements WishProductRepositoryCustom {
         List<WishProductListRespVo> content = queryFactory
                 .select(Projections.constructor(WishProductListRespVo.class,
                         wishProduct.id,
-                        wishProduct.productId,
-                        product.name,
+                        wishProduct.product.id,
+                        wishProduct.product.name,
                         wishProduct.quantity,
                         wishProduct.price
                 ))
-                .from(wishProduct, product)
-                .where(wishProduct.userId.eq(userId)
-                        .and(wishProduct.productId.eq(product.id)))
+                .from(wishProduct)
+                .join(wishProduct.product, product)
+                .where(wishProduct.userId.eq(userId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

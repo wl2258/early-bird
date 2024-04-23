@@ -34,13 +34,13 @@ public class WishProductServiceImpl implements WishProductService {
 
         WishProduct wishProduct = wishProductRepository.findByUserIdAndProductId(userId, productId)
                 .map(wp -> updateWishProduct(wp, wp.getQuantity() + quantity, wp.getPrice() + (quantity * product.getPrice())))
-                .orElseGet(() -> saveWishProduct(userId, productId, quantity, quantity * product.getPrice()));
+                .orElseGet(() -> saveWishProduct(userId, product, quantity, quantity * product.getPrice()));
 
         return wishProduct.getId();
     }
-    private WishProduct saveWishProduct(Long userId, Long productId, int quantity, int price) {
+    private WishProduct saveWishProduct(Long userId, Product product, int quantity, int price) {
         WishProduct wishProduct = WishProduct.builder()
-                .productId(productId)
+                .product(product)
                 .userId(userId)
                 .quantity(quantity)
                 .price(quantity * price)
@@ -63,15 +63,15 @@ public class WishProductServiceImpl implements WishProductService {
     @Transactional
     public void updateQuantity(WishProductUpdateReqDto wishProductUpdateReqDto) {
         WishProduct findWishProduct = findWishProductOrThrow(wishProductUpdateReqDto.getWishProductId());
-        Product findProduct = productService.findProductByIdOrElseThrow(wishProductUpdateReqDto.getProductId());
+        Product product = findWishProduct.getProduct();
 
         int quantity = wishProductUpdateReqDto.getQuantity();
-        updateWishProduct(findWishProduct, quantity, quantity * findProduct.getPrice());
+        updateWishProduct(findWishProduct, quantity, quantity * product.getPrice());
     }
 
     @Override
     public WishProduct findWishProductOrThrow(Long wishProductId) {
-        return wishProductRepository.findById(wishProductId)
+        return wishProductRepository.findByIdProductFetchJoin(wishProductId)
                 .orElseThrow(() -> new CommonBadRequestException("notFoundProduct"));
     }
 

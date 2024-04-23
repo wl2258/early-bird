@@ -15,7 +15,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import static com.ssonzm.userservcie.dto.user.UserRequestDto.*;
-import static com.ssonzm.userservcie.dto.user.UserResponseDto.*;
+import static com.ssonzm.userservcie.dto.user.UserResponseDto.UserDetailsDto;
+import static com.ssonzm.userservcie.dto.user.UserResponseDto.UserMyPageRespDto;
 
 @Slf4j
 @RestController
@@ -76,6 +77,16 @@ public class UserController {
     @PostMapping("/authz/logout")
     public ResponseEntity<?> logout() {
         ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/authz/users/my-page")
+    public ResponseEntity<?> getMyPage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        UserMyPageRespDto myPageRespDto = userService.getMyPageInfo(principalDetails.getUser().getId());
+
+        ResponseDto<UserMyPageRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(myPageRespDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

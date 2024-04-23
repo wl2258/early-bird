@@ -4,9 +4,9 @@ import com.ssonzm.userservcie.domain.product.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import static com.ssonzm.userservcie.dto.product.ProductRequestDto.*;
-import static com.ssonzm.userservcie.vo.product.ProductResponseVo.*;
-import static com.ssonzm.userservcie.dto.product.ProductResponseDto.*;
+import static com.ssonzm.userservcie.dto.product.ProductRequestDto.ProductSaveReqDto;
+import static com.ssonzm.userservcie.dto.product.ProductResponseDto.ProductDetailsRespDto;
+import static com.ssonzm.userservcie.vo.product.ProductResponseVo.ProductListRespVo;
 
 public interface ProductService {
     Long saveProduct(Long userId, ProductSaveReqDto productSaveReqDto);
