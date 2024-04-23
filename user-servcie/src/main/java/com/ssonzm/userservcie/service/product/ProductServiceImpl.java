@@ -35,21 +35,19 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public Long saveProduct(Long userId, ProductSaveReqDto productSaveReqDto) {
         User findUser = userService.findByIdOrElseThrow(userId);
-
-        int quantity = productSaveReqDto.getQuantity();
-        Product product = createProduct(productSaveReqDto, findUser, quantity);
-
+        Product product = createProduct(productSaveReqDto, findUser);
         productRepository.save(product);
-
         return product.getId();
     }
 
-    private static Product createProduct(ProductSaveReqDto productSaveReqDto, User findUser, int quantity) {
+    private Product createProduct(ProductSaveReqDto productSaveReqDto, User findUser) {
+        int quantity = productSaveReqDto.getQuantity();
+        ProductStatus status = quantity > 0 ? ProductStatus.IN_STOCK : ProductStatus.SOLD_OUT;
         return Product.builder()
                 .userId(findUser.getId())
                 .name(productSaveReqDto.getProductName())
                 .category(ProductCategory.valueOf(productSaveReqDto.getCategory()))
-                .status(quantity > 0 ? ProductStatus.IN_STOCK : ProductStatus.SOLD_OUT)
+                .status(status)
                 .description(productSaveReqDto.getDescription())
                 .price(productSaveReqDto.getPrice())
                 .quantity(quantity)
@@ -64,7 +62,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailsRespDto getProductDetails(Long productId) {
         Product findProduct = findProductByIdOrElseThrow(productId);
-
         return new ModelMapper().map(findProduct, ProductDetailsRespDto.class);
     }
 

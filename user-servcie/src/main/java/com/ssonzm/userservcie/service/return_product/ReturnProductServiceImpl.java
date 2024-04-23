@@ -42,22 +42,32 @@ public class ReturnProductServiceImpl implements ReturnProductService {
     @Override
     @Transactional
     public Long saveReturn(Long userId, ReturnProductSaveReqDto returnProductSaveReqDto) {
-        OrderProduct findOrderProduct =
-                orderProductService.findOrderProductByIdOrElseThrow(returnProductSaveReqDto.getOrderProductId());
-
+        OrderProduct findOrderProduct = orderProductService.findOrderProductByIdOrElseThrow(returnProductSaveReqDto.getOrderProductId());
         Delivery findDelivery = deliveryService.findDeliveryByOrderProductIdOrElseThrow(findOrderProduct.getId());
-        LocalDateTime returnsPossibleDate = findDelivery.getLastModifiedDate().plusDays(1);
 
-        if (equalsDeliveryStatus(findDelivery) && returnsPossibleDate.isAfter(LocalDateTime.now())) {
+        if (isDeliveryStatusValid(findDelivery) && isReturnPossible(findDelivery)) {
             ReturnProduct returnProduct = createReturnProduct(userId, returnProductSaveReqDto, findOrderProduct);
             return returnProductRepository.save(returnProduct).getId();
-        } else {
-            throw new CommonBadRequestException("failReturn");
         }
+        throw new CommonBadRequestException("failReturn");
     }
 
-    private static boolean equalsDeliveryStatus(Delivery delivery) {
+    private boolean isDeliveryStatusValid(Delivery delivery) {
         return delivery.getStatus().equals(DeliveryStatus.DELIVERED);
+    }
+
+    private boolean isReturnPossible(Delivery delivery) {
+        LocalDateTime returnsPossibleDate = delivery.getLastModifiedDate().plusDays(1);
+        return returnsPossibleDate.isAfter(LocalDateTime.now());
+    }
+
+    private ReturnProduct createReturnProduct(Long userId, ReturnProductSaveReqDto returnProductSaveReqDto, OrderProduct orderProduct) {
+        return ReturnProduct.builder()
+                .userId(userId)
+                .reason(returnProductSaveReqDto.getReason())
+                .orderProduct(orderProduct)
+                .status(ReturnStatus.REQUESTED)
+                .build();
     }
 
     @Override
@@ -73,19 +83,8 @@ public class ReturnProductServiceImpl implements ReturnProductService {
 
     private void restoreProductQuantity(ReturnProduct returnProduct) {
         OrderProduct orderProduct = returnProduct.getOrderProduct();
-
         Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
         findProduct.updateQuantity(orderProduct.getQuantity());
-
         returnProduct.updateStatus(ReturnStatus.APPROVED);
-    }
-
-    private static ReturnProduct createReturnProduct(Long userId, ReturnProductSaveReqDto returnProductSaveReqDto, OrderProduct orderProduct) {
-        return ReturnProduct.builder()
-                .userId(userId)
-                .reason(returnProductSaveReqDto.getReason())
-                .orderProduct(orderProduct)
-                .status(ReturnStatus.REQUESTED)
-                .build();
     }
 }

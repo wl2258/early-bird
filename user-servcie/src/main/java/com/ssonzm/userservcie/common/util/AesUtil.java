@@ -29,12 +29,6 @@ public class AesUtil {
         secretKey = env.getProperty("aes.secret");
     }
 
-    /**
-     * RuntimeException으로 Wrapping헀으므로 RuntimeException을 캐치할 것.
-     * random으로 하는 경우 unique 체크가 어려우므로 salt를 같은 값으로 처리함
-     * @param targetEncodeString
-     * @return
-     */
     public String encodeUnique(String targetEncodeString) {
         try {
             iv = secretKey.substring(0, IV_LENGTH);
@@ -56,11 +50,6 @@ public class AesUtil {
         }
     }
 
-    /**
-     * RuntimeException으로 Wrapping헀으므로 RuntimeException을 캐치할 것.
-     * @param targetDecodeString
-     * @return
-     */
     public String decodeUnique(String targetDecodeString) {
         try {
             iv = secretKey.substring(0, IV_LENGTH);
