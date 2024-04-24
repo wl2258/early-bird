@@ -61,8 +61,6 @@ class ReturnProductControllerTest extends DummyUtil {
     private DeliveryRepository deliveryRepository;
     @Autowired
     private OrderProductRepository orderProductRepository;
-    @Autowired
-    private ReturnProductRepository returnProductRepository;
 
     @BeforeEach
     void init() {
