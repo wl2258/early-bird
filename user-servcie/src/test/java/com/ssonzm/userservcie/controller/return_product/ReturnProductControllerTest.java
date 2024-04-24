@@ -15,8 +15,7 @@ import com.ssonzm.userservcie.domain.product.ProductStatus;
 import com.ssonzm.userservcie.domain.return_product.ReturnProductRepository;
 import com.ssonzm.userservcie.domain.user.User;
 import com.ssonzm.userservcie.domain.user.UserRepository;
-import com.ssonzm.userservcie.dto.user.UserRequestDto.UserUpdatePwReqDto;
-import com.ssonzm.userservcie.dto.user.UserRequestDto.UserUpdateReqDto;
+import com.ssonzm.userservcie.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -32,10 +31,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import static com.ssonzm.userservcie.dto.user.UserRequestDto.UserSignUpReqDto;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -74,19 +71,16 @@ class ReturnProductControllerTest extends DummyUtil {
     }
 
     @Test
-    @DisplayName("1. 회원가입")
-    void sinUpTest() throws Exception {
+    @DisplayName("1. 반품 등록")
+    void saveReturnTest() throws Exception {
         // given
-        String name = "김철수";
-        String email = "steelwater@naver.com";
-        String pw = "qwe123!!";
-        String phoneNumber = "010-1234-5678";
-        String address = "서울특별시 강북구";
-        UserSignUpReqDto userSignUpReqDto = new UserSignUpReqDto(name, email, pw, phoneNumber, address);
-        String requestBody = om.writeValueAsString(userSignUpReqDto);
+        Long orderProductId = 2L;
+        String reason = "Size miss";
+        ReturnProductSaveReqDto returnProductSaveReqDto = new ReturnProductSaveReqDto(orderProductId, reason);
+        String requestBody = om.writeValueAsString(returnProductSaveReqDto);
 
         // when
-        ResultActions resultActions = mvc.perform(post("/api/users")
+        ResultActions resultActions = mvc.perform(post("/api/authz/returns")
                 .content(requestBody)
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -97,85 +91,22 @@ class ReturnProductControllerTest extends DummyUtil {
     }
 
     @Test
-    @DisplayName("2. 회원가입 실패 - validation phoneNumber")
-    void sinUpFailTest1() throws Exception {
+    @DisplayName("2. 반품 등록 실패 - 배송 완료되지 않은 상품")
+    void saveReturnFailTest() throws Exception {
         // given
-        String name = "김철수";
-        String email = "steelwater@naver.com";
-        String pw = "qwe123!!";
-        String phoneNumber = "01012345678";
-        String address = "서울특별시 강북구";
-        UserSignUpReqDto userSignUpReqDto = new UserSignUpReqDto(name, email, pw, phoneNumber, address);
-        String requestBody = om.writeValueAsString(userSignUpReqDto);
+        Long orderProductId = 1L;
+        String reason = "Size miss";
+        ReturnProductSaveReqDto returnProductSaveReqDto = new ReturnProductSaveReqDto(orderProductId, reason);
+        String requestBody = om.writeValueAsString(returnProductSaveReqDto);
 
         // when
-        ResultActions resultActions = mvc.perform(post("/api/users")
+        ResultActions resultActions = mvc.perform(post("/api/authz/returns")
                 .content(requestBody)
                 .contentType(MediaType.APPLICATION_JSON));
 
         // then
         resultActions
                 .andExpect(status().isBadRequest())
-                .andDo(MockMvcResultHandlers.print());
-    }
-
-    @Test
-    @DisplayName("3. 회원가입 실패 - validation password")
-    void sinUpFailTest2() throws Exception {
-        // given
-        String name = "김철수";
-        String email = "steelwater@naver.com";
-        String pw = "qwe123!!";
-        String phoneNumber = "01012345678";
-        String address = "서울특별시 강북구";
-        UserSignUpReqDto userSignUpReqDto = new UserSignUpReqDto(name, email, pw, phoneNumber, address);
-        String requestBody = om.writeValueAsString(userSignUpReqDto);
-
-        // when
-        ResultActions resultActions = mvc.perform(post("/api/users")
-                .content(requestBody)
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // then
-        resultActions
-                .andExpect(status().isBadRequest())
-                .andDo(MockMvcResultHandlers.print());
-    }
-
-    @Test
-    @DisplayName("4. 비밀번호 변경")
-    void updatePw() throws Exception {
-        // given
-        String newPw = "iloveearlybird";
-        UserUpdatePwReqDto userUpdatePwReqDto = new UserUpdatePwReqDto(newPw);
-        String requestBody = om.writeValueAsString(userUpdatePwReqDto);
-
-        // when
-        ResultActions resultActions = mvc.perform(patch("/api/authz/users/pw")
-                .content(requestBody)
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // then
-        resultActions
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
-    }
-
-    @Test
-    @DisplayName("5. 전화번호 주소 변경")
-    void updateUserInfo() throws Exception {
-        // given
-        UserUpdateReqDto userUpdatePwReqDto = new UserUpdateReqDto("010-7777-7777", "서울광역시 중구");
-        String requestBody = om.writeValueAsString(userUpdatePwReqDto);
-
-        // when
-        ResultActions resultActions = mvc.perform(patch("/api/authz/users")
-                .content(requestBody)
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // then
-        resultActions
-                .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
     }
 

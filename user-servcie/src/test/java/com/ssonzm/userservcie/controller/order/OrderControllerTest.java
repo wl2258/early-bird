@@ -11,7 +11,7 @@ import com.ssonzm.userservcie.domain.product.ProductRepository;
 import com.ssonzm.userservcie.domain.product.ProductStatus;
 import com.ssonzm.userservcie.domain.user.User;
 import com.ssonzm.userservcie.domain.user.UserRepository;
-import com.ssonzm.userservcie.dto.order.OrderRequestDto;
+import com.ssonzm.userservcie.dto.order.OrderRequestDto.OrderSaveReqDto;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -86,9 +86,9 @@ class OrderControllerTest extends DummyUtil {
     @DisplayName("2. 주문하기")
     void saveOrderTest() throws Exception {
         // given
-        List<OrderRequestDto.OrderSaveReqDto> orderList = new ArrayList<>();
+        List<OrderSaveReqDto> orderList = new ArrayList<>();
         Long productId = 1L;
-        orderList.add(new OrderRequestDto.OrderSaveReqDto(productId, 1));
+        orderList.add(new OrderSaveReqDto(productId, 1));
         String requestBody = om.writeValueAsString(orderList);
 
         // when
