@@ -1,4 +1,4 @@
-가server:
+server:
   port: 8080
 
 spring:
@@ -10,7 +10,7 @@ spring:
     encoding: UTF-8
     basename: i18n/exception
   datasource:
-    url: jdbc:mariadb://localhost:3308/early_bird_user
+    url: jdbc:mariadb://localhost:3308/early_bird_user?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
     password: ${database.password}

@@ -1,10 +1,12 @@
 package com.ssonzm.userservcie.dto.product;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 public class ProductRequestDto {
     @Data
+    @AllArgsConstructor
     public static class ProductSaveReqDto {
         @Size(max = 50, message = "상품명은 50자 이하로 작성해 주세요")
         @NotBlank(message = "상품명을 입력해 주세요")

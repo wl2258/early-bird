@@ -1,7 +1,9 @@
 package com.ssonzm.userservcie.dto.user;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class UserRequestDto {
     @Data
@@ -14,7 +16,9 @@ public class UserRequestDto {
         @Size(min = 8, message = "8글자 이상 입력해 주세요")
         private String password;
     }
+
     @Data
+    @AllArgsConstructor
     public static class UserSignUpReqDto {
         @NotBlank(message = "이름을 입력해 주세요")
         private String name;
@@ -27,14 +31,16 @@ public class UserRequestDto {
         @NotBlank(message = "비밀번호를 입력해 주세요")
         private String password;
 
-        @NotBlank(message = "전화번호를 입력해 주세요")
+        @Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다 ex) 010-1234-5678")
         private String phoneNumber;
 
-        @NotBlank(message = "주소를 입력해 주세요")
+        @Pattern(regexp = "^[a-zA-Z0-9가-힣\\s-_.]{1,100}$", message = "주소 형식이 올바르지 않습니다")
         private String address;
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UserUpdateReqDto {
         @Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다 ex) 010-1234-5678")
         private String phoneNumber;
@@ -43,6 +49,8 @@ public class UserRequestDto {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UserUpdatePwReqDto {
         @NotNull(message = "비밀번호를 입력해 주세요")
         @Size(min = 8, message = "8글자 이상 입력해 주세요")

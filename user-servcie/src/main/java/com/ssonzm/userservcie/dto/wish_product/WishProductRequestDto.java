@@ -1,10 +1,14 @@
 package com.ssonzm.userservcie.dto.wish_product;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class WishProductRequestDto {
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class WishProductSaveReqDto {
         @NotNull(message = "상품을 선택해 주세요")
         private Long productId;
@@ -13,6 +17,8 @@ public class WishProductRequestDto {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class WishProductUpdateReqDto {
         @NotNull(message = "관심 상품을 선택해 주세요")
         private Long wishProductId;
