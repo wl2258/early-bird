@@ -50,31 +50,52 @@ public class OrderServiceImpl implements OrderService {
     public Long saveOrder(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList) {
         Order savedOrder = createOrder(userId);
         List<OrderProduct> orderProductList = createOrderProducts(userId, orderSaveReqDtoList, savedOrder);
-
         orderProductRepository.saveAll(orderProductList);
 
         int totalPrice = calculateTotalPrice(orderProductList);
         savedOrder.updateTotalPrice(totalPrice);
 
-        saveDeliveryList(orderProductList); // 배송 준비 중 상태로 Delivery 저장
-
+        saveDeliveryList(orderProductList);
         return savedOrder.getId();
+    }
+
+    private Order createOrder(Long userId) {
+        return orderRepository.save(Order.builder().userId(userId).build());
+    }
+
+    private List<OrderProduct> createOrderProducts(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList, Order savedOrder) {
+        return orderSaveReqDtoList.stream()
+                .map(dto -> createOrderProduct(userId, dto, productService.findProductByIdOrElseThrow(dto.getProductId()), savedOrder))
+                .toList();
+    }
+
+    private OrderProduct createOrderProduct(Long userId, OrderSaveReqDto orderSaveReqDto, Product product, Order savedOrder) {
+        int quantity = orderSaveReqDto.getQuantity();
+        return OrderProduct.builder()
+                .order(savedOrder)
+                .userId(userId)
+                .productId(orderSaveReqDto.getProductId())
+                .quantity(quantity)
+                .price(quantity * product.getPrice())
+                .status(OrderStatus.CREATED)
+                .build();
     }
 
     private void saveDeliveryList(List<OrderProduct> orderProductList) {
         List<Delivery> deliveryList = orderProductList.stream()
-                .map(this::createDelivery)
+                .map(op -> Delivery.builder()
+                        .orderProductId(op.getId())
+                        .status(DeliveryStatus.READY_FOR_SHIPMENT)
+                        .build())
                 .toList();
         deliveryRepository.saveAll(deliveryList);
     }
 
-    private Delivery createDelivery(OrderProduct orderProduct) {
-        return Delivery.builder()
-                .orderProductId(orderProduct.getId())
-                .status(DeliveryStatus.READY_FOR_SHIPMENT)
-                .build();
+    private int calculateTotalPrice(List<OrderProduct> orderProducts) {
+        return orderProducts.stream()
+                .mapToInt(OrderProduct::getPrice)
+                .sum();
     }
-
     @Override
     public Order findOrderByIdOrElseThrow(Long orderId) {
         return orderRepository.findById(orderId)
@@ -88,13 +109,13 @@ public class OrderServiceImpl implements OrderService {
         List<OrderProduct> orderProductList = orderProductService.findAllByOrderIdOrElseThrow(orderId);
         List<Long> orderProductIds = getOrderProductIds(orderProductList);
 
-        List<DeliveryDetailsRespDto> deliveryRespDtos = getDeliveryDetailsRespDtos(orderProductIds);
-        List<OrderProductDetailsRespDto> orderDetailsRespDtos = getOrderDetailsRespDtos(orderProductList);
+        List<DeliveryDetailsRespDto> deliveryRespDtos = getDeliveryDetails(orderProductIds);
+        List<OrderProductDetailsRespDto> orderDetailsRespDtos = getOrderDetails(orderProductList);
 
-        return getOrderDetailsRespDto(findOrder, deliveryRespDtos, orderDetailsRespDtos);
+        return getOrderDetailsResult(findOrder, deliveryRespDtos, orderDetailsRespDtos);
     }
 
-    private List<OrderProductDetailsRespDto> getOrderDetailsRespDtos(List<OrderProduct> orderProductList) {
+    private List<OrderProductDetailsRespDto> getOrderDetails(List<OrderProduct> orderProductList) {
         return orderProductList.stream()
                 .map(op -> new OrderProductDetailsRespDto(op.getId(), String.valueOf(op.getStatus())))
                 .toList();
@@ -106,51 +127,17 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
     }
 
-    private List<DeliveryDetailsRespDto> getDeliveryDetailsRespDtos(List<Long> orderProductIds) {
+    private List<DeliveryDetailsRespDto> getDeliveryDetails(List<Long> orderProductIds) {
         List<Delivery> deliveryList = deliveryService.findDeliveryByOrderProductIds(orderProductIds);
         return deliveryList.stream()
                 .map(d -> new DeliveryDetailsRespDto(d.getId(), String.valueOf(d.getStatus())))
                 .toList();
     }
 
-    private static OrderDetailsRespDto getOrderDetailsRespDto(Order findOrder,
-                                                              List<DeliveryDetailsRespDto> deliveryRespDtos,
-                                                              List<OrderProductDetailsRespDto> orderDetailsRespDtos) {
+    private static OrderDetailsRespDto getOrderDetailsResult(Order findOrder,
+                                                             List<DeliveryDetailsRespDto> deliveryRespDtos,
+                                                             List<OrderProductDetailsRespDto> orderDetailsRespDtos) {
         return new OrderDetailsRespDto(findOrder, deliveryRespDtos, orderDetailsRespDtos);
     }
 
-    private Order createOrder(Long userId) {
-        return orderRepository.save(
-                Order.builder()
-                        .userId(userId)
-                        .build());
-    }
-
-    private List<OrderProduct> createOrderProducts(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList, Order savedOrder) {
-        return orderSaveReqDtoList.stream()
-                .map(dto -> {
-                    Product product = productService.findProductByIdOrElseThrow(dto.getProductId());
-                    return createOrderProduct(userId, dto, product, savedOrder);
-                })
-                .toList();
-    }
-
-    private OrderProduct createOrderProduct(Long userId, OrderSaveReqDto orderSaveReqDto,
-                                            Product product, Order savedOrder) {
-        int quantity = orderSaveReqDto.getQuantity();
-        return OrderProduct.builder()
-                .order(savedOrder)
-                .userId(userId)
-                .productId(orderSaveReqDto.getProductId())
-                .quantity(quantity)
-                .price(quantity * product.getPrice())
-                .status(OrderStatus.CREATED)
-                .build();
-    }
-
-    private int calculateTotalPrice(List<OrderProduct> orderProducts) {
-        return orderProducts.stream()
-                .mapToInt(OrderProduct::getPrice)
-                .sum();
-    }
 }

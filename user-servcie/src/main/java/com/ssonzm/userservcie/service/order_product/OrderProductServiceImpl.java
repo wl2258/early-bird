@@ -65,28 +65,24 @@ public class OrderProductServiceImpl implements OrderProductService {
     @Transactional
     public void cancelOrderProduct(Long orderProductId) {
         OrderProduct orderProduct = findOrderProductByIdOrElseThrow(orderProductId);
-
         // 배송 중인 상품이 있는 경우: 주문 취소 불가
-        checkDeliveryStatus(orderProduct);
+        if (isDeliveryInProgress(orderProduct)) {
+            throw new CommonBadRequestException("failCancelOrder");
+        }
         // 상품 재고 복구
         restoreProductQuantity(orderProduct);
         // 주문 상태 변경
         orderProduct.updateOrderStatus(OrderStatus.CANCELED);
     }
 
+    private boolean isDeliveryInProgress(OrderProduct orderProduct) {
+        Delivery findDelivery = deliveryRepository.findDeliveryByOrderProductId(orderProduct.getId())
+                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
+        return !findDelivery.getStatus().equals(DeliveryStatus.READY_FOR_SHIPMENT);
+    }
+
     private void restoreProductQuantity(OrderProduct orderProduct) {
         Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
         findProduct.updateQuantity(orderProduct.getQuantity());
-    }
-
-    private void checkDeliveryStatus(OrderProduct orderProduct) {
-        Delivery findDelivery = deliveryRepository.findDeliveryByOrderProductId(orderProduct.getId())
-                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
-
-        if (!findDelivery.getStatus().equals(DeliveryStatus.READY_FOR_SHIPMENT)) {
-            throw new CommonBadRequestException("failCancelOrder");
-        }
-
-        orderProduct.updateOrderStatus(OrderStatus.CANCELED);
     }
 }

@@ -1,10 +1,13 @@
 package com.ssonzm.userservcie.dto.order;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class OrderRequestDto {
     @Data
+    @AllArgsConstructor
     public static class OrderSaveReqDto {
         @NotNull(message = "삼품을 선택해 주세요")
         private Long productId;

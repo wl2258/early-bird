@@ -1,10 +1,12 @@
 package com.ssonzm.userservcie.dto.return_product;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 public class ReturnProductRequestDto {
     @Data
+    @AllArgsConstructor
     public static class ReturnProductSaveReqDto {
         @NotNull(message = "반품할 상품을 선택해 주세요")
         private Long orderProductId;

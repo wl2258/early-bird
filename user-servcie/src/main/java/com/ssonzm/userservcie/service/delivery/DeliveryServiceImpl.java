@@ -38,12 +38,12 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Transactional
     public void updateAllDeliveryStatusToShipped() {
         log.info("Update Delivery Status to SHIPPED");
-        List<OrderProduct> orderProductList = orderProductService.findAllBetweenYesterdayAndToday();
-        List<Long> orderProductIds = orderProductList.stream()
-                .map(OrderProduct::getId)
-                .toList();
-
-        updateDeliveryStatus(orderProductIds, DeliveryStatus.SHIPPED);
+        updateDeliveryStatus(
+                orderProductService.findAllBetweenYesterdayAndToday().stream()
+                        .map(OrderProduct::getId)
+                        .toList(),
+                DeliveryStatus.SHIPPED
+        );
     }
 
     /**
@@ -53,11 +53,12 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Transactional
     public void updateAllDeliveryStatusToDelivered() {
         log.info("Update Delivery Status to DELIVERED");
-        List<OrderProduct> orderProductList = orderProductService.findAllBetweenTwoDaysAgoAndYesterday();
-        List<Long> orderProductIds = orderProductList.stream()
-                .map(OrderProduct::getId)
-                .toList();
-        updateDeliveryStatus(orderProductIds, DeliveryStatus.DELIVERED);
+        updateDeliveryStatus(
+                orderProductService.findAllBetweenTwoDaysAgoAndYesterday().stream()
+                        .map(OrderProduct::getId)
+                        .toList(),
+                DeliveryStatus.DELIVERED
+        );
     }
 
     private void updateDeliveryStatus(List<Long> orderProductIds, DeliveryStatus deliveryStatus) {

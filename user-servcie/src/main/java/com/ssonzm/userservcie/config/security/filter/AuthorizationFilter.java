@@ -41,15 +41,17 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (!isRequestValid(request)) {
+/*if (!isRequestValid(request)) {
             filterChain.doFilter(request, response);
             return;
-        }
+        }*/
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         try {
-            String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            String jwtToken = authorizationHeader.replace(TOKEN_PREFIX, "");
-            setAuthenticationFromAccessToken(jwtToken);
+            if (authorizationHeader != null) {
+                String jwtToken = authorizationHeader.replace(TOKEN_PREFIX, "");
+                setAuthenticationFromAccessToken(jwtToken);
+            }
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             ResponseUtil.fail(response, messageSource, HttpStatus.BAD_REQUEST);
