@@ -4,13 +4,11 @@ import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.orderservice.domain.delivery.Delivery;
 import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;
 import com.ssonzm.orderservice.domain.order_product.OrderProduct;
-import com.ssonzm.orderservice.domain.product.Product;
 import com.ssonzm.orderservice.domain.return_product.ReturnProduct;
 import com.ssonzm.orderservice.domain.return_product.ReturnProductRepository;
 import com.ssonzm.orderservice.domain.return_product.ReturnStatus;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
-import com.ssonzm.orderservice.service.product.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +24,12 @@ import static com.ssonzm.orderservice.dto.return_product.ReturnProductRequestDto
 @Service
 @Transactional(readOnly = true)
 public class ReturnProductServiceImpl implements ReturnProductService {
-    private final ProductService productService;
     private final DeliveryService deliveryService;
     private final OrderProductService orderProductService;
     private final ReturnProductRepository returnProductRepository;
 
-    public ReturnProductServiceImpl(ProductService productService, DeliveryService deliveryService, OrderProductService orderProductService,
+    public ReturnProductServiceImpl(DeliveryService deliveryService, OrderProductService orderProductService,
                                     ReturnProductRepository returnProductRepository) {
-        this.productService = productService;
         this.deliveryService = deliveryService;
         this.orderProductService = orderProductService;
         this.returnProductRepository = returnProductRepository;
@@ -83,8 +79,9 @@ public class ReturnProductServiceImpl implements ReturnProductService {
 
     private void restoreProductQuantity(ReturnProduct returnProduct) {
         OrderProduct orderProduct = returnProduct.getOrderProduct();
-        Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
-        findProduct.updateQuantity(orderProduct.getQuantity());
+        // TODO 수정 필요
+/*        Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
+        findProduct.updateQuantity(orderProduct.getQuantity());*/
         returnProduct.updateStatus(ReturnStatus.APPROVED);
     }
 }

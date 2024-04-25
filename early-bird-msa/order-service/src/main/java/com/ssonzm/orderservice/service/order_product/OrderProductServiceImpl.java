@@ -7,8 +7,6 @@ import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;
 import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderStatus;
-import com.ssonzm.orderservice.domain.product.Product;
-import com.ssonzm.orderservice.service.product.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +20,11 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 public class OrderProductServiceImpl implements OrderProductService {
-    private final ProductService productService;
     private final DeliveryRepository deliveryRepository;
     private final OrderProductRepository orderProductRepository;
 
-    public OrderProductServiceImpl(ProductService productService,
-                                   DeliveryRepository deliveryRepository,
+    public OrderProductServiceImpl(DeliveryRepository deliveryRepository,
                                    OrderProductRepository orderProductRepository) {
-        this.productService = productService;
         this.deliveryRepository = deliveryRepository;
         this.orderProductRepository = orderProductRepository;
     }
@@ -81,8 +76,9 @@ public class OrderProductServiceImpl implements OrderProductService {
         return !findDelivery.getStatus().equals(DeliveryStatus.READY_FOR_SHIPMENT);
     }
 
+    // TODO 수정 필요
     private void restoreProductQuantity(OrderProduct orderProduct) {
-        Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
-        findProduct.updateQuantity(orderProduct.getQuantity());
+/*        Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
+        findProduct.updateQuantity(orderProduct.getQuantity());*/
     }
 }

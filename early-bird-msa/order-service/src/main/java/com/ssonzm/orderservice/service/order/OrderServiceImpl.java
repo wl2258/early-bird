@@ -9,11 +9,9 @@ import com.ssonzm.orderservice.domain.order.OrderRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderStatus;
-import com.ssonzm.orderservice.domain.product.Product;
 import com.ssonzm.orderservice.dto.order.OrderRequestDto.OrderSaveReqDto;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
-import com.ssonzm.orderservice.service.product.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,17 +25,15 @@ import static com.ssonzm.orderservice.dto.order_product.OrderProductResponseDto.
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 
-    private final ProductService productService;
     private final DeliveryService deliveryService;
     private final OrderRepository orderRepository;
     private final DeliveryRepository deliveryRepository;
     private final OrderProductService orderProductService;
     private final OrderProductRepository orderProductRepository;
 
-    public OrderServiceImpl(ProductService productService, DeliveryService deliveryService,
-                            OrderRepository orderRepository, DeliveryRepository deliveryRepository,
-                            OrderProductService orderProductService, OrderProductRepository orderProductRepository) {
-        this.productService = productService;
+    public OrderServiceImpl(DeliveryService deliveryService, OrderRepository orderRepository,
+                            DeliveryRepository deliveryRepository, OrderProductService orderProductService,
+                            OrderProductRepository orderProductRepository) {
         this.deliveryService = deliveryService;
         this.orderRepository = orderRepository;
         this.deliveryRepository = deliveryRepository;
@@ -65,18 +61,19 @@ public class OrderServiceImpl implements OrderService {
 
     private List<OrderProduct> createOrderProducts(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList, Order savedOrder) {
         return orderSaveReqDtoList.stream()
-                .map(dto -> createOrderProduct(userId, dto, productService.findProductByIdOrElseThrow(dto.getProductId()), savedOrder))
+                // TODO 수정 필요
+                .map(dto -> createOrderProduct(userId, dto, 0, savedOrder))
                 .toList();
     }
 
-    private OrderProduct createOrderProduct(Long userId, OrderSaveReqDto orderSaveReqDto, Product product, Order savedOrder) {
+    private OrderProduct createOrderProduct(Long userId, OrderSaveReqDto orderSaveReqDto, int price, Order savedOrder) {
         int quantity = orderSaveReqDto.getQuantity();
         return OrderProduct.builder()
                 .order(savedOrder)
                 .userId(userId)
                 .productId(orderSaveReqDto.getProductId())
                 .quantity(quantity)
-                .price(quantity * product.getPrice())
+                .price(quantity * price)
                 .status(OrderStatus.CREATED)
                 .build();
     }

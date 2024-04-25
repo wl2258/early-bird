@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 public class DeliveryResponseDto {
-    public DeliveryResponseDto(Long id, String s) {
-    }
 
     @Data
     @AllArgsConstructor
