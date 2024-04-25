@@ -2,7 +2,6 @@ package com.ssonzm.userservice.config.security;
 
 import com.ssonzm.userservice.config.security.filter.AuthenticationFilter;
 import com.ssonzm.userservice.config.security.filter.AuthorizationFilter;
-import com.ssonzm.userservice.domain.user.UserRole;
 import com.ssonzm.userservice.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -17,7 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 
 @Slf4j
 @Configuration
@@ -49,8 +48,13 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers(new AntPathRequestMatcher("/api/authz/**")).authenticated()
-                                .requestMatchers(new AntPathRequestMatcher ("/admin/**")).hasRole("" + UserRole.ADMIN)
+                                .requestMatchers("/**").access(
+                                        new WebExpressionAuthorizationManager(
+                                                // localhost, 나 자신, api gateway ip address만 acess 가능
+                                                // TODO : add api gateway ip address
+                                                "hasIpAddress('127.0.0.1') or hasIpAddress('::1')"
+                                        )
+                                )
                                 .anyRequest().permitAll()
                 )
                 .addFilter(getAuthenticationFilter(authenticationManager))
