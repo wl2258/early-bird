@@ -24,7 +24,6 @@ import static com.ssonzm.userservice.dto.user.UserResponseDto.UserDetailsDto;
 public class UserServiceImpl implements UserService {
     private final MessageSource messageSource;
     private final UserRepository userRepository;
-//    private final ProductRepository productRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserServiceImpl(MessageSource messageSource, UserRepository userRepository,
@@ -82,18 +81,6 @@ public class UserServiceImpl implements UserService {
 
         return new ModelMapper().map(findUser, UserDetailsDto.class);
     }
-
-/*
-    @Override
-    public UserMyPageRespDto getMyPageInfo(Long userId) {
-        List<Product> myProductList = productRepository.findByUserId(userId);
-        List<ProductDetailsRespDto> myProductDetails = myProductList.stream()
-                .map(ProductDetailsRespDto::new)
-                .toList();
-
-        return new UserMyPageRespDto(myProductDetails);
-    }
-*/
 
     @Override
     public User findByIdOrElseThrow(Long userId) {
