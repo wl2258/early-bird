@@ -2,15 +2,12 @@ package com.ssonzm.userservice.controller.user;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
-import com.ssonzm.userservice.common.util.SecurityConfigUtil;
-import com.ssonzm.userservice.config.security.PrincipalDetails;
 import com.ssonzm.userservice.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +20,10 @@ import static com.ssonzm.userservice.dto.user.UserResponseDto.UserDetailsDto;
 public class UserController {
     private final UserService userService;
     private final MessageSource messageSource;
-    private final SecurityConfigUtil securityConfigUtil;
 
-    public UserController(UserService userService, MessageSource messageSource, SecurityConfigUtil securityConfigUtil) {
+    public UserController(UserService userService, MessageSource messageSource) {
         this.userService = userService;
         this.messageSource = messageSource;
-        this.securityConfigUtil = securityConfigUtil;
     }
 
     @PostMapping("/users")
@@ -44,8 +39,8 @@ public class UserController {
     @PatchMapping("/authz/users/pw")
     public ResponseEntity<?> updatePw(@RequestBody @Valid UserUpdatePwReqDto userUpdatePwReqDto,
                                       BindingResult bindingResult,
-                                      @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        userService.updatePassword(principalDetails.getUser().getId(), userUpdatePwReqDto);
+                                      @RequestHeader("x_user_id") String userId) {
+        userService.updatePassword(Long.valueOf(userId), userUpdatePwReqDto);
 
         ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
@@ -55,8 +50,8 @@ public class UserController {
     @PatchMapping("/authz/users")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UserUpdateReqDto userUpdateReqDto,
                                         BindingResult bindingResult,
-                                        @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        userService.updateUserInfo(principalDetails.getUser().getId(), userUpdateReqDto);
+                                        @RequestHeader("x_user_id") String userId) {
+        userService.updateUserInfo(Long.valueOf(userId), userUpdateReqDto);
 
         ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
@@ -64,8 +59,9 @@ public class UserController {
     }
 
     @GetMapping("/authz/users")
-    public ResponseEntity<?> getUserDetails(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        UserDetailsDto userDetails = userService.getUserDetails(principalDetails.getUser().getId());
+    public ResponseEntity<?> getUserDetails(@RequestHeader("x_user_id") String userId) {
+
+        UserDetailsDto userDetails = userService.getUserDetails(Long.valueOf(userId));
 
         ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(userDetails);
