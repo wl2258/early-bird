@@ -1,0 +1,35 @@
+spring:
+  test:
+    database:
+      replace: none
+  profiles:
+    include: secret
+  datasource:
+    url: jdbc:tc:mariadb:10.3.39:///earlybird?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  output:
+    ansi:
+      enabled: always
+  messages:
+    encoding: UTF-8
+    basename: i18n/exception
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    redis:
+      host: localhost
+      port: 6380

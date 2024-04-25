@@ -1,0 +1,69 @@
+version: '3.1'
+
+services:
+  msa_user_mariadb:
+    container_name: msa_user_mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_user
+      TZ: Asia/Seoul
+    ports:
+        - "3308:3306"
+    volumes:
+      - msa_early_bird_user_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
+  msa_order_mariadb:
+    container_name: msa_order_mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_order
+      TZ: Asia/Seoul
+    ports:
+      - "3309:3306"
+    volumes:
+      - msa_early_bird_order_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
+  msa_product_mariadb:
+    container_name: msa_product_mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_product
+      TZ: Asia/Seoul
+    ports:
+      - "3310:3306"
+    volumes:
+      - msa_early_bird_product_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
+  msa_user_redis:
+    container_name: msa_user_redis
+    image: redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - msa_redis_user_data:/data
+    networks:
+      - early-bird-network
+
+volumes:
+    msa_early_bird_user_data:
+    msa_early_bird_order_data:
+    msa_early_bird_product_data:
+    msa_redis_user_data:
+
+networks:
+    early-bird-network:
+
+
+
