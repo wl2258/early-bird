@@ -29,6 +29,7 @@ public class UserRequestDto {
         private String email;
 
         @NotBlank(message = "비밀번호를 입력해 주세요")
+        @Size(min = 8, message = "8글자 이상 입력해 주세요")
         private String password;
 
         @Pattern(regexp = "^\\d{3}-\\d{4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다 ex) 010-1234-5678")
