@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.ssonzm.userservice.dto.user.UserRequestDto.*;
 import static com.ssonzm.userservice.dto.user.UserResponseDto.UserDetailsDto;
-import static com.ssonzm.userservice.dto.user.UserResponseDto.UserMyPageRespDto;
 
 @Slf4j
 @RestController
@@ -81,7 +80,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/authz/users/my-page")
+/*    @GetMapping("/authz/users/my-page")
     public ResponseEntity<?> getMyPage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         UserMyPageRespDto myPageRespDto = userService.getMyPageInfo(principalDetails.getUser().getId());
 
@@ -89,5 +88,5 @@ public class UserController {
         responseDto.setBody(myPageRespDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
+    }*/
 }
