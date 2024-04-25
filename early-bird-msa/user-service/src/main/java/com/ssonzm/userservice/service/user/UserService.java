@@ -2,7 +2,6 @@ package com.ssonzm.userservice.service.user;
 
 import com.ssonzm.userservice.domain.user.User;
 import com.ssonzm.userservice.dto.user.UserResponseDto.UserDetailsDto;
-import com.ssonzm.userservice.dto.user.UserResponseDto.UserMyPageRespDto;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import static com.ssonzm.userservice.dto.user.UserRequestDto.*;
@@ -18,5 +17,5 @@ public interface UserService extends UserDetailsService {
 
     UserDetailsDto getUserDetails(Long userId);
 
-    UserMyPageRespDto getMyPageInfo(Long userId);
+//    UserMyPageRespDto getMyPageInfo(Long userId);
 }

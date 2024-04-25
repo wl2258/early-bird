@@ -2,17 +2,6 @@ package com.ssonzm.userservice.controller.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.userservice.common.util.DummyUtil;
-import com.ssonzm.userservice.domain.delivery.DeliveryRepository;
-import com.ssonzm.userservice.domain.delivery.DeliveryStatus;
-import com.ssonzm.userservice.domain.order.Order;
-import com.ssonzm.userservice.domain.order.OrderRepository;
-import com.ssonzm.userservice.domain.order_product.OrderProduct;
-import com.ssonzm.userservice.domain.order_product.OrderProductRepository;
-import com.ssonzm.userservice.domain.order_product.OrderStatus;
-import com.ssonzm.userservice.domain.product.Product;
-import com.ssonzm.userservice.domain.product.ProductRepository;
-import com.ssonzm.userservice.domain.product.ProductStatus;
-import com.ssonzm.userservice.domain.user.User;
 import com.ssonzm.userservice.domain.user.UserRepository;
 import com.ssonzm.userservice.dto.user.UserRequestDto.UserSignUpReqDto;
 import com.ssonzm.userservice.dto.user.UserRequestDto.UserUpdatePwReqDto;
@@ -54,14 +43,6 @@ class UserControllerTest extends DummyUtil {
     private MessageSource messageSource;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private DeliveryRepository deliveryRepository;
-    @Autowired
-    private OrderProductRepository orderProductRepository;
 
     @BeforeEach
     void init() {
@@ -190,37 +171,8 @@ class UserControllerTest extends DummyUtil {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    @DisplayName("7. 사용자 등록 상품 조회")
-    void getMyPageTest() throws Exception {
-        // given
-
-        // when
-        ResultActions resultActions = mvc.perform(get("/api/authz/users/my-page")
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // then
-        resultActions
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print());
-    }
-
-
     private void dataSetting() {
-        User user = userRepository.save(newUser("신짱구", "test@naver.com"));
-
-        Product product = productRepository.save(
-                newMockProduct(1L, "pants", ProductStatus.IN_STOCK, user.getId()));
-
-        Order order = orderRepository.save(newMockOrder(1L, user.getId()));
-
-        OrderProduct orderProduct1 = orderProductRepository.save(
-                newMockOrderProduct(1L, user.getId(), product.getId(), order, OrderStatus.CREATED));
-        OrderProduct orderProduct2 = orderProductRepository.save(
-                newMockOrderProduct(2L, user.getId(), product.getId(), order, OrderStatus.CREATED));
-
-        deliveryRepository.save(newMockDelivery(1L, orderProduct1.getId(), DeliveryStatus.READY_FOR_SHIPMENT));
-        deliveryRepository.save(newMockDelivery(2L, orderProduct2.getId(), DeliveryStatus.DELIVERED));
+        userRepository.save(newUser("신짱구", "test@naver.com"));
 
         em.clear();
     }

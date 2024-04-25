@@ -2,12 +2,9 @@ package com.ssonzm.userservice.service.user;
 
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.userservice.config.security.PrincipalDetails;
-import com.ssonzm.userservice.domain.product.Product;
-import com.ssonzm.userservice.domain.product.ProductRepository;
 import com.ssonzm.userservice.domain.user.User;
 import com.ssonzm.userservice.domain.user.UserRepository;
 import com.ssonzm.userservice.domain.user.UserRole;
-import com.ssonzm.userservice.dto.product.ProductResponseDto.ProductDetailsRespDto;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.MessageSource;
@@ -18,11 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 import static com.ssonzm.userservice.dto.user.UserRequestDto.*;
 import static com.ssonzm.userservice.dto.user.UserResponseDto.UserDetailsDto;
-import static com.ssonzm.userservice.dto.user.UserResponseDto.UserMyPageRespDto;
 
 @Slf4j
 @Service
@@ -30,14 +24,13 @@ import static com.ssonzm.userservice.dto.user.UserResponseDto.UserMyPageRespDto;
 public class UserServiceImpl implements UserService {
     private final MessageSource messageSource;
     private final UserRepository userRepository;
-    private final ProductRepository productRepository;
+//    private final ProductRepository productRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserServiceImpl(MessageSource messageSource, UserRepository userRepository,
-                           ProductRepository productRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+                           BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.messageSource = messageSource;
         this.userRepository = userRepository;
-        this.productRepository = productRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -90,6 +83,7 @@ public class UserServiceImpl implements UserService {
         return new ModelMapper().map(findUser, UserDetailsDto.class);
     }
 
+/*
     @Override
     public UserMyPageRespDto getMyPageInfo(Long userId) {
         List<Product> myProductList = productRepository.findByUserId(userId);
@@ -99,6 +93,7 @@ public class UserServiceImpl implements UserService {
 
         return new UserMyPageRespDto(myProductDetails);
     }
+*/
 
     @Override
     public User findByIdOrElseThrow(Long userId) {
