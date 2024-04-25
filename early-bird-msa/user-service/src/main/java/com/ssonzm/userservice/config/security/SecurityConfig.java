@@ -48,14 +48,14 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(
                         auth -> auth
+                                .requestMatchers("/actuator/**").permitAll()
                                 .requestMatchers("/**").access(
                                         new WebExpressionAuthorizationManager(
-                                                // localhost, 나 자신, api gateway ip address만 acess 가능
                                                 // TODO : add api gateway ip address
                                                 "hasIpAddress('127.0.0.1') or hasIpAddress('::1')"
                                         )
                                 )
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                 )
                 .addFilter(getAuthenticationFilter(authenticationManager))
                 .addFilter(getAuthorizationFilter(authenticationManager))
