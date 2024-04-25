@@ -2,7 +2,6 @@ package com.ssonzm.productservice.controller.product;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
-import com.ssonzm.productservice.config.security.PrincipalDetails;
 import com.ssonzm.productservice.service.product.ProductService;
 import com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
 import jakarta.validation.Valid;
@@ -14,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +35,9 @@ public class ProductController {
     @PostMapping("/authz/products")
     public ResponseEntity<?> saveProduct(@RequestBody @Valid ProductSaveReqDto productSaveReqDto,
                                          BindingResult bindingResult,
-                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
+                                         @RequestHeader("x_user_id") Long userId) {
 
-        Long productId = productService.saveProduct(principalDetails.getUser().getId(), productSaveReqDto);
+        Long productId = productService.saveProduct(userId, productSaveReqDto);
 
         ResponseDto<Long> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productId);

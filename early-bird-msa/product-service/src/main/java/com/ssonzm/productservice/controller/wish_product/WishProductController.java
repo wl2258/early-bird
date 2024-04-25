@@ -2,7 +2,6 @@ package com.ssonzm.productservice.controller.wish_product;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
-import com.ssonzm.productservice.config.security.PrincipalDetails;
 import com.ssonzm.productservice.service.wish_product.WishProductService;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,9 +32,9 @@ public class WishProductController {
     @PostMapping("/authz/wish-products")
     public ResponseEntity<?> saveWishProduct(@RequestBody @Valid WishProductSaveReqDto wishProductSaveReqDto,
                                              BindingResult bindingResult,
-                                             @AuthenticationPrincipal PrincipalDetails principalDetails) {
+                                             @RequestHeader("x_user_id") Long userId) {
 
-        Long wishProductId = wishProductService.saveWishProduct(principalDetails.getUser().getId(), wishProductSaveReqDto);
+        Long wishProductId = wishProductService.saveWishProduct(userId, wishProductSaveReqDto);
 
         ResponseDto<Long> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(wishProductId);
@@ -46,9 +44,9 @@ public class WishProductController {
 
     @GetMapping("/authz/wish-products")
     public ResponseEntity<?> getWishProductList(@PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                @AuthenticationPrincipal PrincipalDetails principalDetails) {
+                                                @RequestHeader("x_user_id") Long userId) {
         Page<WishProductListRespVo> wishProductList =
-                wishProductService.findWishProductList(principalDetails.getUser().getId(), pageable);
+                wishProductService.findWishProductList(userId, pageable);
 
         ResponseDto<Page<WishProductListRespVo>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(wishProductList);
