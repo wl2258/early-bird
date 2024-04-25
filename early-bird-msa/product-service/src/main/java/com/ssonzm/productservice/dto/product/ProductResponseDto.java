@@ -2,10 +2,12 @@ package com.ssonzm.productservice.dto.product;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ssonzm.productservice.domain.product.Product;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProductResponseDto {
     @Data
@@ -27,5 +29,11 @@ public class ProductResponseDto {
             this.price = product.getPrice();
             this.createdDate = product.getCreatedDate();
         }
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class ProductListSavedUser {
+        private List<ProductDetailsRespDto> savedProductList;
     }
 }
