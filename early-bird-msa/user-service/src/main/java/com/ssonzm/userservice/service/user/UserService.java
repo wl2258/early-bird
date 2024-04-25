@@ -16,6 +16,4 @@ public interface UserService extends UserDetailsService {
     void updateUserInfo(Long userId, UserUpdateReqDto userUpdateReqDto);
 
     UserDetailsDto getUserDetails(Long userId);
-
-//    UserMyPageRespDto getMyPageInfo(Long userId);
 }
