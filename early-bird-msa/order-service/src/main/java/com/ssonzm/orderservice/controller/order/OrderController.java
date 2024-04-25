@@ -2,14 +2,12 @@ package com.ssonzm.orderservice.controller.order;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
-import com.ssonzm.orderservice.config.security.PrincipalDetails;
 import com.ssonzm.orderservice.dto.order.OrderRequestDto.OrderSaveReqDto;
 import com.ssonzm.orderservice.service.order.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,9 +29,9 @@ public class OrderController {
     @PostMapping("/authz/orders")
     public ResponseEntity<?> saveOrder(@RequestBody @Valid List<OrderSaveReqDto> orderSaveReqDtoList,
                                        BindingResult bindingResult,
-                                       @AuthenticationPrincipal PrincipalDetails principalDetails) {
+                                       @RequestHeader("x_user_id") Long userId) {
 
-        Long orderId = orderService.saveOrder(principalDetails.getUser().getId(), orderSaveReqDtoList);
+        Long orderId = orderService.saveOrder(userId, orderSaveReqDtoList);
 
         ResponseDto<Long> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(orderId);
