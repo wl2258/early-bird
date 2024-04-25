@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import static com.ssonzm.productservice.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.productservice.dto.product.ProductResponseDto.ProductDetailsRespDto;
+import static com.ssonzm.productservice.dto.product.ProductResponseDto.ProductListSavedUser;
 import static com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
 
 public interface ProductService {
@@ -16,4 +17,6 @@ public interface ProductService {
     ProductDetailsRespDto getProductDetails(Long productId);
 
     Product findProductByIdOrElseThrow(Long productId);
+
+    ProductListSavedUser getProductSavedByUser (Long userId);
 }

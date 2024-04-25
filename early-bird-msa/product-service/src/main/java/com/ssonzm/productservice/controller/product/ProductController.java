@@ -2,6 +2,7 @@ package com.ssonzm.productservice.controller.product;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
+import com.ssonzm.productservice.dto.product.ProductResponseDto.ProductListSavedUser;
 import com.ssonzm.productservice.service.product.ProductService;
 import com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
 import jakarta.validation.Valid;
@@ -62,6 +63,17 @@ public class ProductController {
 
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productDetails);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/authz/products/my")
+    public ResponseEntity<?> getProductListSavedByUser(@RequestHeader("x_user_id") Long userId) {
+
+        ProductListSavedUser productList = productService.getProductSavedByUser(userId);
+
+        ResponseDto<ProductListSavedUser> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(productList);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

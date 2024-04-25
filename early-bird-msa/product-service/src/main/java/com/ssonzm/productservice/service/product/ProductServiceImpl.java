@@ -12,8 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.ssonzm.productservice.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.productservice.dto.product.ProductResponseDto.ProductDetailsRespDto;
+import static com.ssonzm.productservice.dto.product.ProductResponseDto.ProductListSavedUser;
 import static com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
 
 @Slf4j
@@ -30,8 +33,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public Long saveProduct(Long userId, ProductSaveReqDto productSaveReqDto) {
-//        User findUser = userService.findByIdOrElseThrow(userId);
-        Product product = createProduct(productSaveReqDto, null);
+        Product product = createProduct(productSaveReqDto, userId);
         productRepository.save(product);
         return product.getId();
     }
@@ -65,5 +67,15 @@ public class ProductServiceImpl implements ProductService {
     public Product findProductByIdOrElseThrow(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
+    }
+
+    @Override
+    public ProductListSavedUser getProductSavedByUser(Long userId) {
+        List<Product> productList = productRepository.findByUserId(userId);
+        List<ProductDetailsRespDto> savedProductList = productList.stream()
+                .map(ProductDetailsRespDto::new)
+                .toList();
+
+        return new ProductListSavedUser(savedProductList);
     }
 }
