@@ -1,4 +1,4 @@
-package com.ssonzm.userservice.common.aop;
+package com.ssonzm.coremodule.aop;
 
 import com.ssonzm.coremodule.exception.CommonValidationException;
 import org.aspectj.lang.ProceedingJoinPoint;

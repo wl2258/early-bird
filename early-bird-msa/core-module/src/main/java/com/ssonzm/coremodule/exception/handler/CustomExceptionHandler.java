@@ -1,4 +1,4 @@
-package com.ssonzm.userservice.common.exception;
+package com.ssonzm.coremodule.exception.handler;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
