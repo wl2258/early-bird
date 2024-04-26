@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @EnableJpaAuditing
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.ssonzm.coremodule", "com.ssonzm.orderservice"})
 @EnableDiscoveryClient
 public class OrderServiceApplication {
 
