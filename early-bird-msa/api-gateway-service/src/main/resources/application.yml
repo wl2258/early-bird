@@ -8,6 +8,8 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
 spring:
+  profiles:
+    include: secret
   application:
     name: api-gateway-service
   cloud:
@@ -32,7 +34,6 @@ spring:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
             - AuthorizationFilter
 
-        # ??? ??
         - id: user-admin
           uri: lb://USER-SERVICE
           predicates:
@@ -43,16 +44,16 @@ spring:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
             - AuthorizationFilter
 
-        - id: user-signup-email
+        - id: user-service
           uri: lb://USER-SERVICE
           predicates:
-            - Path=/user-service/api/users, /user-service/api/verify-email
-            - Method=POST
+            - Path=/user-service/api/**
+            - Method=GET, POST
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
-        - id: order-service
+        - id: order-auth
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/order-service/api/authz/**
@@ -62,7 +63,16 @@ spring:
             - RewritePath=/order-service/(?<segment>.*), /$\{segment}
             - AuthorizationFilter
 
-        - id: product-service
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order-service/api/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+
+        - id: product-auth
           uri: lb://PRODUCT-SERVICE
           predicates:
             - Path=/product-service/api/authz/**
@@ -71,3 +81,12 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/product-service/(?<segment>.*), /$\{segment}
             - AuthorizationFilter
+
+        - id: product-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/product-service/api/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/product-service/(?<segment>.*), /$\{segment}

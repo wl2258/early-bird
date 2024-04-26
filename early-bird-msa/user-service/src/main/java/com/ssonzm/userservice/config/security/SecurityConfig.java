@@ -1,5 +1,6 @@
 package com.ssonzm.userservice.config.security;
 
+import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.userservice.config.security.filter.AuthenticationFilter;
 import com.ssonzm.userservice.config.security.filter.AuthorizationFilter;
 import com.ssonzm.userservice.service.user.UserService;
@@ -8,12 +9,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
@@ -51,15 +54,22 @@ public class SecurityConfig {
                                 .requestMatchers("/actuator/**").permitAll()
                                 .requestMatchers("/**").access(
                                         new WebExpressionAuthorizationManager(
-                                                // TODO : add api gateway ip address
-                                                "hasIpAddress('127.0.0.1') or hasIpAddress('::1')"
+                                                "hasIpAddress('127.0.0.1') or hasIpAddress('::1') " +
+                                                        "or hasIpAddress('172.30.1.37')"
                                         )
                                 )
                                 .anyRequest().authenticated()
                 )
                 .addFilter(getAuthenticationFilter(authenticationManager))
-                .addFilter(getAuthorizationFilter(authenticationManager))
                 .authenticationManager(authenticationManager)
+                .exceptionHandling((exception) -> exception
+                        .authenticationEntryPoint((request, response, authException) ->
+                                ResponseUtil.fail(response, messageSource, HttpStatus.UNAUTHORIZED))
+                        .accessDeniedHandler((request, response, authException) ->
+                                ResponseUtil.fail(response, messageSource, HttpStatus.FORBIDDEN)))
+                .formLogin(AbstractHttpConfigurer::disable)
+                .sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 

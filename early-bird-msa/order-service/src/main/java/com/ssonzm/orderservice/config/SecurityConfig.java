@@ -32,8 +32,8 @@ public class SecurityConfig {
                                 .requestMatchers("/actuator/**").permitAll()
                                 .requestMatchers("/**").access(
                                         new WebExpressionAuthorizationManager(
-                                                // TODO : add api gateway ip address
-                                                "hasIpAddress('127.0.0.1') or hasIpAddress('::1')"
+                                                "hasIpAddress('127.0.0.1') or hasIpAddress('::1')" +
+                                                        "or hasIpAddress('172.30.1.37')"
                                         )
                                 )
                                 .anyRequest().authenticated()
