@@ -13,7 +13,7 @@ public class WishProductRequestDto {
         @NotNull(message = "상품을 선택해 주세요")
         private Long productId;
         @NotNull(message = "상품 수량을 입력해 주세요")
-        private int quantity;
+        private Integer quantity;
     }
 
     @Data
@@ -25,6 +25,6 @@ public class WishProductRequestDto {
         @NotNull(message = "상품을 선택해 주세요")
         private Long productId;
         @NotNull(message = "상품 수량을 입력해 주세요")
-        private int quantity;
+        private Integer quantity;
     }
 }

@@ -22,9 +22,9 @@ public class ProductRequestDto {
         private String description;
 
         @NotNull(message = "수량을 입력해 주세요")
-        private int quantity;
+        private Integer quantity;
 
         @NotNull(message = "가격을 입력해 주세요")
-        private int price;
+        private Integer price;
     }
 }

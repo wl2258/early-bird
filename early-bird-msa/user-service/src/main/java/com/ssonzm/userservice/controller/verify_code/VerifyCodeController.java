@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.ssonzm.userservice.dto.verify_code.VerifyCodeDto.SendEmailCodeReqDto;
 
 @RestController
-@RequestMapping("/api/verify-code")
+@RequestMapping("/api/users/verify-code")
 public class VerifyCodeController {
 
     private final MessageSource messageSource;
