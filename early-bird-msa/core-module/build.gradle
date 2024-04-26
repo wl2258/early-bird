@@ -16,8 +16,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 
     /* Querydsl 추가 */
