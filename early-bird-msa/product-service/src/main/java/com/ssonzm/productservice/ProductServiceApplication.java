@@ -6,7 +6,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.ssonzm.coremodule", "com.ssonzm.productservice"})
 @EnableDiscoveryClient
 public class ProductServiceApplication {
 
