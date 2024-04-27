@@ -13,6 +13,7 @@ public class ProductResponseDto {
     @Data
     @NoArgsConstructor
     public static class ProductDetailsRespDto {
+        private Long id;
         private String name;
         private String category;
         private String description;
@@ -22,6 +23,7 @@ public class ProductResponseDto {
         private LocalDateTime createdDate;
 
         public ProductDetailsRespDto(Product product) {
+            this.id = product.getId();
             this.name = product.getName();
             this.category = String.valueOf(product.getCategory());
             this.description = product.getDescription();

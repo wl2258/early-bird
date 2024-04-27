@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.ssonzm.productservice.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.productservice.dto.product.ProductResponseDto.ProductDetailsRespDto;
 
@@ -63,6 +65,16 @@ public class ProductController {
 
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productDetails);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/products/detail")
+    public ResponseEntity<?> getProductDetailsByIds(@RequestBody List<Long> productIds) {
+        List<ProductDetailsRespDto> productDetailsByIds = productService.getProductDetailsByIds(productIds);
+
+        ResponseDto<List<ProductDetailsRespDto>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(productDetailsByIds);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

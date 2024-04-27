@@ -64,6 +64,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductDetailsRespDto> getProductDetailsByIds(List<Long> productIds) {
+        List<Product> productList = productRepository.findAllByIds(productIds);
+        return productList.stream()
+                .map(p -> new ModelMapper().map(p, ProductDetailsRespDto.class))
+                .toList();
+    }
+
+    @Override
     public Product findProductByIdOrElseThrow(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
