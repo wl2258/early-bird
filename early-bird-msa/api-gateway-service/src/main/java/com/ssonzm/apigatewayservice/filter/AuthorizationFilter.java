@@ -1,5 +1,6 @@
 package com.ssonzm.apigatewayservice.filter;
 
+import com.ssonzm.apigatewayservice.filter.dto.UserDetailsDto;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -43,9 +44,15 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
 
-            Long userId = verify(jwt);
+            UserDetailsDto userDetails = verify(jwt);
+
+            String role = userDetails.getRole();
+            if (!isAuthorizedAccess(role, request.getPath().value())) {
+                return onError(exchange, "Unauthorized access", HttpStatus.FORBIDDEN);
+            }
+
             ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
-                    .header(USER_ID_HEADER, String.valueOf(userId))
+                    .header(USER_ID_HEADER, String.valueOf(userDetails.getUserId()))
                     .build();
 
             ServerWebExchange modifiedExchange = exchange.mutate()
@@ -56,11 +63,25 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
         };
     }
 
-    private Long verify (String jwtToken) {
+    private boolean isAuthorizedAccess(String role, String requestPath) {
+        boolean isAuthorized = true;
+
+        if (role.equals("USER")) {
+            if (requestPath.startsWith("/api/admin"))
+                isAuthorized = false;
+        } else if (!role.equals("ADMIN")) {
+            isAuthorized = false;
+        }
+
+        return isAuthorized;
+    }
+
+    private UserDetailsDto verify (String jwtToken) {
         byte[] secretKeyBytes = Base64.getEncoder().encode(env.getProperty("token.secret").getBytes());
         SecretKey signingKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
 
         Long id = null;
+        String role = null;
         try {
             JwtParser jwtParser = Jwts.parserBuilder()
                     .setSigningKey(signingKey)
@@ -69,13 +90,14 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
             Jws<Claims> claimsJws = jwtParser.parseClaimsJws(jwtToken);
             Claims claims = claimsJws.getBody();
 
-            id = claims.get("id", Long.class);
+             id = claims.get("id", Long.class);
+             role = claims.get("role", String.class);
 
         } catch (Exception ex) {
             log.error("JWT parsing error: {}", ex.getMessage());
         }
 
-        return id;
+        return new UserDetailsDto(id, role);
     }
 
     private boolean isJwtValid(String jwt) {

@@ -3,6 +3,7 @@ package com.ssonzm.orderservice.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,12 @@ import org.springframework.security.web.access.expression.WebExpressionAuthoriza
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final Environment env;
+
+    public SecurityConfig(Environment env) {
+        this.env = env;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
@@ -33,7 +40,7 @@ public class SecurityConfig {
                                 .requestMatchers("/**").access(
                                         new WebExpressionAuthorizationManager(
                                                 "hasIpAddress('127.0.0.1') or hasIpAddress('::1')" +
-                                                        "or hasIpAddress('172.30.1.60')"
+                                                        "or hasIpAddress('" + env.getProperty("api-gateway.ip")+ "')"
                                         )
                                 )
                                 .anyRequest().authenticated()

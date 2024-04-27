@@ -75,4 +75,9 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
+    @GetMapping("/admin")
+    public String test() {
+        return "test";
+    }
 }
