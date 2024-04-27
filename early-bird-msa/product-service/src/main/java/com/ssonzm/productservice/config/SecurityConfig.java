@@ -1,10 +1,8 @@
 package com.ssonzm.productservice.config;
 
-import com.ssonzm.coremodule.util.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,7 +33,7 @@ public class SecurityConfig {
                                 .requestMatchers("/**").access(
                                         new WebExpressionAuthorizationManager(
                                                 "hasIpAddress('127.0.0.1') or hasIpAddress('::1')" +
-                                                        "or hasIpAddress('172.30.1.37')"
+                                                        "or hasIpAddress('172.30.1.60')"
                                         )
                                 )
                                 .anyRequest().authenticated()
