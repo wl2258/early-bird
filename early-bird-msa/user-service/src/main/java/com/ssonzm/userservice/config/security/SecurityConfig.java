@@ -55,7 +55,7 @@ public class SecurityConfig {
                                 .requestMatchers("/**").access(
                                         new WebExpressionAuthorizationManager(
                                                 "hasIpAddress('127.0.0.1') or hasIpAddress('::1') " +
-                                                        "or hasIpAddress('172.30.1.37')"
+                                                        "or hasIpAddress('172.30.1.60')"
                                         )
                                 )
                                 .anyRequest().authenticated()

@@ -1,8 +1,6 @@
 package com.ssonzm.apigatewayservice.filter;
 
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -23,6 +21,7 @@ import java.util.Base64;
 @Component
 public class AuthorizationFilter extends AbstractGatewayFilterFactory<AuthorizationFilter.Config> {
     private Environment env;
+    private final String USER_ID_HEADER = "x_user_id";
 
     public AuthorizationFilter( Environment env) {
         super(Config.class);
@@ -44,8 +43,39 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
 
-            return chain.filter(exchange);
+            Long userId = verify(jwt);
+            ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
+                    .header(USER_ID_HEADER, String.valueOf(userId))
+                    .build();
+
+            ServerWebExchange modifiedExchange = exchange.mutate()
+                    .request(modifiedRequest)
+                    .build();
+
+            return chain.filter(modifiedExchange);
         };
+    }
+
+    private Long verify (String jwtToken) {
+        byte[] secretKeyBytes = Base64.getEncoder().encode(env.getProperty("token.secret").getBytes());
+        SecretKey signingKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
+
+        Long id = null;
+        try {
+            JwtParser jwtParser = Jwts.parserBuilder()
+                    .setSigningKey(signingKey)
+                    .build();
+
+            Jws<Claims> claimsJws = jwtParser.parseClaimsJws(jwtToken);
+            Claims claims = claimsJws.getBody();
+
+            id = claims.get("id", Long.class);
+
+        } catch (Exception ex) {
+            log.error("JWT parsing error: {}", ex.getMessage());
+        }
+
+        return id;
     }
 
     private boolean isJwtValid(String jwt) {
