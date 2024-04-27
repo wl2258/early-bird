@@ -72,7 +72,7 @@ public class WishProductServiceImpl implements WishProductService {
     @Override
     public WishProduct findWishProductOrThrow(Long wishProductId) {
         return wishProductRepository.findByIdProductFetchJoin(wishProductId)
-                .orElseThrow(() -> new CommonBadRequestException("notFoundProduct"));
+                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
     }
 
     @Override

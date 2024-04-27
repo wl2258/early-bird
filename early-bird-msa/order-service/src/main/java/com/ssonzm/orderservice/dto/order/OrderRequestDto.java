@@ -11,6 +11,6 @@ public class OrderRequestDto {
         @NotNull(message = "삼품을 선택해 주세요")
         private Long productId;
         @NotNull(message = "수량을 입력해 주세요")
-        private int quantity;
+        private Integer quantity;
     }
 }

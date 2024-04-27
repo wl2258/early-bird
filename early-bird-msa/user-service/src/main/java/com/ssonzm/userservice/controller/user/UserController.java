@@ -39,8 +39,8 @@ public class UserController {
     @PatchMapping("/authz/users/pw")
     public ResponseEntity<?> updatePw(@RequestBody @Valid UserUpdatePwReqDto userUpdatePwReqDto,
                                       BindingResult bindingResult,
-                                      @RequestHeader("x_user_id") String userId) {
-        userService.updatePassword(Long.valueOf(userId), userUpdatePwReqDto);
+                                      @RequestHeader("x_user_id") Long userId) {
+        userService.updatePassword(userId, userUpdatePwReqDto);
 
         ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
@@ -50,8 +50,8 @@ public class UserController {
     @PatchMapping("/authz/users")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UserUpdateReqDto userUpdateReqDto,
                                         BindingResult bindingResult,
-                                        @RequestHeader("x_user_id") String userId) {
-        userService.updateUserInfo(Long.valueOf(userId), userUpdateReqDto);
+                                        @RequestHeader("x_user_id") Long userId) {
+        userService.updateUserInfo(userId, userUpdateReqDto);
 
         ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
@@ -59,9 +59,9 @@ public class UserController {
     }
 
     @GetMapping("/authz/users")
-    public ResponseEntity<?> getUserDetails(@RequestHeader("x_user_id") String userId) {
+    public ResponseEntity<?> getUserDetails(@RequestHeader("x_user_id") Long userId) {
 
-        UserDetailsDto userDetails = userService.getUserDetails(Long.valueOf(userId));
+        UserDetailsDto userDetails = userService.getUserDetails(userId);
 
         ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(userDetails);
