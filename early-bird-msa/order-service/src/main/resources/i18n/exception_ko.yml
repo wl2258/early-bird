@@ -45,3 +45,7 @@ failCancelOrder:
 failReturn:
   code: "-4009"
   msg: "반품이 불가능합니다"
+
+failSqsSender:
+  code: "-4010"
+  msg: "SQS 메시지 전송을 실패했습니다"
