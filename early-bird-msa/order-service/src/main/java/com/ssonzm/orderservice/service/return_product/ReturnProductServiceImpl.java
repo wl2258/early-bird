@@ -1,5 +1,8 @@
 package com.ssonzm.orderservice.service.return_product;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.orderservice.domain.delivery.Delivery;
 import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;
@@ -7,6 +10,7 @@ import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.return_product.ReturnProduct;
 import com.ssonzm.orderservice.domain.return_product.ReturnProductRepository;
 import com.ssonzm.orderservice.domain.return_product.ReturnStatus;
+import com.ssonzm.orderservice.service.aws_sqs.AmazonSqsSender;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +28,14 @@ import static com.ssonzm.coremodule.dto.return_product.ReturnProductRequestDto.R
 @Service
 @Transactional(readOnly = true)
 public class ReturnProductServiceImpl implements ReturnProductService {
+    private final AmazonSqsSender sqsSender;
     private final DeliveryService deliveryService;
     private final OrderProductService orderProductService;
     private final ReturnProductRepository returnProductRepository;
 
-    public ReturnProductServiceImpl(DeliveryService deliveryService, OrderProductService orderProductService,
+    public ReturnProductServiceImpl(AmazonSqsSender sqsSender, DeliveryService deliveryService, OrderProductService orderProductService,
                                     ReturnProductRepository returnProductRepository) {
+        this.sqsSender = sqsSender;
         this.deliveryService = deliveryService;
         this.orderProductService = orderProductService;
         this.returnProductRepository = returnProductRepository;
@@ -38,7 +44,8 @@ public class ReturnProductServiceImpl implements ReturnProductService {
     @Override
     @Transactional
     public Long saveReturn(Long userId, ReturnProductSaveReqDto returnProductSaveReqDto) {
-        OrderProduct findOrderProduct = orderProductService.findOrderProductByIdOrElseThrow(returnProductSaveReqDto.getOrderProductId());
+        OrderProduct findOrderProduct = orderProductService.findOrderProductByIdOrElseThrow(
+                returnProductSaveReqDto.getOrderProductId());
         Delivery findDelivery = deliveryService.findDeliveryByOrderProductIdOrElseThrow(findOrderProduct.getId());
 
         if (isDeliveryStatusValid(findDelivery) && isReturnPossible(findDelivery)) {
@@ -73,15 +80,28 @@ public class ReturnProductServiceImpl implements ReturnProductService {
         LocalDateTime today = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
         LocalDateTime yesterday = today.minusDays(1);
 
-        List<ReturnProduct> returnProductList = returnProductRepository.findAllBetweenPrevDayAndToday(yesterday, today);
-        returnProductList.forEach(this::restoreProductQuantity);
+        List<ReturnProduct> returnProductList = returnProductRepository.findAllBetweenPrevDayAndToday(
+                yesterday, today, ReturnStatus.REQUESTED);
+        restoreProductQuantity(returnProductList);
     }
 
-    private void restoreProductQuantity(ReturnProduct returnProduct) {
-        OrderProduct orderProduct = returnProduct.getOrderProduct();
-        // TODO 수정 필요
-/*        Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
-        findProduct.updateQuantity(orderProduct.getQuantity());*/
-        returnProduct.updateStatus(ReturnStatus.APPROVED);
+    private void restoreProductQuantity(List<ReturnProduct> returnProductList) {
+        List<OrderProductUpdateReqDto> orderProductList = returnProductList.stream()
+                .map(rp -> {
+                    rp.updateStatus(ReturnStatus.APPROVED);
+                    return new OrderProductUpdateReqDto(rp.getId(), rp.getOrderProduct().getQuantity());
+                })
+                .toList();
+
+        // TODO sqs 사용
+        try {
+            log.debug("Receive AWS SQS message");
+            ObjectMapper objectMapper = new ObjectMapper();
+            String message = objectMapper.writeValueAsString(orderProductList);
+
+            sqsSender.sendMessage(message);
+        } catch (JsonProcessingException e) {
+            throw new CommonBadRequestException("failSqsSender");
+        }
     }
 }
