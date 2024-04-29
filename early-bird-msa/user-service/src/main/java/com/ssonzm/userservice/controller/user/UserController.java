@@ -1,6 +1,7 @@
 package com.ssonzm.userservice.controller.user;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
+import com.ssonzm.coremodule.dto.user.UserResponseDto.UserMyPageRespDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.userservice.service.user.UserService;
 import jakarta.validation.Valid;
@@ -90,5 +91,15 @@ public class UserController {
     @GetMapping("/admin")
     public String test() {
         return "test";
+    }
+
+    @GetMapping("/authz/users/my-page/{userId}")
+    public ResponseEntity<ResponseDto<UserMyPageRespDto>> getMyPage(@PathVariable("userId") Long userId) {
+        UserMyPageRespDto userMyPageRespDto = userService.getMyPage(userId);
+
+        ResponseDto<UserMyPageRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(userMyPageRespDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }

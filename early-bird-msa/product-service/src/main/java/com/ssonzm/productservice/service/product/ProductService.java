@@ -9,8 +9,7 @@ import java.util.List;
 
 import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
-import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductListSavedUser;
-import static com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
+import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 
 public interface ProductService {
     Long saveProduct(Long userId, ProductSaveReqDto productSaveReqDto);
@@ -23,5 +22,5 @@ public interface ProductService {
 
     Product findProductByIdOrElseThrow(Long productId);
 
-    ProductListSavedUser getProductSavedByUser (Long userId);
+    Page<ProductListRespVo> getProductSavedByUser (Pageable pageable, Long userId);
 }
