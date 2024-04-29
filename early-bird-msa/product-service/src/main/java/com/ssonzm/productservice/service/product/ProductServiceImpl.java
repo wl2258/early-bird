@@ -6,6 +6,7 @@ import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.domain.product.ProductCategory;
 import com.ssonzm.productservice.domain.product.ProductRepository;
 import com.ssonzm.productservice.domain.product.ProductStatus;
+import com.ssonzm.productservice.service.client.UserServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import java.util.List;
 import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductListSavedUser;
+import static com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
 import static com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
 
 @Slf4j
@@ -26,9 +28,11 @@ import static com.ssonzm.productservice.vo.product.ProductResponseVo.ProductList
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final UserServiceClient userServiceClient;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, UserServiceClient userServiceClient) {
         this.productRepository = productRepository;
+        this.userServiceClient = userServiceClient;
     }
 
     @Override
@@ -61,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailsRespDto getProductDetails(Long productId) {
         Product findProduct = findProductByIdOrElseThrow(productId);
-        return new ModelMapper().map(findProduct, ProductDetailsRespDto.class);
+        return createProductDetailsRespDto(findProduct);
     }
 
     @Override
@@ -82,14 +86,18 @@ public class ProductServiceImpl implements ProductService {
     public ProductListSavedUser getProductSavedByUser(Long userId) {
         List<Product> productList = productRepository.findByUserId(userId);
         List<ProductDetailsRespDto> savedProductList = productList.stream()
-                .map(ProductServiceImpl::createProductDetailsRespDto)
+                .map(this::createProductDetailsRespDto)
                 .toList();
 
         return new ProductListSavedUser(savedProductList);
     }
 
-    private static ProductDetailsRespDto createProductDetailsRespDto(Product p) {
-        return new ProductDetailsRespDto(p.getId(), p.getName(), String.valueOf(p.getCategory()),
-                p.getDescription(), p.getQuantity(), p.getPrice(), p.getCreatedDate());
+    private ProductDetailsRespDto createProductDetailsRespDto(Product product) {
+        UserDetailsDto userDetailsDto = userServiceClient.getUserDetailsFeignClient(product.getUserId()).getBody().getBody();
+
+
+        return new ProductDetailsRespDto(product.getId(), userDetailsDto.getName(), product.getName(),
+                String.valueOf(product.getCategory()), product.getDescription(), product.getQuantity(),
+                product.getPrice(), product.getCreatedDate());
     }
 }

@@ -69,6 +69,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ResponseDto<UserDetailsDto>> getUserDetailsFeignClient(@PathVariable("userId") Long userId) {
+
+        UserDetailsDto userDetails = userService.getUserDetails(userId);
+
+        ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(userDetails);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
     @PostMapping("/authz/logout")
     public ResponseEntity<?> logout() {
         ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
