@@ -2,7 +2,7 @@ package com.ssonzm.orderservice.controller.return_product;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
-import com.ssonzm.orderservice.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
+import com.ssonzm.coremodule.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
 import com.ssonzm.orderservice.service.return_product.ReturnProductService;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;

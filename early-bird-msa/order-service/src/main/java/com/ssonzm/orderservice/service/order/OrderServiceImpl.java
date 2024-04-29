@@ -1,5 +1,7 @@
 package com.ssonzm.orderservice.service.order;
 
+import com.ssonzm.coremodule.dto.order.OrderRequestDto.OrderSaveReqDto;
+import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.orderservice.domain.delivery.Delivery;
 import com.ssonzm.orderservice.domain.delivery.DeliveryRepository;
@@ -9,18 +11,21 @@ import com.ssonzm.orderservice.domain.order.OrderRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderStatus;
-import com.ssonzm.orderservice.dto.order.OrderRequestDto.OrderSaveReqDto;
+import com.ssonzm.orderservice.service.client.ProductServiceClient;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.ssonzm.orderservice.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
-import static com.ssonzm.orderservice.dto.order.OrderResponseDto.OrderDetailsRespDto;
-import static com.ssonzm.orderservice.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
+import static com.ssonzm.coremodule.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
+import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespDto;
+import static com.ssonzm.coremodule.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
@@ -29,15 +34,17 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final DeliveryRepository deliveryRepository;
     private final OrderProductService orderProductService;
+    private final ProductServiceClient productServiceClient;
     private final OrderProductRepository orderProductRepository;
 
     public OrderServiceImpl(DeliveryService deliveryService, OrderRepository orderRepository,
                             DeliveryRepository deliveryRepository, OrderProductService orderProductService,
-                            OrderProductRepository orderProductRepository) {
+                            ProductServiceClient productServiceClient, OrderProductRepository orderProductRepository) {
         this.deliveryService = deliveryService;
         this.orderRepository = orderRepository;
         this.deliveryRepository = deliveryRepository;
         this.orderProductService = orderProductService;
+        this.productServiceClient = productServiceClient;
         this.orderProductRepository = orderProductRepository;
     }
 
@@ -60,20 +67,33 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private List<OrderProduct> createOrderProducts(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList, Order savedOrder) {
-        return orderSaveReqDtoList.stream()
-                // TODO 수정 필요
-                .map(dto -> createOrderProduct(userId, dto, 0, savedOrder))
+
+        List<Long> productIds = orderSaveReqDtoList.stream()
+                .map(OrderSaveReqDto::getProductId)
                 .toList();
+
+        List<ProductDetailsFeignClientRespDto> productDetailsList = productServiceClient.getProductDetailsByIds(productIds).getBody().getBody();
+
+        return orderSaveReqDtoList.stream()
+                .map(orderSaveReqDto -> createOrderProduct(userId, orderSaveReqDto, productDetailsList, savedOrder))
+                .collect(Collectors.toList());
     }
 
-    private OrderProduct createOrderProduct(Long userId, OrderSaveReqDto orderSaveReqDto, int price, Order savedOrder) {
+    private OrderProduct createOrderProduct(Long userId, OrderSaveReqDto orderSaveReqDto,
+                                            List<ProductDetailsFeignClientRespDto> productDetailsList,
+                                            Order savedOrder) {
+        ProductDetailsFeignClientRespDto productDetails = productDetailsList.stream()
+                .filter(p -> p.getId().equals(orderSaveReqDto.getProductId()))
+                .findFirst()
+                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
+
         int quantity = orderSaveReqDto.getQuantity();
         return OrderProduct.builder()
                 .order(savedOrder)
                 .userId(userId)
-                .productId(orderSaveReqDto.getProductId())
+                .productId(productDetails.getId())
                 .quantity(quantity)
-                .price(quantity * price)
+                .price(quantity * productDetails.getPrice())
                 .status(OrderStatus.CREATED)
                 .build();
     }
@@ -93,6 +113,7 @@ public class OrderServiceImpl implements OrderService {
                 .mapToInt(OrderProduct::getPrice)
                 .sum();
     }
+
     @Override
     public Order findOrderByIdOrElseThrow(Long orderId) {
         return orderRepository.findById(orderId)
@@ -131,10 +152,10 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
     }
 
-    private static OrderDetailsRespDto getOrderDetailsResult(Order findOrder,
-                                                             List<DeliveryDetailsRespDto> deliveryRespDtos,
-                                                             List<OrderProductDetailsRespDto> orderDetailsRespDtos) {
-        return new OrderDetailsRespDto(findOrder, deliveryRespDtos, orderDetailsRespDtos);
+    private OrderDetailsRespDto getOrderDetailsResult(Order findOrder,
+                                                      List<DeliveryDetailsRespDto> deliveryRespDtos,
+                                                      List<OrderProductDetailsRespDto> orderDetailsRespDtos) {
+        return new OrderDetailsRespDto(findOrder.getTotalPrice(), findOrder.getCreatedDate(),
+                deliveryRespDtos, orderDetailsRespDtos);
     }
-
 }

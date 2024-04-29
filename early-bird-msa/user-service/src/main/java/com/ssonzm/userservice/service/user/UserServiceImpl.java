@@ -15,8 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.ssonzm.userservice.dto.user.UserRequestDto.*;
-import static com.ssonzm.userservice.dto.user.UserResponseDto.UserDetailsDto;
+import static com.ssonzm.coremodule.dto.user.UserRequestDto.*;
+import static com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
 
 @Slf4j
 @Service

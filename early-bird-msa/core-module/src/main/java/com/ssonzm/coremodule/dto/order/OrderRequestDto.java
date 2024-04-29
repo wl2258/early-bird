@@ -1,4 +1,4 @@
-package com.ssonzm.orderservice.dto.order;
+package com.ssonzm.coremodule.dto.order;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

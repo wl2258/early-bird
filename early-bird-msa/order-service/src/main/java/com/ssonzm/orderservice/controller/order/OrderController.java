@@ -2,7 +2,7 @@ package com.ssonzm.orderservice.controller.order;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
-import com.ssonzm.orderservice.dto.order.OrderRequestDto.OrderSaveReqDto;
+import com.ssonzm.coremodule.dto.order.OrderRequestDto.OrderSaveReqDto;
 import com.ssonzm.orderservice.service.order.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.ssonzm.orderservice.dto.order.OrderResponseDto.OrderDetailsRespDto;
+import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespDto;
 
 @RestController
 @RequestMapping("/api")

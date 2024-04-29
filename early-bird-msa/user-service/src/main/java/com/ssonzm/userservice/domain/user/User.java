@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static com.ssonzm.userservice.dto.user.UserRequestDto.UserUpdateReqDto;
+import static com.ssonzm.coremodule.dto.user.UserRequestDto.UserUpdateReqDto;
 
 @Getter
 @Entity

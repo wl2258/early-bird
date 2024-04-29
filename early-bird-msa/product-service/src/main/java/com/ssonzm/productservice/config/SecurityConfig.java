@@ -40,7 +40,7 @@ public class SecurityConfig {
                                 .requestMatchers("/**").access(
                                         new WebExpressionAuthorizationManager(
                                                 "hasIpAddress('127.0.0.1') or hasIpAddress('::1')" +
-                                                        "or hasIpAddress('" + env.getProperty("api-gateway.ip")+ "')"
+                                                        "or hasIpAddress('" + env.getProperty("api-gateway.ip") + "')"
                                         )
                                 )
                                 .anyRequest().authenticated()

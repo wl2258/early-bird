@@ -44,4 +44,4 @@ eureka:
 
 logging:
   level:
-    com.ssonzm.earlybird: DEBUG
+    com.ssonzm.earlybird.orderservice: DEBUG

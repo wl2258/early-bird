@@ -2,13 +2,9 @@ package com.ssonzm.productservice.controller.wish_product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.productservice.common.util.DummyUtil;
-import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.domain.product.ProductRepository;
-import com.ssonzm.productservice.domain.product.ProductStatus;
-import com.ssonzm.productservice.domain.user.User;
-import com.ssonzm.productservice.domain.user.UserRepository;
 import com.ssonzm.productservice.domain.wish_product.WishProductRepository;
-import com.ssonzm.productservice.dto.wish_product.WishProductRequestDto.WishProductSaveReqDto;
+import com.ssonzm.coremodule.dto.wish_product.WishProductRequestDto.WishProductSaveReqDto;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -24,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import static com.ssonzm.productservice.dto.wish_product.WishProductRequestDto.WishProductUpdateReqDto;
+import static com.ssonzm.coremodule.dto.wish_product.WishProductRequestDto.WishProductUpdateReqDto;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -45,8 +41,8 @@ class WishProductControllerTest extends DummyUtil {
     private ObjectMapper om;
     @Mock
     private MessageSource messageSource;
-    @Autowired
-    private UserRepository userRepository;
+/*    @Autowired
+    private UserRepository userRepository;*/
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -129,13 +125,13 @@ class WishProductControllerTest extends DummyUtil {
     }
 
     private void dataSetting() {
-        User user = userRepository.save(newUser("신짱구", "test@naver.com"));
+/*        User user = userRepository.save(newUser("신짱구", "test@naver.com"));
 
         Product product = productRepository.save(
                 newMockProduct(1L, "pants", ProductStatus.IN_STOCK, user.getId()));
 
         wishProductRepository.save(newMockWishProduct(1L, user.getId(), product));
 
-        em.clear();
+        em.clear();*/
     }
 }

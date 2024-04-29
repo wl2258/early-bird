@@ -1,4 +1,4 @@
-package com.ssonzm.productservice.dto.product;
+package com.ssonzm.coremodule.dto.product;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

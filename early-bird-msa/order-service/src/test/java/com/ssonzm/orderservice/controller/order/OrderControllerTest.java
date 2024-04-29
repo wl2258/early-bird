@@ -2,16 +2,9 @@ package com.ssonzm.orderservice.controller.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.orderservice.common.util.DummyUtil;
-import com.ssonzm.orderservice.domain.order.Order;
 import com.ssonzm.orderservice.domain.order.OrderRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
-import com.ssonzm.orderservice.domain.order_product.OrderStatus;
-import com.ssonzm.orderservice.domain.product.Product;
-import com.ssonzm.orderservice.domain.product.ProductRepository;
-import com.ssonzm.orderservice.domain.product.ProductStatus;
-import com.ssonzm.orderservice.domain.user.User;
-import com.ssonzm.orderservice.domain.user.UserRepository;
-import com.ssonzm.orderservice.dto.order.OrderRequestDto;
+import com.ssonzm.coremodule.dto.order.OrderRequestDto;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -52,11 +45,7 @@ class OrderControllerTest extends DummyUtil {
     @Mock
     private MessageSource messageSource;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private OrderRepository orderRepository;
-    @Autowired
-    private ProductRepository productRepository;
     @Autowired
     private OrderProductRepository orderProductRepository;
 
@@ -103,11 +92,11 @@ class OrderControllerTest extends DummyUtil {
     }
 
     private void dataSetting() {
-        User user = userRepository.save(newUser("신짱구", "test@naver.com"));
+/*        User user = userRepository.save(newUser("신짱구", "test@naver.com"));
         Product product = productRepository.save(newMockProduct(1L, "pants", ProductStatus.IN_STOCK, user.getId()));
         Order order = orderRepository.save(newMockOrder(1L, user.getId()));
         orderProductRepository.save(newMockOrderProduct(1L, user.getId(), product.getId(), order, OrderStatus.CREATED));
 
-        em.clear();
+        em.clear();*/
     }
 }

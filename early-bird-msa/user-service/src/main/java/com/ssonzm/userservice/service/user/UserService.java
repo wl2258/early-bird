@@ -1,10 +1,10 @@
 package com.ssonzm.userservice.service.user;
 
 import com.ssonzm.userservice.domain.user.User;
-import com.ssonzm.userservice.dto.user.UserResponseDto.UserDetailsDto;
+import com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import static com.ssonzm.userservice.dto.user.UserRequestDto.*;
+import static com.ssonzm.coremodule.dto.user.UserRequestDto.*;
 
 
 public interface UserService extends UserDetailsService {
