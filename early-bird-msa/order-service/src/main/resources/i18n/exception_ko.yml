@@ -49,3 +49,7 @@ failReturn:
 failSqsSender:
   code: "-4010"
   msg: "SQS 메시지 전송을 실패했습니다"
+
+failSqsListener:
+  code: "-4011"
+  msg: "SQS 메시지 수신을 실패했습니다"

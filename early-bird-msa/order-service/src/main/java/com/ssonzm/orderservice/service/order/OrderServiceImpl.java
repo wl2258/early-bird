@@ -1,5 +1,7 @@
 package com.ssonzm.orderservice.service.order;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.coremodule.dto.order.OrderRequestDto.OrderSaveReqDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
@@ -11,6 +13,7 @@ import com.ssonzm.orderservice.domain.order.OrderRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderStatus;
+import com.ssonzm.orderservice.service.aws_sqs.AmazonSqsSender;
 import com.ssonzm.orderservice.service.client.ProductServiceClient;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
@@ -24,12 +27,13 @@ import java.util.stream.Collectors;
 import static com.ssonzm.coremodule.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
+import static com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
 
 @Slf4j
 @Service
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
-
+    private final AmazonSqsSender sqsSender;
     private final DeliveryService deliveryService;
     private final OrderRepository orderRepository;
     private final DeliveryRepository deliveryRepository;
@@ -37,9 +41,10 @@ public class OrderServiceImpl implements OrderService {
     private final ProductServiceClient productServiceClient;
     private final OrderProductRepository orderProductRepository;
 
-    public OrderServiceImpl(DeliveryService deliveryService, OrderRepository orderRepository,
+    public OrderServiceImpl(AmazonSqsSender sqsSender, DeliveryService deliveryService, OrderRepository orderRepository,
                             DeliveryRepository deliveryRepository, OrderProductService orderProductService,
                             ProductServiceClient productServiceClient, OrderProductRepository orderProductRepository) {
+        this.sqsSender = sqsSender;
         this.deliveryService = deliveryService;
         this.orderRepository = orderRepository;
         this.deliveryRepository = deliveryRepository;
@@ -59,7 +64,24 @@ public class OrderServiceImpl implements OrderService {
         savedOrder.updateTotalPrice(totalPrice);
 
         saveDeliveryList(orderProductList);
+
+        updateQuantity(orderProductList);
+
         return savedOrder.getId();
+    }
+
+    private void updateQuantity(List<OrderProduct> orderProductList) {
+        List<OrderProductUpdateReqDto> orderProductUpdateReqDtoList = orderProductList.stream()
+                .map(op -> new OrderProductUpdateReqDto(op.getProductId(), -op.getQuantity()))
+                .toList();
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String message = objectMapper.writeValueAsString(orderProductUpdateReqDtoList);
+            sqsSender.sendMessage(message);
+        } catch (JsonProcessingException e) {
+            throw new CommonBadRequestException("failSqsSender");
+        }
     }
 
     private Order createOrder(Long userId) {

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import static com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductCancelReqDto;
+import static com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
 
 @Slf4j
 @Service
@@ -83,20 +83,19 @@ public class OrderProductServiceImpl implements OrderProductService {
         return !findDelivery.getStatus().equals(DeliveryStatus.READY_FOR_SHIPMENT);
     }
 
-    // TODO 수정 필요
+    // TODO sqs 사용
     private void restoreProductQuantity(OrderProduct orderProduct) {
-
-        OrderProductCancelReqDto orderProductCancelReqDto = new OrderProductCancelReqDto(
+        OrderProductUpdateReqDto orderProductUpdateReqDto = new OrderProductUpdateReqDto(
                 orderProduct.getProductId(), orderProduct.getQuantity());
 
         try {
-            String message = new ObjectMapper().writeValueAsString(orderProductCancelReqDto);
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<OrderProductUpdateReqDto> orderProductList = List.of(orderProductUpdateReqDto);
+            String message = objectMapper.writeValueAsString(orderProductList);
+
             sqsSender.sendMessage(message);
         } catch (JsonProcessingException e) {
             throw new CommonBadRequestException("failSqsSender");
         }
-
-        /*        Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
-        findProduct.updateQuantity(orderProduct.getQuantity());*/
     }
 }

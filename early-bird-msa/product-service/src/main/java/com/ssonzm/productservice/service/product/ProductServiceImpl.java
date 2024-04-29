@@ -1,5 +1,6 @@
 package com.ssonzm.productservice.service.product;
 
+import com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.productservice.domain.product.Product;
@@ -84,6 +85,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductListRespVo> getProductSavedByUser(Pageable pageable, Long userId) {
         return productRepository.getProductListByUser(pageable, userId);
+    }
+
+    @Override
+    @Transactional
+    public void updateProductQuantity(List<OrderProductUpdateReqDto> orderProductUpdateList) {
+        for (OrderProductUpdateReqDto updateDto : orderProductUpdateList) {
+            Product findProduct = findProductByIdOrElseThrow(updateDto.getProductId());
+            findProduct.updateQuantity(updateDto.getQuantity());
+        }
     }
 
     private ProductDetailsRespDto createProductDetailsRespDto(Product product) {
