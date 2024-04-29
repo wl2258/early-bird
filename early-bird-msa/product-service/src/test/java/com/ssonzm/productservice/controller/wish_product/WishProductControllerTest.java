@@ -8,7 +8,7 @@ import com.ssonzm.productservice.domain.product.ProductStatus;
 import com.ssonzm.productservice.domain.user.User;
 import com.ssonzm.productservice.domain.user.UserRepository;
 import com.ssonzm.productservice.domain.wish_product.WishProductRepository;
-import com.ssonzm.productservice.dto.wish_product.WishProductRequestDto.WishProductSaveReqDto;
+import com.ssonzm.coremodule.dto.wish_product.WishProductRequestDto.WishProductSaveReqDto;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import static com.ssonzm.productservice.dto.wish_product.WishProductRequestDto.WishProductUpdateReqDto;
+import static com.ssonzm.coremodule.dto.wish_product.WishProductRequestDto.WishProductUpdateReqDto;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

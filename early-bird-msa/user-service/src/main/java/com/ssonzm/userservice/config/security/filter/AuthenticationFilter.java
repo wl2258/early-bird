@@ -3,7 +3,7 @@ package com.ssonzm.userservice.config.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.userservice.config.security.PrincipalDetails;
 import com.ssonzm.userservice.domain.user.User;
-import com.ssonzm.userservice.dto.user.UserRequestDto.UserLoginReqDto;
+import com.ssonzm.coremodule.dto.user.UserRequestDto.UserLoginReqDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;

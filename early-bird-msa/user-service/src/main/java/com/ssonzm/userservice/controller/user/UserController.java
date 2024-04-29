@@ -11,8 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import static com.ssonzm.userservice.dto.user.UserRequestDto.*;
-import static com.ssonzm.userservice.dto.user.UserResponseDto.UserDetailsDto;
+import static com.ssonzm.coremodule.dto.user.UserRequestDto.*;
+import static com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
 
 @Slf4j
 @RestController

@@ -14,8 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import static com.ssonzm.productservice.dto.wish_product.WishProductRequestDto.WishProductSaveReqDto;
-import static com.ssonzm.productservice.dto.wish_product.WishProductRequestDto.WishProductUpdateReqDto;
+import static com.ssonzm.coremodule.dto.wish_product.WishProductRequestDto.WishProductSaveReqDto;
+import static com.ssonzm.coremodule.dto.wish_product.WishProductRequestDto.WishProductUpdateReqDto;
 import static com.ssonzm.productservice.vo.wish_product.WishProductResponseVo.WishProductListRespVo;
 
 @RestController

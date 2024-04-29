@@ -1,6 +1,6 @@
 package com.ssonzm.orderservice.service.return_product;
 
-import com.ssonzm.orderservice.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
+import com.ssonzm.coremodule.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
 
 public interface ReturnProductService {
 

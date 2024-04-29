@@ -1,8 +1,10 @@
 package com.ssonzm.orderservice.service.client;
 
-import com.ssonzm.orderservice.dto.product.ProductResponseDto.ProductDetailsRespDto;
+import com.ssonzm.coremodule.dto.ResponseDto;
+import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -10,6 +12,6 @@ import java.util.List;
 @FeignClient(name = "product-service")
 public interface ProductServiceClient {
 
-    @GetMapping("/api/products/detail")
-    List<ProductDetailsRespDto> getProductDetailsByIds(@RequestBody List<Long> productIds);
+    @PostMapping("/api/products/detail")
+    ResponseEntity<ResponseDto<List<ProductDetailsFeignClientRespDto>>> getProductDetailsByIds(@RequestBody List<Long> productIds);
 }

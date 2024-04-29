@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import static com.ssonzm.userservice.dto.verify_code.VerifyCodeDto.SendEmailCodeReqDto;
+import static com.ssonzm.coremodule.dto.verify_code.VerifyCodeDto.SendEmailCodeReqDto;
 
 @RestController
 @RequestMapping("/api/users/verify-code")

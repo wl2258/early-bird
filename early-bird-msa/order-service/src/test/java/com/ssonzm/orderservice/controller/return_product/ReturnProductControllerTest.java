@@ -15,7 +15,7 @@ import com.ssonzm.orderservice.domain.product.ProductStatus;
 import com.ssonzm.orderservice.domain.return_product.ReturnProductRepository;
 import com.ssonzm.orderservice.domain.user.User;
 import com.ssonzm.orderservice.domain.user.UserRepository;
-import com.ssonzm.orderservice.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
+import com.ssonzm.coremodule.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;

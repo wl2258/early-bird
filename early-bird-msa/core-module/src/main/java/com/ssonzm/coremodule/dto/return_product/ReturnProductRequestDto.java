@@ -1,4 +1,4 @@
-package com.ssonzm.orderservice.dto.return_product;
+package com.ssonzm.coremodule.dto.return_product;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

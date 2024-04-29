@@ -14,7 +14,7 @@ import com.ssonzm.productservice.domain.product.ProductRepository;
 import com.ssonzm.productservice.domain.product.ProductStatus;
 import com.ssonzm.productservice.domain.user.User;
 import com.ssonzm.productservice.domain.user.UserRepository;
-import com.ssonzm.productservice.dto.product.ProductRequestDto.ProductSaveReqDto;
+import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;

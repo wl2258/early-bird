@@ -1,5 +1,6 @@
 package com.ssonzm.productservice.service.product;
 
+import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.domain.product.ProductCategory;
@@ -14,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.ssonzm.productservice.dto.product.ProductRequestDto.ProductSaveReqDto;
-import static com.ssonzm.productservice.dto.product.ProductResponseDto.ProductDetailsRespDto;
-import static com.ssonzm.productservice.dto.product.ProductResponseDto.ProductListSavedUser;
+import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
+import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
+import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductListSavedUser;
 import static com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
 
 @Slf4j
@@ -64,10 +65,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDetailsRespDto> getProductDetailsByIds(List<Long> productIds) {
+    public List<ProductDetailsFeignClientRespDto> getProductDetailsByIds(List<Long> productIds) {
         List<Product> productList = productRepository.findAllByIds(productIds);
         return productList.stream()
-                .map(p -> new ModelMapper().map(p, ProductDetailsRespDto.class))
+                .map(p -> new ModelMapper().map(p, ProductDetailsFeignClientRespDto.class))
                 .toList();
     }
 
@@ -81,9 +82,14 @@ public class ProductServiceImpl implements ProductService {
     public ProductListSavedUser getProductSavedByUser(Long userId) {
         List<Product> productList = productRepository.findByUserId(userId);
         List<ProductDetailsRespDto> savedProductList = productList.stream()
-                .map(ProductDetailsRespDto::new)
+                .map(ProductServiceImpl::createProductDetailsRespDto)
                 .toList();
 
         return new ProductListSavedUser(savedProductList);
+    }
+
+    private static ProductDetailsRespDto createProductDetailsRespDto(Product p) {
+        return new ProductDetailsRespDto(p.getId(), p.getName(), String.valueOf(p.getCategory()),
+                p.getDescription(), p.getQuantity(), p.getPrice(), p.getCreatedDate());
     }
 }

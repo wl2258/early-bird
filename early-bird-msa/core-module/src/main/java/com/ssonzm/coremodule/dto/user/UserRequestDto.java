@@ -1,4 +1,4 @@
-package com.ssonzm.userservice.dto.user;
+package com.ssonzm.coremodule.dto.user;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

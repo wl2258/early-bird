@@ -1,4 +1,4 @@
-package com.ssonzm.orderservice.dto.delivery;
+package com.ssonzm.coremodule.dto.delivery;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

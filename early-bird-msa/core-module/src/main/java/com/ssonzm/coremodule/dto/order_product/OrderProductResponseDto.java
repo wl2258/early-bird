@@ -1,4 +1,4 @@
-package com.ssonzm.orderservice.dto.order_product;
+package com.ssonzm.coremodule.dto.order_product;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

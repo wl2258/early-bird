@@ -1,4 +1,4 @@
-package com.ssonzm.productservice.dto.wish_product;
+package com.ssonzm.coremodule.dto.wish_product;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

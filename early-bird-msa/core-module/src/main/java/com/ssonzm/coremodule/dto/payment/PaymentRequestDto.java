@@ -1,4 +1,4 @@
-package com.ssonzm.orderservice.dto.payment;
+package com.ssonzm.coremodule.dto.payment;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
