@@ -1,21 +1,12 @@
 package com.ssonzm.orderservice.controller.return_product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssonzm.coremodule.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
 import com.ssonzm.orderservice.common.util.DummyUtil;
 import com.ssonzm.orderservice.domain.delivery.DeliveryRepository;
-import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;
-import com.ssonzm.orderservice.domain.order.Order;
 import com.ssonzm.orderservice.domain.order.OrderRepository;
-import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
-import com.ssonzm.orderservice.domain.order_product.OrderStatus;
-import com.ssonzm.orderservice.domain.product.Product;
-import com.ssonzm.orderservice.domain.product.ProductRepository;
-import com.ssonzm.orderservice.domain.product.ProductStatus;
 import com.ssonzm.orderservice.domain.return_product.ReturnProductRepository;
-import com.ssonzm.orderservice.domain.user.User;
-import com.ssonzm.orderservice.domain.user.UserRepository;
-import com.ssonzm.coremodule.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -51,12 +42,12 @@ class ReturnProductControllerTest extends DummyUtil {
     private ObjectMapper om;
     @Mock
     private MessageSource messageSource;
-    @Autowired
-    private UserRepository userRepository;
+/*    @Autowired
+    private UserRepository userRepository;*/
     @Autowired
     private OrderRepository orderRepository;
-    @Autowired
-    private ProductRepository productRepository;
+/*    @Autowired
+    private ProductRepository productRepository;*/
     @Autowired
     private DeliveryRepository deliveryRepository;
     @Autowired
@@ -111,7 +102,7 @@ class ReturnProductControllerTest extends DummyUtil {
     }
 
     private void dataSetting() {
-        User user = userRepository.save(newUser("신짱구", "test@naver.com"));
+/*        User user = userRepository.save(newUser("신짱구", "test@naver.com"));
 
         Product product = productRepository.save(
                 newMockProduct(1L, "pants", ProductStatus.IN_STOCK, user.getId()));
@@ -126,6 +117,6 @@ class ReturnProductControllerTest extends DummyUtil {
         deliveryRepository.save(newMockDelivery(1L, orderProduct1.getId(), DeliveryStatus.READY_FOR_SHIPMENT));
         deliveryRepository.save(newMockDelivery(2L, orderProduct2.getId(), DeliveryStatus.DELIVERED));
 
-        em.clear();
+        em.clear();*/
     }
 }
