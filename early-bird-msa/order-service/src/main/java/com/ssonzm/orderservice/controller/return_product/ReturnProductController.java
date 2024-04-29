@@ -36,4 +36,10 @@ public class ReturnProductController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
+
+    @GetMapping("/test")
+    public String test() {
+        returnProductService.updateReturnStatus();
+        return "test";
+    }
 }

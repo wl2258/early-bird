@@ -10,7 +10,9 @@ import java.util.List;
 
 public interface ReturnProductRepository extends JpaRepository<ReturnProduct, Long> {
     @EntityGraph(attributePaths = {"orderProduct"})
-    @Query("select rp from ReturnProduct rp where rp.lastModifiedDate between :prevDay and :nextDay")
+    @Query("select rp from ReturnProduct rp where rp.lastModifiedDate between :prevDay and :nextDay " +
+            "and rp.status = :status")
     List<ReturnProduct> findAllBetweenPrevDayAndToday(@Param("prevDay") LocalDateTime prevDay,
-                                                     @Param("nextDay")LocalDateTime nextDay);
+                                                      @Param("nextDay") LocalDateTime nextDay,
+                                                      @Param("status") ReturnStatus status);
 }
