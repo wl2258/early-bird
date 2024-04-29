@@ -28,6 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 
 	/* Querydsl 추가 */
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

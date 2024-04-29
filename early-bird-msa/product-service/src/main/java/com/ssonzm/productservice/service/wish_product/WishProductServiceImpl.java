@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.ssonzm.productservice.vo.wish_product.WishProductResponseVo.WishProductListRespVo;
+import static com.ssonzm.coremodule.vo.wish_product.WishProductResponseVo.WishProductListRespVo;
 
 @Service
 @Transactional(readOnly = true)

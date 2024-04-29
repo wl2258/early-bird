@@ -1,4 +1,4 @@
-package com.ssonzm.productservice.vo.wish_product;
+package com.ssonzm.coremodule.vo.wish_product;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

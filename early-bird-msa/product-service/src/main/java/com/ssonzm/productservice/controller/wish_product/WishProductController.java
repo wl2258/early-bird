@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.ssonzm.coremodule.dto.wish_product.WishProductRequestDto.WishProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.wish_product.WishProductRequestDto.WishProductUpdateReqDto;
-import static com.ssonzm.productservice.vo.wish_product.WishProductResponseVo.WishProductListRespVo;
+import static com.ssonzm.coremodule.vo.wish_product.WishProductResponseVo.WishProductListRespVo;
 
 @RestController
 @RequestMapping("/api")
@@ -42,9 +42,10 @@ public class WishProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @GetMapping("/authz/wish-products")
-    public ResponseEntity<?> getWishProductList(@PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                @RequestHeader("x_user_id") Long userId) {
+    @GetMapping("/wish-products/{userId}")
+    public ResponseEntity<ResponseDto<Page<WishProductListRespVo>>> getWishProductList(
+            @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable("userId") Long userId) {
         Page<WishProductListRespVo> wishProductList =
                 wishProductService.findWishProductList(userId, pageable);
 

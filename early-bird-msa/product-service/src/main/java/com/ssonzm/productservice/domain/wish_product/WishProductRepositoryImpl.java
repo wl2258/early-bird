@@ -12,7 +12,7 @@ import java.util.List;
 
 import static com.ssonzm.productservice.domain.product.QProduct.product;
 import static com.ssonzm.productservice.domain.wish_product.QWishProduct.wishProduct;
-import static com.ssonzm.productservice.vo.wish_product.WishProductResponseVo.*;
+import static com.ssonzm.coremodule.vo.wish_product.WishProductResponseVo.*;
 
 
 public class WishProductRepositoryImpl implements WishProductRepositoryCustom {

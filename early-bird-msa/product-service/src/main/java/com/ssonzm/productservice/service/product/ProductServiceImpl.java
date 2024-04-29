@@ -18,9 +18,8 @@ import java.util.List;
 
 import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
-import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductListSavedUser;
 import static com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
-import static com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
+import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 
 @Slf4j
 @Service
@@ -83,18 +82,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductListSavedUser getProductSavedByUser(Long userId) {
-        List<Product> productList = productRepository.findByUserId(userId);
-        List<ProductDetailsRespDto> savedProductList = productList.stream()
-                .map(this::createProductDetailsRespDto)
-                .toList();
-
-        return new ProductListSavedUser(savedProductList);
+    public Page<ProductListRespVo> getProductSavedByUser(Pageable pageable, Long userId) {
+        return productRepository.getProductListByUser(pageable, userId);
     }
 
     private ProductDetailsRespDto createProductDetailsRespDto(Product product) {
         UserDetailsDto userDetailsDto = userServiceClient.getUserDetailsFeignClient(product.getUserId()).getBody().getBody();
-
 
         return new ProductDetailsRespDto(product.getId(), userDetailsDto.getName(), product.getName(),
                 String.valueOf(product.getCategory()), product.getDescription(), product.getQuantity(),

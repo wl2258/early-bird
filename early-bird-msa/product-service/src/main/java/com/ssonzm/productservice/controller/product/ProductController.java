@@ -2,10 +2,9 @@ package com.ssonzm.productservice.controller.product;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
-import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductListSavedUser;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.productservice.service.product.ProductService;
-import com.ssonzm.productservice.vo.product.ProductResponseVo.ProductListRespVo;
+import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -71,7 +70,7 @@ public class ProductController {
     }
 
     @GetMapping("/products/{productId}")
-    public ResponseEntity<?> getProductDetails(@PathVariable Long productId) {
+    public ResponseEntity<?> getProductDetails(@PathVariable("productId") Long productId) {
         ProductDetailsRespDto productDetails = productService.getProductDetails(productId);
 
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
@@ -80,13 +79,15 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/authz/products/my")
-    public ResponseEntity<?> getProductListSavedByUser(@RequestHeader("x_user_id") Long userId) {
+    @GetMapping("/products/my/{userId}")
+    public ResponseEntity<ResponseDto<Page<ProductListRespVo>>> getProductListSavedByUser(
+            @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC)Pageable pageable,
+            @PathVariable("userId") Long userId) {
 
-        ProductListSavedUser productList = productService.getProductSavedByUser(userId);
+        Page<ProductListRespVo> productSavedByUser = productService.getProductSavedByUser(pageable, userId);
 
-        ResponseDto<ProductListSavedUser> responseDto = ResponseUtil.setResponseDto(messageSource, true);
-        responseDto.setBody(productList);
+        ResponseDto<Page<ProductListRespVo>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(productSavedByUser);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
