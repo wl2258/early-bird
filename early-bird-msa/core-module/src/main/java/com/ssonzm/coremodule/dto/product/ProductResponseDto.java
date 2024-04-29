@@ -13,8 +13,9 @@ public class ProductResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ProductDetailsRespDto {
-        private Long id;
-        private String name;
+        private Long productId;
+        private String username;
+        private String productName;
         private String category;
         private String description;
         private int quantity;
