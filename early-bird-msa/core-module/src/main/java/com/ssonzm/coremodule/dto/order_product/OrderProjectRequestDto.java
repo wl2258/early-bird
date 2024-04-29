@@ -8,8 +8,8 @@ public class OrderProjectRequestDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class OrderProductCancelReqDto {
-        private Long orderProductId;
+    public static class OrderProductUpdateReqDto {
+        private Long productId;
         private int quantity;
     }
 }

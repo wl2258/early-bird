@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+import static com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
 import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
@@ -23,4 +24,6 @@ public interface ProductService {
     Product findProductByIdOrElseThrow(Long productId);
 
     Page<ProductListRespVo> getProductSavedByUser (Pageable pageable, Long userId);
+
+    void updateProductQuantity(List<OrderProductUpdateReqDto> orderProductUpdateList);
 }
