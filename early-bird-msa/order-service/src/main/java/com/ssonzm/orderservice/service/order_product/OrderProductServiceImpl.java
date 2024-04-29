@@ -1,5 +1,7 @@
 package com.ssonzm.orderservice.service.order_product;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.orderservice.domain.delivery.Delivery;
 import com.ssonzm.orderservice.domain.delivery.DeliveryRepository;
@@ -7,6 +9,7 @@ import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;
 import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderStatus;
+import com.ssonzm.orderservice.service.aws_sqs.AmazonSqsSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,15 +19,19 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductCancelReqDto;
+
 @Slf4j
 @Service
 @Transactional(readOnly = true)
 public class OrderProductServiceImpl implements OrderProductService {
+    private final AmazonSqsSender sqsSender;
     private final DeliveryRepository deliveryRepository;
     private final OrderProductRepository orderProductRepository;
 
-    public OrderProductServiceImpl(DeliveryRepository deliveryRepository,
+    public OrderProductServiceImpl(AmazonSqsSender sqsSender, DeliveryRepository deliveryRepository,
                                    OrderProductRepository orderProductRepository) {
+        this.sqsSender = sqsSender;
         this.deliveryRepository = deliveryRepository;
         this.orderProductRepository = orderProductRepository;
     }
@@ -78,7 +85,18 @@ public class OrderProductServiceImpl implements OrderProductService {
 
     // TODO 수정 필요
     private void restoreProductQuantity(OrderProduct orderProduct) {
-/*        Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
+
+        OrderProductCancelReqDto orderProductCancelReqDto = new OrderProductCancelReqDto(
+                orderProduct.getProductId(), orderProduct.getQuantity());
+
+        try {
+            String message = new ObjectMapper().writeValueAsString(orderProductCancelReqDto);
+            sqsSender.sendMessage(message);
+        } catch (JsonProcessingException e) {
+            throw new CommonBadRequestException("failSqsSender");
+        }
+
+        /*        Product findProduct = productService.findProductByIdOrElseThrow(orderProduct.getProductId());
         findProduct.updateQuantity(orderProduct.getQuantity());*/
     }
 }

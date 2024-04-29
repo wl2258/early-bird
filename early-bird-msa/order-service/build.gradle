@@ -30,6 +30,10 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 
+    // aws sqs
+    implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+
     /* Querydsl 추가 */
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
