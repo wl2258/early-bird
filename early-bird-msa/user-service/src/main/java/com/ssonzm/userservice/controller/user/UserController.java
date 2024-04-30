@@ -70,17 +70,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<ResponseDto<UserDetailsDto>> getUserDetailsFeignClient(@PathVariable("userId") Long userId) {
-
-        UserDetailsDto userDetails = userService.getUserDetails(userId);
-
-        ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
-        responseDto.setBody(userDetails);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
     @PostMapping("/authz/logout")
     public ResponseEntity<?> logout() {
         ResponseDto<UserDetailsDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
@@ -88,13 +77,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @GetMapping("/admin")
-    public String test() {
-        return "test";
-    }
-
-    @GetMapping("/authz/users/my-page/{userId}")
-    public ResponseEntity<ResponseDto<UserMyPageRespDto>> getMyPage(@PathVariable("userId") Long userId) {
+    @GetMapping("/authz/users/my-page")
+    public ResponseEntity<?> getMyPage(@RequestHeader("x_user_id") Long userId) {
         UserMyPageRespDto userMyPageRespDto = userService.getMyPage(userId);
 
         ResponseDto<UserMyPageRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
