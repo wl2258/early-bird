@@ -97,7 +97,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private ProductDetailsRespDto createProductDetailsRespDto(Product product) {
-        UserDetailsDto userDetailsDto = userServiceClient.getUserDetailsFeignClient(product.getUserId()).getBody().getBody();
+        UserDetailsDto userDetailsDto = userServiceClient.getUserDetails(product.getUserId()).getBody().getBody();
 
         return new ProductDetailsRespDto(product.getId(), userDetailsDto.getName(), product.getName(),
                 String.valueOf(product.getCategory()), product.getDescription(), product.getQuantity(),
