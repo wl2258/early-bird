@@ -90,3 +90,13 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+
+        - id: product-internal-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/product-service/internal/**
+            - Method=GET, POST, PATCH, DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+            - AuthorizationFilter
