@@ -1,10 +1,9 @@
 package com.ssonzm.productservice.controller.product;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
-import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
-import com.ssonzm.productservice.service.product.ProductService;
 import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
+import com.ssonzm.productservice.service.product.ProductService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -16,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
@@ -59,35 +56,12 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    @PostMapping("/products/detail")
-    public ResponseEntity<ResponseDto<List<ProductDetailsFeignClientRespDto>>> getProductDetailsByIds(@RequestBody List<Long> productIds) {
-        List<ProductDetailsFeignClientRespDto> productDetailsByIds = productService.getProductDetailsByIds(productIds);
-
-        ResponseDto<List<ProductDetailsFeignClientRespDto>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
-        responseDto.setBody(productDetailsByIds);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
     @GetMapping("/products/{productId}")
     public ResponseEntity<?> getProductDetails(@PathVariable("productId") Long productId) {
         ProductDetailsRespDto productDetails = productService.getProductDetails(productId);
 
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productDetails);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    @GetMapping("/products/my/{userId}")
-    public ResponseEntity<ResponseDto<Page<ProductListRespVo>>> getProductListSavedByUser(
-            @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC)Pageable pageable,
-            @PathVariable("userId") Long userId) {
-
-        Page<ProductListRespVo> productSavedByUser = productService.getProductSavedByUser(pageable, userId);
-
-        ResponseDto<Page<ProductListRespVo>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
-        responseDto.setBody(productSavedByUser);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

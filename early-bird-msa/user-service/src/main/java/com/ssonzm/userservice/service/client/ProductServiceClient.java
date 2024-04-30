@@ -13,11 +13,11 @@ import static com.ssonzm.coremodule.vo.wish_product.WishProductResponseVo.WishPr
 
 @FeignClient(name = "product-service")
 public interface ProductServiceClient {
-    @GetMapping("/api/products/my/{userId}")
+    @GetMapping("/internal/products/my/{userId}")
     ResponseEntity<ResponseDto<Page<ProductListRespVo>>> getProductListSavedByUser(
             @PathVariable("userId") Long userId);
 
-    @GetMapping("/api/wish-products/{userId}")
+    @GetMapping("/internal/wish-products/{userId}")
     ResponseEntity<ResponseDto<Page<WishProductListRespVo>>> getWishProductList(
             @PathVariable("userId") Long userId);
 }

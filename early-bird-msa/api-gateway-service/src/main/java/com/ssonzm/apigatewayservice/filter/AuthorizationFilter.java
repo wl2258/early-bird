@@ -1,13 +1,18 @@
 package com.ssonzm.apigatewayservice.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssonzm.apigatewayservice.filter.dto.ResponseDto;
 import com.ssonzm.apigatewayservice.filter.dto.UserDetailsDto;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -21,10 +26,15 @@ import java.util.Base64;
 @Slf4j
 @Component
 public class AuthorizationFilter extends AbstractGatewayFilterFactory<AuthorizationFilter.Config> {
-    private Environment env;
+    private final Environment env;
     private final String USER_ID_HEADER = "x_user_id";
+    private final String USER_ROLE = "USER";
+    private final String ADMIN_ROLE = "ADMIN";
+    private final String NO_AUTH_MSG = "접근 권한이 없습니다";
+    private final String NOT_VALID = "유효성 검사에 실패했습니다";
 
-    public AuthorizationFilter( Environment env) {
+
+    public AuthorizationFilter(Environment env) {
         super(Config.class);
         this.env = env;
     }
@@ -33,22 +43,28 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
+
+            String requestUri = request.getURI().toString();
+            if (requestUri.contains("/internal/")) {
+                return onError(exchange, NO_AUTH_MSG, HttpStatus.UNAUTHORIZED);
+            }
+
             if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
+                return onError(exchange, NO_AUTH_MSG, HttpStatus.UNAUTHORIZED);
             }
 
             String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
             String jwt = authorizationHeader.replace("Bearer", "");
 
             if (!isJwtValid(jwt)) {
-                return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
+                return onError(exchange, NOT_VALID, HttpStatus.UNAUTHORIZED);
             }
 
             UserDetailsDto userDetails = verify(jwt);
 
             String role = userDetails.getRole();
             if (!isAuthorizedAccess(role, request.getPath().value())) {
-                return onError(exchange, "Unauthorized access", HttpStatus.FORBIDDEN);
+                return onError(exchange, NO_AUTH_MSG, HttpStatus.FORBIDDEN);
             }
 
             ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
@@ -66,11 +82,13 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
     private boolean isAuthorizedAccess(String role, String requestPath) {
         boolean isAuthorized = true;
 
-        if (role.equals("USER")) {
+        if (role.equals(USER_ROLE)) {
             if (requestPath.startsWith("/api/admin"))
                 isAuthorized = false;
-        } else if (!role.equals("ADMIN")) {
-            isAuthorized = false;
+        } else {
+            if (!role.equals(ADMIN_ROLE)) {
+                isAuthorized = false;
+            }
         }
 
         return isAuthorized;
@@ -128,8 +146,18 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
 
-        log.error(err);
-        return response.setComplete();
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseDto responseDto = new ResponseDto(err);
+        DataBuffer buffer = null;
+        try {
+            buffer = response.bufferFactory().wrap(new ObjectMapper().writeValueAsBytes(responseDto));
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
+
+        return response.writeWith(Mono.just(buffer))
+                .doOnError(error -> Mono.empty());
     }
 
     public static class Config {
