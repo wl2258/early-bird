@@ -10,6 +10,8 @@ import com.ssonzm.productservice.domain.product.ProductStatus;
 import com.ssonzm.productservice.service.client.UserServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,10 +31,13 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final UserServiceClient userServiceClient;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
-    public ProductServiceImpl(ProductRepository productRepository, UserServiceClient userServiceClient) {
+    public ProductServiceImpl(ProductRepository productRepository, UserServiceClient userServiceClient,
+                              CircuitBreakerFactory circuitBreakerFactory) {
         this.productRepository = productRepository;
         this.userServiceClient = userServiceClient;
+        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     @Override
@@ -97,7 +102,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private ProductDetailsRespDto createProductDetailsRespDto(Product product) {
-        UserDetailsDto userDetailsDto = userServiceClient.getUserDetails(product.getUserId()).getBody().getBody();
+        CircuitBreaker circuitbreaker = circuitBreakerFactory.create("user-circuit-breaker");
+
+        UserDetailsDto userDetailsDto = circuitbreaker
+                .run(() -> userServiceClient.getUserDetails(product.getUserId()).getBody().getBody(),
+                        throwable -> new UserDetailsDto());
 
         return new ProductDetailsRespDto(product.getId(), userDetailsDto.getName(), product.getName(),
                 String.valueOf(product.getCategory()), product.getDescription(), product.getQuantity(),
