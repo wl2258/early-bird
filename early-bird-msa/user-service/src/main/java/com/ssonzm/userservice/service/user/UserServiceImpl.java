@@ -8,14 +8,19 @@ import com.ssonzm.userservice.domain.user.UserRole;
 import com.ssonzm.userservice.service.client.ProductServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 import static com.ssonzm.coremodule.dto.user.UserRequestDto.*;
 import static com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
@@ -31,14 +36,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ProductServiceClient productServiceClient;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
     public UserServiceImpl(MessageSource messageSource, UserRepository userRepository,
                            ProductServiceClient productServiceClient,
-                           BCryptPasswordEncoder bCryptPasswordEncoder) {
+                           BCryptPasswordEncoder bCryptPasswordEncoder, CircuitBreakerFactory circuitBreakerFactory) {
         this.messageSource = messageSource;
         this.userRepository = userRepository;
         this.productServiceClient = productServiceClient;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     @Override
@@ -93,8 +100,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserMyPageRespDto getMyPage(Long userId) {
 
-        Page<ProductListRespVo> productList = productServiceClient.getProductListSavedByUser(userId).getBody().getBody();
-        Page<WishProductListRespVo> wishProductList = productServiceClient.getWishProductList(userId).getBody().getBody();
+        CircuitBreaker circuitbreaker = circuitBreakerFactory.create("product-circuit-breaker");
+
+        Page<ProductListRespVo> productList = circuitbreaker
+                .run(() -> productServiceClient.getProductListSavedByUser(userId).getBody().getBody(),
+                        throwable -> new PageImpl<>(Collections.emptyList()));
+
+        Page<WishProductListRespVo> wishProductList = circuitbreaker
+                .run(() -> productServiceClient.getWishProductList(userId).getBody().getBody(),
+                        throwable -> new PageImpl<>(Collections.emptyList()));
 
         return new UserMyPageRespDto(productList, wishProductList);
     }
@@ -103,7 +117,7 @@ public class UserServiceImpl implements UserService {
     public User findByIdOrElseThrow(Long userId) {
 
         return userRepository.findById(userId).orElseThrow(() -> {
-            String messageSource = this.messageSource.getMessage( "notFoundUser.msg", null, LocaleContextHolder.getLocale());
+            String messageSource = this.messageSource.getMessage("notFoundUser.msg", null, LocaleContextHolder.getLocale());
             log.error(messageSource);
             return new CommonBadRequestException(messageSource);
         });

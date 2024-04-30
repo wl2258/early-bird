@@ -53,3 +53,7 @@ failSqsSender:
 failSqsListener:
   code: "-4011"
   msg: "SQS 메시지 수신을 실패했습니다"
+
+tryAgain:
+  code: "-4012"
+  msg: "잠시 후 다시 시도해 주세요"
