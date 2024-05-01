@@ -84,7 +84,8 @@ public class ProductServiceImpl implements ProductService {
                 product.getDescription(),
                 product.getQuantity(),
                 product.getPrice(),
-                product.getCreatedDate()
+                product.getCreatedDate(),
+                product.getReservationStartTime()
         );
     }
 
