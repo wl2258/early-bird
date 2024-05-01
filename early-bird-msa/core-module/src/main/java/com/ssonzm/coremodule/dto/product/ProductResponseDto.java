@@ -22,6 +22,8 @@ public class ProductResponseDto {
         private int price;
         @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime createdDate;
+        @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "Asia/Seoul")
+        private LocalDateTime reservationStartTime;
     }
 
     @Data

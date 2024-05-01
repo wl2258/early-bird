@@ -31,7 +31,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         product.status.stringValue(),
                         product.quantity,
                         product.price,
-                        product.description
+                        product.description,
+                        product.reservationStartTime
                 ))
                 .from(product)
                 .offset(pageable.getOffset())
@@ -56,7 +57,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         product.status.stringValue(),
                         product.quantity,
                         product.price,
-                        product.description
+                        product.description,
+                        product.reservationStartTime
                 ))
                 .from(product)
                 .where(product.userId.eq(userId))

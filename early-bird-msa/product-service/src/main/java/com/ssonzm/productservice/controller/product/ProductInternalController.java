@@ -1,9 +1,7 @@
 package com.ssonzm.productservice.controller.product;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
-import com.ssonzm.coremodule.dto.product.ProductResponseDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
-import com.ssonzm.coremodule.vo.product.ProductResponseVo;
 import com.ssonzm.productservice.service.product.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -16,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
+import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 
 @Slf4j
 @RestController
@@ -30,23 +31,23 @@ public class ProductInternalController {
     }
 
     @PostMapping("/products/detail")
-    public ResponseEntity<ResponseDto<List<ProductResponseDto.ProductDetailsFeignClientRespDto>>> getProductDetailsByIds(@RequestBody List<Long> productIds) {
-        List<ProductResponseDto.ProductDetailsFeignClientRespDto> productDetailsByIds = productService.getProductDetailsByIds(productIds);
+    public ResponseEntity<ResponseDto<List<ProductDetailsFeignClientRespDto>>> getProductDetailsByIds(@RequestBody List<Long> productIds) {
+        List<ProductDetailsFeignClientRespDto> productDetailsByIds = productService.getProductDetailsByIds(productIds);
 
-        ResponseDto<List<ProductResponseDto.ProductDetailsFeignClientRespDto>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        ResponseDto<List<ProductDetailsFeignClientRespDto>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productDetailsByIds);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @GetMapping("/products/my/{userId}")
-    public ResponseEntity<ResponseDto<Page<ProductResponseVo.ProductListRespVo>>> getProductListSavedByUser(
+    public ResponseEntity<ResponseDto<Page<ProductListRespVo>>> getProductListSavedByUser(
             @PageableDefault(size = 20, sort = "createdDate", direction = Sort.Direction.DESC)Pageable pageable,
             @PathVariable("userId") Long userId) {
 
-        Page<ProductResponseVo.ProductListRespVo> productSavedByUser = productService.getProductSavedByUser(pageable, userId);
+        Page<ProductListRespVo> productSavedByUser = productService.getProductSavedByUser(pageable, userId);
 
-        ResponseDto<Page<ProductResponseVo.ProductListRespVo>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        ResponseDto<Page<ProductListRespVo>> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productSavedByUser);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
