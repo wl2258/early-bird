@@ -17,11 +17,11 @@ import com.ssonzm.orderservice.service.aws_sqs.AmazonSqsSender;
 import com.ssonzm.orderservice.service.client.ProductServiceClient;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,6 +110,10 @@ public class OrderServiceImpl implements OrderService {
                 .filter(p -> p.getId().equals(orderSaveReqDto.getProductId()))
                 .findFirst()
                 .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
+
+        if (productDetails.getReservationStartTime() != null && productDetails.getReservationStartTime().isAfter(LocalDateTime.now())) {
+            throw new CommonBadRequestException("failOrder");
+        }
 
         int quantity = orderSaveReqDto.getQuantity();
         return OrderProduct.builder()

@@ -32,6 +32,7 @@ public class ProductResponseDto {
     public static class ProductDetailsFeignClientRespDto {
         private Long id;
         private int price;
+        private LocalDateTime reservationStartTime;
     }
 
     @Data
