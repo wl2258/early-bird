@@ -1,11 +1,15 @@
 package com.ssonzm.coremodule.dto.product;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 public class ProductRequestDto {
     @Data
@@ -26,5 +30,9 @@ public class ProductRequestDto {
 
         @NotNull(message = "가격을 입력해 주세요")
         private Integer price;
+
+        @Nullable
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+        private LocalDateTime reservationStartTime;
     }
 }

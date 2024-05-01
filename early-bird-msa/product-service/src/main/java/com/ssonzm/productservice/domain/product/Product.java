@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Entity
 @Table(name = "products")
@@ -40,9 +42,12 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private int price;
 
+    private LocalDateTime reservationStartTime;
+
     @Builder
     public Product(Long id, Long userId, String name, ProductCategory category,
-                   String description, ProductStatus status, int quantity, int price) {
+                   String description, ProductStatus status, int quantity, int price,
+                   LocalDateTime reservationStartTime) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -51,6 +56,7 @@ public class Product extends BaseEntity {
         this.status = status;
         this.quantity = quantity;
         this.price = price;
+        this.reservationStartTime = reservationStartTime;
     }
 
     public void updateQuantity(int quantity) {

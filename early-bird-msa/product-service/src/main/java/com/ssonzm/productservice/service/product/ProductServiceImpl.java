@@ -55,6 +55,7 @@ public class ProductServiceImpl implements ProductService {
                 .description(productSaveReqDto.getDescription())
                 .price(productSaveReqDto.getPrice())
                 .quantity(quantity)
+                .reservationStartTime(productSaveReqDto.getReservationStartTime())
                 .build();
     }
 
