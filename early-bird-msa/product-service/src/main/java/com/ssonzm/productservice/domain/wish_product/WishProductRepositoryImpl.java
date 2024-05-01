@@ -31,7 +31,8 @@ public class WishProductRepositoryImpl implements WishProductRepositoryCustom {
                         wishProduct.product.id,
                         wishProduct.product.name,
                         wishProduct.quantity,
-                        wishProduct.price
+                        wishProduct.price,
+                        wishProduct.product.reservationStartTime
                 ))
                 .from(wishProduct)
                 .join(wishProduct.product, product)
