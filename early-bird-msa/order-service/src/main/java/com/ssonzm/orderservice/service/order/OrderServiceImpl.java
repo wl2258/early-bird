@@ -17,9 +17,8 @@ import com.ssonzm.orderservice.service.aws_sqs.AmazonSqsSender;
 import com.ssonzm.orderservice.service.client.ProductServiceClient;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,20 +40,17 @@ public class OrderServiceImpl implements OrderService {
     private final DeliveryRepository deliveryRepository;
     private final OrderProductService orderProductService;
     private final ProductServiceClient productServiceClient;
-    private final CircuitBreakerFactory circuitBreakerFactory;
     private final OrderProductRepository orderProductRepository;
 
     public OrderServiceImpl(AmazonSqsSender sqsSender, DeliveryService deliveryService, OrderRepository orderRepository,
                             DeliveryRepository deliveryRepository, OrderProductService orderProductService,
-                            ProductServiceClient productServiceClient, CircuitBreakerFactory circuitBreakerFactory,
-                            OrderProductRepository orderProductRepository) {
+                            ProductServiceClient productServiceClient, OrderProductRepository orderProductRepository) {
         this.sqsSender = sqsSender;
         this.deliveryService = deliveryService;
         this.orderRepository = orderRepository;
         this.deliveryRepository = deliveryRepository;
         this.orderProductService = orderProductService;
         this.productServiceClient = productServiceClient;
-        this.circuitBreakerFactory = circuitBreakerFactory;
         this.orderProductRepository = orderProductRepository;
     }
 
@@ -99,14 +95,9 @@ public class OrderServiceImpl implements OrderService {
                 .map(OrderSaveReqDto::getProductId)
                 .toList();
 
-        CircuitBreaker circuitbreaker = circuitBreakerFactory.create("product-circuit-breaker");
+        List<ProductDetailsFeignClientRespDto> productDetailsList =
+                productServiceClient.getProductDetailsByIds(productIds).getBody().getBody();
 
-        List<ProductDetailsFeignClientRespDto> productDetailsList = circuitbreaker
-                .run(() -> productServiceClient.getProductDetailsByIds(productIds).getBody().getBody(),
-                        throwable -> {
-                            throw new CommonBadRequestException("tryAgain", throwable);
-                        });
-        
         return orderSaveReqDtoList.stream()
                 .map(orderSaveReqDto -> createOrderProduct(userId, orderSaveReqDto, productDetailsList, savedOrder))
                 .collect(Collectors.toList());
