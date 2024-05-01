@@ -6,20 +6,16 @@ import com.ssonzm.userservice.domain.user.User;
 import com.ssonzm.userservice.domain.user.UserRepository;
 import com.ssonzm.userservice.domain.user.UserRole;
 import com.ssonzm.userservice.service.client.ProductServiceClient;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
 
 import static com.ssonzm.coremodule.dto.user.UserRequestDto.*;
 import static com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
@@ -97,28 +93,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserMyPageRespDto getMyPage(Long userId) {
 
-        Page<ProductListRespVo> productList = getMyProductList(userId);
-        Page<WishProductListRespVo> wishProductList = getMyWishProductList(userId);
+        Page<ProductListRespVo> productList = productServiceClient.getProductListSavedByUser(userId).getBody().getBody();
+        Page<WishProductListRespVo> wishProductList = productServiceClient.getWishProductList(userId).getBody().getBody();
 
         return new UserMyPageRespDto(productList, wishProductList);
-    }
-
-    @CircuitBreaker(name = "product-circuit-breaker", fallbackMethod = "failGetMyProductList")
-    private Page<ProductListRespVo> getMyProductList(Long userId) {
-        return productServiceClient.getProductListSavedByUser(userId).getBody().getBody();
-    }
-
-    private Page<ProductListRespVo> failGetMyProductList(Long userId, Exception e) {
-        return new PageImpl<>(Collections.emptyList());
-    }
-
-    @CircuitBreaker(name = "product-circuit-breaker", fallbackMethod = "failGetMyWishProductList")
-    private Page<WishProductListRespVo> getMyWishProductList(Long userId) {
-        return productServiceClient.getWishProductList(userId).getBody().getBody();
-    }
-
-    private Page<ProductListRespVo> failGetMyWishProductList(Long userId, Exception e) {
-        return new PageImpl<>(Collections.emptyList());
     }
 
     @Override

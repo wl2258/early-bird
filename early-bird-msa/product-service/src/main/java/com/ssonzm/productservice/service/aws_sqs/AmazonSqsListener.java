@@ -2,7 +2,6 @@ package com.ssonzm.productservice.service.aws_sqs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.productservice.service.product.ProductService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,7 @@ public class AmazonSqsListener {
     }
 
     @SqsListener(queueNames="${cloud.aws.sqs.queue-name}")
+    // TODO sqs listener exception retry
     public void messageListener(String message) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -31,7 +31,7 @@ public class AmazonSqsListener {
 
             productService.updateProductQuantity(orderProductUpdateList);
         } catch (JsonProcessingException e) {
-            throw new CommonBadRequestException("failSqsListener");
+            log.error("Failed to process message: {}", e.getMessage(), e);
         }
     }
 }

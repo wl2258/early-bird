@@ -10,8 +10,6 @@ import com.ssonzm.productservice.domain.product.ProductStatus;
 import com.ssonzm.productservice.service.client.UserServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,13 +29,11 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final UserServiceClient userServiceClient;
-    private final CircuitBreakerFactory circuitBreakerFactory;
 
-    public ProductServiceImpl(ProductRepository productRepository, UserServiceClient userServiceClient,
-                              CircuitBreakerFactory circuitBreakerFactory) {
+
+    public ProductServiceImpl(ProductRepository productRepository, UserServiceClient userServiceClient) {
         this.productRepository = productRepository;
         this.userServiceClient = userServiceClient;
-        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     @Override
@@ -70,7 +66,25 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailsRespDto getProductDetails(Long productId) {
         Product findProduct = findProductByIdOrElseThrow(productId);
-        return createProductDetailsRespDto(findProduct);
+        return getProductDetailsRespDto(findProduct);
+    }
+
+    private ProductDetailsRespDto getProductDetailsRespDto(Product product) {
+        UserDetailsDto userDetailsDto = userServiceClient.getUserDetails(product.getUserId()).getBody().getBody();
+        return createProductDetailsRespDto(product, userDetailsDto.getName());
+    }
+
+    private ProductDetailsRespDto createProductDetailsRespDto(Product product, String username) {
+        return new ProductDetailsRespDto(
+                product.getId(),
+                username,
+                product.getName(),
+                String.valueOf(product.getCategory()),
+                product.getDescription(),
+                product.getQuantity(),
+                product.getPrice(),
+                product.getCreatedDate()
+        );
     }
 
     @Override
@@ -99,17 +113,5 @@ public class ProductServiceImpl implements ProductService {
             Product findProduct = findProductByIdOrElseThrow(updateDto.getProductId());
             findProduct.updateQuantity(updateDto.getQuantity());
         }
-    }
-
-    private ProductDetailsRespDto createProductDetailsRespDto(Product product) {
-        CircuitBreaker circuitbreaker = circuitBreakerFactory.create("user-circuit-breaker");
-
-        UserDetailsDto userDetailsDto = circuitbreaker
-                .run(() -> userServiceClient.getUserDetails(product.getUserId()).getBody().getBody(),
-                        throwable -> new UserDetailsDto());
-
-        return new ProductDetailsRespDto(product.getId(), userDetailsDto.getName(), product.getName(),
-                String.valueOf(product.getCategory()), product.getDescription(), product.getQuantity(),
-                product.getPrice(), product.getCreatedDate());
     }
 }

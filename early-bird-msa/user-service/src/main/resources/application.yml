@@ -45,3 +45,24 @@ eureka:
 logging:
   level:
     com.ssonzm.earlybird: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        failureRateThreshold: 30 # 실패율 임계값(30% 이상 실패하면 Open 상태로 전환)
+        slowCallRateThreshold: 50 # 느린 호출 비율 임계값 (50% 이상 느린 호출이면 Open 상태로 전환)
+        slowCallDurationThreshold: 7000 # 느린 호출 지속 시간 임계값 (7초 이상 지연되면 느린 호출로 간주)
+        permittedNumberOfCallsInHalfOpenState: 10 # 반 열린 상태에서 허용되는 호출 수
+        maxWaitDurationInHalfOpenState: 5000 # 반 열린 상태 최대 대기 시간
+        slidingWindowType: COUNT_BASED # 슬라이딩 윈도우 유형
+        slidingWindowSize: 100 # 슬라이딩 윈도우 크기
+        minimumNumberOfCalls: 10 # 최소 호출 수
+        waitDurationInOpenState: 300000 # 열린 상태 대기 시간
+        automatic-transition-from-open-to-half-open-enabled: true # 자동 열린 상태 -> 반 열린 상태 전환 활성화
+        record-exceptions: # 예외 기록 목록
+          - com.ssonzm.coremodule.exception.CommonBadRequestException
+          - feign.FeignException
+    instances:
+      customCircuitBreaker:
+        baseConfig: default
