@@ -2,7 +2,7 @@ package com.ssonzm.orderservice.service.return_product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
+import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.orderservice.domain.delivery.Delivery;
 import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;

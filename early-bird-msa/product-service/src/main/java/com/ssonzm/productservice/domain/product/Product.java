@@ -1,6 +1,7 @@
 package com.ssonzm.productservice.domain.product;
 
 import com.ssonzm.coremodule.domain.BaseEntity;
+import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Getter
 @Entity
@@ -61,5 +63,27 @@ public class Product extends BaseEntity {
 
     public void updateQuantity(int quantity) {
         this.quantity += quantity;
+    }
+
+    public void updateProduct(ProductUpdateReqDto productUpdateReqDto) {
+        Optional.ofNullable(productUpdateReqDto.getCategory())
+                .map(ProductCategory::valueOf)
+                .ifPresent(category -> this.category = category);
+
+        Optional.ofNullable(productUpdateReqDto.getStatus())
+                .map(ProductStatus::valueOf)
+                .ifPresent(status -> this.status = status);
+
+        Optional.ofNullable(productUpdateReqDto.getDescription())
+                .ifPresent(description -> this.description = description);
+
+        Optional.ofNullable(productUpdateReqDto.getName())
+                .ifPresent(name -> this.name = name);
+
+        Optional.ofNullable(productUpdateReqDto.getPrice())
+                .ifPresent(price -> this.price = price);
+
+        Optional.ofNullable(productUpdateReqDto.getReservationStartTime())
+                .ifPresent(reservationStartTime -> this.reservationStartTime = reservationStartTime);
     }
 }

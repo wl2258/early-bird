@@ -17,7 +17,6 @@ import com.ssonzm.orderservice.service.aws_sqs.AmazonSqsSender;
 import com.ssonzm.orderservice.service.client.ProductServiceClient;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 import static com.ssonzm.coremodule.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
-import static com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
+import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 
 @Slf4j
 @Service
