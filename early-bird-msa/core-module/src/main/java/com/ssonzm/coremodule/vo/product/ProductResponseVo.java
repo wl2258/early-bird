@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 public class ProductResponseVo {
 
     @Data
@@ -18,5 +20,6 @@ public class ProductResponseVo {
         private int quantity;
         private int price;
         private String description;
+        private LocalDateTime reservationStartTime;
     }
 }
