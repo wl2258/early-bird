@@ -1,10 +1,7 @@
 package com.ssonzm.coremodule.dto.product;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,6 +30,7 @@ public class ProductRequestDto {
 
         @Nullable
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+        @FutureOrPresent(message = "예약 시작 시간은 현재 이후로 설정해 주세요")
         private LocalDateTime reservationStartTime;
     }
 }
