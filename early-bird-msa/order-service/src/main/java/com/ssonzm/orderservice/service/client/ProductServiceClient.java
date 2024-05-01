@@ -15,7 +15,7 @@ import java.util.List;
 
 @FeignClient(name = "product-service")
 public interface ProductServiceClient {
-    static final Logger log = LoggerFactory.getLogger(ProductServiceClient.class);
+    Logger log = LoggerFactory.getLogger(ProductServiceClient.class);
 
     @PostMapping("/internal/products/detail")
     @CircuitBreaker(name = "productCircuitBreaker", fallbackMethod = "failGetProductDetailsByIds")

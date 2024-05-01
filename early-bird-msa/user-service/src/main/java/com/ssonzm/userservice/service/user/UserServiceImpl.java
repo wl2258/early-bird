@@ -6,10 +6,9 @@ import com.ssonzm.userservice.domain.user.User;
 import com.ssonzm.userservice.domain.user.UserRepository;
 import com.ssonzm.userservice.domain.user.UserRole;
 import com.ssonzm.userservice.service.client.ProductServiceClient;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -36,16 +35,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ProductServiceClient productServiceClient;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final CircuitBreakerFactory circuitBreakerFactory;
 
     public UserServiceImpl(MessageSource messageSource, UserRepository userRepository,
                            ProductServiceClient productServiceClient,
-                           BCryptPasswordEncoder bCryptPasswordEncoder, CircuitBreakerFactory circuitBreakerFactory) {
+                           BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.messageSource = messageSource;
         this.userRepository = userRepository;
         this.productServiceClient = productServiceClient;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     @Override
@@ -100,17 +97,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserMyPageRespDto getMyPage(Long userId) {
 
-        CircuitBreaker circuitbreaker = circuitBreakerFactory.create("product-circuit-breaker");
-
-        Page<ProductListRespVo> productList = circuitbreaker
-                .run(() -> productServiceClient.getProductListSavedByUser(userId).getBody().getBody(),
-                        throwable -> new PageImpl<>(Collections.emptyList()));
-
-        Page<WishProductListRespVo> wishProductList = circuitbreaker
-                .run(() -> productServiceClient.getWishProductList(userId).getBody().getBody(),
-                        throwable -> new PageImpl<>(Collections.emptyList()));
+        Page<ProductListRespVo> productList = getMyProductList(userId);
+        Page<WishProductListRespVo> wishProductList = getMyWishProductList(userId);
 
         return new UserMyPageRespDto(productList, wishProductList);
+    }
+
+    @CircuitBreaker(name = "product-circuit-breaker", fallbackMethod = "failGetMyProductList")
+    private Page<ProductListRespVo> getMyProductList(Long userId) {
+        return productServiceClient.getProductListSavedByUser(userId).getBody().getBody();
+    }
+
+    private Page<ProductListRespVo> failGetMyProductList(Long userId, Exception e) {
+        return new PageImpl<>(Collections.emptyList());
+    }
+
+    @CircuitBreaker(name = "product-circuit-breaker", fallbackMethod = "failGetMyWishProductList")
+    private Page<WishProductListRespVo> getMyWishProductList(Long userId) {
+        return productServiceClient.getWishProductList(userId).getBody().getBody();
+    }
+
+    private Page<ProductListRespVo> failGetMyWishProductList(Long userId, Exception e) {
+        return new PageImpl<>(Collections.emptyList());
     }
 
     @Override

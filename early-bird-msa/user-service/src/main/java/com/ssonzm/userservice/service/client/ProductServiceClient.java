@@ -3,6 +3,7 @@ package com.ssonzm.userservice.service.client;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,10 @@ public interface ProductServiceClient {
     ResponseEntity<ResponseDto<Page<ProductListRespVo>>> getProductListSavedByUser(
             @PathVariable("userId") Long userId);
 
+
     @GetMapping("/internal/wish-products/{userId}")
     ResponseEntity<ResponseDto<Page<WishProductListRespVo>>> getWishProductList(
             @PathVariable("userId") Long userId);
+
+
 }
