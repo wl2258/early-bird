@@ -55,3 +55,20 @@ cloud:
 logging:
   level:
     com.ssonzm.earlybird.orderservice: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 3000
+        permittedNumberOfCallsInHalfOpenState: 3
+        maxWaitDurationInHalfOpenState: 3000
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 1000
+    instances:
+      customCircuitBreaker:
+        baseConfig: default
