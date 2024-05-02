@@ -1,6 +1,7 @@
 package com.ssonzm.productservice.controller.product;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
+import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 import com.ssonzm.productservice.service.product.ProductService;
@@ -62,6 +63,16 @@ public class ProductController {
 
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productDetails);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @PatchMapping("/authz/products")
+    public ResponseEntity<?> updateProducts(@RequestBody @Valid ProductUpdateReqDto productUpdateReqDto,
+                                            BindingResult bindingResult) {
+        productService.updateProductInfo(productUpdateReqDto);
+
+        ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }

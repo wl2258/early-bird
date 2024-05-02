@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import static com.ssonzm.coremodule.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
-import static com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
+import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 
 @Slf4j
 @Service

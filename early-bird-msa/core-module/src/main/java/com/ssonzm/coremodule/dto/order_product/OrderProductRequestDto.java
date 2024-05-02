@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-public class OrderProjectRequestDto {
+public class OrderProductRequestDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
