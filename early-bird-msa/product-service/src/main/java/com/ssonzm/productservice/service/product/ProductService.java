@@ -28,5 +28,7 @@ public interface ProductService {
 
     void updateProductQuantity(List<OrderProductUpdateReqDto> orderProductUpdateList);
 
+    int getProductQuantity(Long productId);
+    
     void updateProductInfo(ProductUpdateReqDto productUpdateReqDto);
 }

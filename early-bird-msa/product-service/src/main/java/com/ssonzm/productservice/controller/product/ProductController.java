@@ -67,6 +67,16 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
+    @GetMapping("/products/quantity/{productId}")
+    public ResponseEntity<?> getProductQuantity(@PathVariable("productId") Long productId) {
+        int quantity = productService.getProductQuantity(productId);
+
+        ResponseDto<Integer> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        responseDto.setBody(quantity);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
     @PatchMapping("/authz/products")
     public ResponseEntity<?> updateProducts(@RequestBody @Valid ProductUpdateReqDto productUpdateReqDto,
                                             BindingResult bindingResult) {
