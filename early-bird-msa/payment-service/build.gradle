@@ -22,16 +22,10 @@ ext {
 dependencies {
     implementation project(':core-module')
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
     implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
-
-    // aws sqs
-    implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 
     /* Querydsl 추가 */
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

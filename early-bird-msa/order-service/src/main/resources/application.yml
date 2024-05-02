@@ -54,7 +54,7 @@ cloud:
 
 logging:
   level:
-    com.ssonzm.earlybird.orderservice: DEBUG
+    com.ssonzm.orderservice: DEBUG
 
 resilience4j:
   circuitbreaker:
