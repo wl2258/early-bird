@@ -1,0 +1,31 @@
+successResult:
+  code: "0"
+  msg: "성공하였습니다"
+
+failResult:
+  code: "-1"
+  msg: "실패하였습니다"
+
+notFoundUser:
+  code: "-4000"
+  msg: "일치하는 회원정보가 없습니다"
+
+failValidTest:
+  code: "-4001"
+  msg: "유효성 검사에 실패했습니다"
+
+notFoundData:
+  code: "-4007"
+  msg: "등록되지 않은 데이터입니다"
+
+failCancelOrder:
+  code: "-4008"
+  msg: "취소할 수 없는 주문입니다"
+
+tryAgain:
+  code: "-4012"
+  msg: "잠시 후 다시 시도해 주세요"
+
+failOrder:
+  code: "-4013"
+  msg: "주문할 수 없는 상품입니다"

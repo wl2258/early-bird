@@ -46,6 +46,21 @@ services:
     networks:
       - early-bird-network
 
+  msa_payment_mariadb:
+    container_name: msa_payment_mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_payment
+      TZ: Asia/Seoul
+    ports:
+      - "3311:3306"
+    volumes:
+      - msa_early_bird_payment_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
   msa_user_redis:
     container_name: msa_user_redis
     image: redis
@@ -60,6 +75,7 @@ volumes:
     msa_early_bird_user_data:
     msa_early_bird_order_data:
     msa_early_bird_product_data:
+    msa_early_bird_payment_data:
     msa_redis_user_data:
 
 networks:

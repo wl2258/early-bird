@@ -1,4 +1,4 @@
-package com.ssonzm.orderservice.domain.payment;
+package com.ssonzm.paymentservice.domain.payment;
 
 import com.ssonzm.coremodule.domain.BaseEntity;
 import jakarta.persistence.*;
@@ -21,16 +21,24 @@ public class Payment extends BaseEntity {
     private Long userId;
 
     @Column(nullable = false)
-    private Long orderId;
+    private String orderId;
 
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus status;
 
+    @Column(nullable = false)
+    private Integer amount;
+
+    @Column(nullable = false)
+    private String orderName;
+
     @Builder
-    public Payment(Long id, Long userId, Long orderId, PaymentStatus status) {
+    public Payment(Long id, Long userId, String orderId, PaymentStatus status, Integer amount, String orderName) {
         this.id = id;
         this.userId = userId;
         this.orderId = orderId;
         this.status = status;
+        this.amount = amount;
+        this.orderName = orderName;
     }
 }
