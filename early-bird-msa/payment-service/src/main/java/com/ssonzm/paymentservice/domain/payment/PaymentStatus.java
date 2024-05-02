@@ -1,4 +1,4 @@
-package com.ssonzm.orderservice.domain.payment;
+package com.ssonzm.paymentservice.domain.payment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
