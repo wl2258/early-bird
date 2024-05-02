@@ -1,6 +1,7 @@
 package com.ssonzm.productservice.service.product;
 
-import com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
+import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
+import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.productservice.domain.product.Product;
@@ -121,5 +122,12 @@ public class ProductServiceImpl implements ProductService {
     public int getProductQuantity(Long productId) {
         Product findProduct = findProductByIdOrElseThrow(productId);
         return findProduct.getQuantity();
+    }
+
+    @Override
+    @Transactional
+    public void updateProductInfo(ProductUpdateReqDto productUpdateReqDto) {
+        Product findProduct = findProductByIdOrElseThrow(productUpdateReqDto.getProductId());
+        findProduct.updateProduct(productUpdateReqDto);
     }
 }

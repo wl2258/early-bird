@@ -1,5 +1,6 @@
 package com.ssonzm.productservice.service.product;
 
+import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.productservice.domain.product.Product;
 import org.springframework.data.domain.Page;
@@ -7,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static com.ssonzm.coremodule.dto.order_product.OrderProjectRequestDto.OrderProductUpdateReqDto;
+import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
 import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
@@ -28,4 +29,6 @@ public interface ProductService {
     void updateProductQuantity(List<OrderProductUpdateReqDto> orderProductUpdateList);
 
     int getProductQuantity(Long productId);
+    
+    void updateProductInfo(ProductUpdateReqDto productUpdateReqDto);
 }
