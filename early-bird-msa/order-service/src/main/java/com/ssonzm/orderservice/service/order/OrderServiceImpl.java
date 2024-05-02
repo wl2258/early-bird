@@ -163,8 +163,16 @@ public class OrderServiceImpl implements OrderService {
 
     private List<OrderProductDetailsRespDto> getOrderDetails(List<OrderProduct> orderProductList) {
         return orderProductList.stream()
-                .map(op -> new OrderProductDetailsRespDto(op.getId(), String.valueOf(op.getStatus())))
+                .map(op -> new OrderProductDetailsRespDto(op.getId(), String.valueOf(op.getStatus()),
+                        getProductName(op.getProductId()), op.getQuantity(), op.getPrice()))
                 .toList();
+    }
+
+    private String getProductName(Long productId) {
+        List<ProductDetailsFeignClientRespDto> productDetails =
+                productServiceClient.getProductDetailsByIds(List.of(productId)).getBody().getBody();
+
+        return productDetails.getFirst().getName();
     }
 
     private List<Long> getOrderProductIds(List<OrderProduct> orderProductList) {

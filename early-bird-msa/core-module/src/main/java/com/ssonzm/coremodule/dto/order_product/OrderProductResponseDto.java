@@ -9,6 +9,9 @@ public class OrderProductResponseDto {
     public static class OrderProductDetailsRespDto {
         private Long id;
         private String orderStatus;
+        private String productName;
+        private int quantity;
+        private int price;
     }
 
     @Data
