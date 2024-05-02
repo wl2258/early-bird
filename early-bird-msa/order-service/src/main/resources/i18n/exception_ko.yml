@@ -57,3 +57,7 @@ failSqsListener:
 tryAgain:
   code: "-4012"
   msg: "잠시 후 다시 시도해 주세요"
+
+failOrder:
+  code: "-4013"
+  msg: "주문할 수 없는 상품입니다"
