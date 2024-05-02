@@ -26,4 +26,6 @@ public interface ProductService {
     Page<ProductListRespVo> getProductSavedByUser (Pageable pageable, Long userId);
 
     void updateProductQuantity(List<OrderProductUpdateReqDto> orderProductUpdateList);
+
+    int getProductQuantity(Long productId);
 }

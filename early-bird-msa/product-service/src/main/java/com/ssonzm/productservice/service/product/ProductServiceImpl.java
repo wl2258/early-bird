@@ -116,4 +116,10 @@ public class ProductServiceImpl implements ProductService {
             findProduct.updateQuantity(updateDto.getQuantity());
         }
     }
+
+    @Override
+    public int getProductQuantity(Long productId) {
+        Product findProduct = findProductByIdOrElseThrow(productId);
+        return findProduct.getQuantity();
+    }
 }
