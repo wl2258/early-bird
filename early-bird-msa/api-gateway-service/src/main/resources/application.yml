@@ -84,7 +84,7 @@ spring:
             - Method=GET
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/order-service/(?<segment>.*), /$\{segment}
 
         - id: order-actuator
           uri: lb://ORDER-SERVICE
@@ -93,7 +93,7 @@ spring:
             - Method=GET, POST
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/order-service/(?<segment>.*), /$\{segment}
 
         - id: product-auth
           uri: lb://PRODUCT-SERVICE
@@ -140,8 +140,26 @@ spring:
             - Method=GET, POST, PATCH, DELETE
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
             - AuthorizationFilter
+
+        - id: payment-actuator
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/actuator/**
+            - Method=GET, POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/api/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
 
 management:
   endpoints:
