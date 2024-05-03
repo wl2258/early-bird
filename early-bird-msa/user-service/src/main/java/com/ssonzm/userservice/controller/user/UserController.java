@@ -7,6 +7,7 @@ import com.ssonzm.userservice.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -19,10 +20,12 @@ import static com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
 @RestController
 @RequestMapping("/api")
 public class UserController {
+    private final Environment env;
     private final UserService userService;
     private final MessageSource messageSource;
 
-    public UserController(UserService userService, MessageSource messageSource) {
+    public UserController(Environment env, UserService userService, MessageSource messageSource) {
+        this.env = env;
         this.userService = userService;
         this.messageSource = messageSource;
     }

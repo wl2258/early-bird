@@ -71,6 +71,21 @@ services:
     networks:
       - early-bird-network
 
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+      - 15671:15671
+      - 5671:5671
+      - 4369:4369
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - early-bird-network
+
 volumes:
     msa_early_bird_user_data:
     msa_early_bird_order_data:

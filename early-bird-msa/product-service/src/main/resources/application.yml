@@ -76,3 +76,9 @@ resilience4j:
     instances:
       customCircuitBreaker:
         baseConfig: default
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, bean, httpexchanges, busrefresh

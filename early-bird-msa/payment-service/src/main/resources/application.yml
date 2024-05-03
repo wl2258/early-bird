@@ -31,3 +31,9 @@ eureka:
 logging:
   level:
     com.ssonzm.paymentservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, bean, httpexchanges, busrefresh
