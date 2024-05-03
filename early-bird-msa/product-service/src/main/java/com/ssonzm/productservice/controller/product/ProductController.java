@@ -5,7 +5,6 @@ import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 import com.ssonzm.productservice.service.product.ProductService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -88,16 +87,5 @@ public class ProductController {
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    @GetMapping("/health_check")
-    public String status(HttpServletRequest request) {
-        return String.format("It's Working in User Service"
-                + ", port(local.server.port)=" + env.getProperty("local.server.port")
-                + ", port(server.port)=" + request.getServerPort()
-                + ", with token secret=" + env.getProperty("token.secret")
-                + ", with token time=" + env.getProperty("token.expiration_time")
-                + "api-gateway-ip" + env.getProperty("api-gateway.ip")
-        );
     }
 }
