@@ -6,6 +6,9 @@ spring:
     include: secret
   application:
     name: order-service
+  cloud:
+    refresh:
+      extra-refreshable: com.zaxxer.hikari.HikariDataSource
   messages:
     encoding: UTF-8
     basename: i18n/exception
@@ -20,17 +23,6 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${mail.username}
-    password: ${mail.password}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
     redis:
       host: localhost
       port: 6380
@@ -76,3 +68,9 @@ resilience4j:
     instances:
       customCircuitBreaker:
         baseConfig: default
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, bean, httpexchanges, busrefresh

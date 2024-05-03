@@ -24,7 +24,6 @@ import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetail
 @RestController
 @RequestMapping("/api")
 public class ProductController {
-
     private final MessageSource messageSource;
     private final ProductService productService;
 

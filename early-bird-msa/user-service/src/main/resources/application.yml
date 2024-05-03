@@ -6,6 +6,14 @@ spring:
     include: secret
   application:
     name: user-service
+  cloud:
+    refresh:
+      extra-refreshable: com.zaxxer.hikari.HikariDataSource
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
   messages:
     encoding: UTF-8
     basename: i18n/exception
@@ -66,3 +74,9 @@ resilience4j:
     instances:
       customCircuitBreaker:
         baseConfig: default
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, bean, httpexchanges, busrefresh

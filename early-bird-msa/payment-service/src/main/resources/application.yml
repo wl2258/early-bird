@@ -6,6 +6,9 @@ spring:
     include: secret
   application:
     name: payment-service
+  cloud:
+    refresh:
+      extra-refreshable: com.zaxxer.hikari.HikariDataSource
   messages:
     encoding: UTF-8
     basename: i18n/exception
@@ -31,3 +34,9 @@ eureka:
 logging:
   level:
     com.ssonzm.paymentservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, bean, httpexchanges, busrefresh

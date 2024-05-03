@@ -12,6 +12,11 @@ spring:
     include: secret
   application:
     name: api-gateway-service
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
   cloud:
     gateway:
       routes:
@@ -53,6 +58,15 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
+        - id: user-actuator
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/actuator/**
+            - Method=GET, POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
         - id: order-auth
           uri: lb://ORDER-SERVICE
           predicates:
@@ -70,7 +84,16 @@ spring:
             - Method=GET
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/order-service/(?<segment>.*), /$\{segment}
+
+        - id: order-actuator
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order-service/actuator/**
+            - Method=GET, POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/order-service/(?<segment>.*), /$\{segment}
 
         - id: product-auth
           uri: lb://PRODUCT-SERVICE
@@ -100,3 +123,46 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/product-service/(?<segment>.*), /$\{segment}
             - AuthorizationFilter
+
+        - id: product-actuator
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/product-service/actuator/**
+            - Method=GET, POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/product-service/(?<segment>.*), /$\{segment}
+
+        - id: payment-auth
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/api/authz/**
+            - Method=GET, POST, PATCH, DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+            - AuthorizationFilter
+
+        - id: payment-actuator
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/actuator/**
+            - Method=GET, POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/api/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, httptrace, busrefresh
