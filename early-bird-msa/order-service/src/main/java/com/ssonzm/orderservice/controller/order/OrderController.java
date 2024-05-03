@@ -4,10 +4,8 @@ import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.dto.order.OrderRequestDto.OrderSaveReqDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.orderservice.service.order.OrderService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -20,12 +18,10 @@ import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespD
 @RestController
 @RequestMapping("/api")
 public class OrderController {
-    private final Environment env;
     private final OrderService orderService;
     private final MessageSource messageSource;
 
-    public OrderController(Environment env, OrderService orderService, MessageSource messageSource) {
-        this.env = env;
+    public OrderController(OrderService orderService, MessageSource messageSource) {
         this.orderService = orderService;
         this.messageSource = messageSource;
     }
@@ -52,16 +48,5 @@ public class OrderController {
         responseDto.setBody(orderDetails);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-
-    @GetMapping("/health_check")
-    public String status(HttpServletRequest request) {
-        return String.format("It's Working in User Service"
-                + ", port(local.server.port)=" + env.getProperty("local.server.port")
-                + ", port(server.port)=" + request.getServerPort()
-                + ", with token secret=" + env.getProperty("token.secret")
-                + ", with token time=" + env.getProperty("token.expiration_time")
-                + "api-gateway-ip" + env.getProperty("api-gateway.ip")
-        );
     }
 }

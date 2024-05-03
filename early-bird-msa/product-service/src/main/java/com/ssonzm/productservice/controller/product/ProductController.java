@@ -8,7 +8,6 @@ import com.ssonzm.productservice.service.product.ProductService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
-import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,12 +24,10 @@ import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetail
 @RestController
 @RequestMapping("/api")
 public class ProductController {
-    private final Environment env;
     private final MessageSource messageSource;
     private final ProductService productService;
 
-    public ProductController(Environment env, MessageSource messageSource, ProductService productService) {
-        this.env = env;
+    public ProductController(MessageSource messageSource, ProductService productService) {
         this.messageSource = messageSource;
         this.productService = productService;
     }
