@@ -14,6 +14,7 @@ import com.ssonzm.orderservice.service.aws_sqs.AmazonSqsSender;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +29,15 @@ import static com.ssonzm.coremodule.dto.return_product.ReturnProductRequestDto.R
 @Service
 @Transactional(readOnly = true)
 public class ReturnProductServiceImpl implements ReturnProductService {
+    private final Environment env;
     private final AmazonSqsSender sqsSender;
     private final DeliveryService deliveryService;
     private final OrderProductService orderProductService;
     private final ReturnProductRepository returnProductRepository;
 
-    public ReturnProductServiceImpl(AmazonSqsSender sqsSender, DeliveryService deliveryService, OrderProductService orderProductService,
+    public ReturnProductServiceImpl(Environment env, AmazonSqsSender sqsSender, DeliveryService deliveryService, OrderProductService orderProductService,
                                     ReturnProductRepository returnProductRepository) {
+        this.env = env;
         this.sqsSender = sqsSender;
         this.deliveryService = deliveryService;
         this.orderProductService = orderProductService;
@@ -99,7 +102,7 @@ public class ReturnProductServiceImpl implements ReturnProductService {
             ObjectMapper objectMapper = new ObjectMapper();
             String message = objectMapper.writeValueAsString(orderProductList);
 
-            sqsSender.sendMessage(message);
+            sqsSender.sendMessage(env.getProperty("sqs.product.group-id"), message);
         } catch (JsonProcessingException e) {
             throw new CommonBadRequestException("failSqsSender");
         }

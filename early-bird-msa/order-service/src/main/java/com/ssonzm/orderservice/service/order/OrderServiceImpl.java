@@ -18,6 +18,7 @@ import com.ssonzm.orderservice.service.client.ProductServiceClient;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
 import com.ssonzm.orderservice.service.order_product.OrderProductService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +28,14 @@ import java.util.stream.Collectors;
 
 import static com.ssonzm.coremodule.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespDto;
-import static com.ssonzm.coremodule.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
+import static com.ssonzm.coremodule.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
 
 @Slf4j
 @Service
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
+    private final Environment env;
     private final AmazonSqsSender sqsSender;
     private final DeliveryService deliveryService;
     private final OrderRepository orderRepository;
@@ -42,9 +44,10 @@ public class OrderServiceImpl implements OrderService {
     private final ProductServiceClient productServiceClient;
     private final OrderProductRepository orderProductRepository;
 
-    public OrderServiceImpl(AmazonSqsSender sqsSender, DeliveryService deliveryService, OrderRepository orderRepository,
+    public OrderServiceImpl(Environment env, AmazonSqsSender sqsSender, DeliveryService deliveryService, OrderRepository orderRepository,
                             DeliveryRepository deliveryRepository, OrderProductService orderProductService,
                             ProductServiceClient productServiceClient, OrderProductRepository orderProductRepository) {
+        this.env = env;
         this.sqsSender = sqsSender;
         this.deliveryService = deliveryService;
         this.orderRepository = orderRepository;
@@ -79,7 +82,8 @@ public class OrderServiceImpl implements OrderService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             String message = objectMapper.writeValueAsString(orderProductUpdateReqDtoList);
-            sqsSender.sendMessage(message);
+
+            sqsSender.sendMessage(env.getProperty("sqs.product.group-id"), message);
         } catch (JsonProcessingException e) {
             throw new CommonBadRequestException("failSqsSender");
         }

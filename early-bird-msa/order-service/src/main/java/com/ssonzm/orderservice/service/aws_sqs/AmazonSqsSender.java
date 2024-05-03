@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Slf4j
 @Component
 public class AmazonSqsSender {
@@ -17,12 +19,14 @@ public class AmazonSqsSender {
         this.sqsTemplate = sqsTemplate;
     }
 
-    public SendResult<String> sendMessage(String message) {
+    public SendResult<String> sendMessage(String groupId, String message) {
         String queueName = env.getProperty("cloud.aws.sqs.queue-name");
 
         log.debug("Send AWS SQS message");
         return sqsTemplate.send(to -> to
                 .queue(queueName)
+                .messageGroupId(groupId)
+                .messageDeduplicationId(UUID.randomUUID().toString())
                 .payload(message));
     }
 }

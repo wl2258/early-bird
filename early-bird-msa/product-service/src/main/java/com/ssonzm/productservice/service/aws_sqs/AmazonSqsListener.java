@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.productservice.service.product.ProductService;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.services.sqs.model.Message;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,21 +17,30 @@ import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.Ord
 @Slf4j
 @Component
 public class AmazonSqsListener {
+    private final Environment env;
+    private final ObjectMapper objectMapper;
     private final ProductService productService;
 
-    public AmazonSqsListener(ProductService productService) {
+    public AmazonSqsListener(Environment env, ObjectMapper objectMapper, ProductService productService) {
+        this.env = env;
+        this.objectMapper = objectMapper;
         this.productService = productService;
     }
 
     @SqsListener(queueNames="${cloud.aws.sqs.queue-name}")
     // TODO sqs listener exception retry
-    public void messageListener(String message) {
+    public void messageListener(Message message) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<OrderProductUpdateReqDto> orderProductUpdateList = Arrays.asList(objectMapper.readValue(
-                    message, OrderProductUpdateReqDto[].class));
+            String body = message.body();
+            String messageGroupId = message.attributesAsStrings().get("MessageGroupId");
 
-            productService.updateProductQuantity(orderProductUpdateList);
+            if (messageGroupId.equals(env.getProperty("sqs.product.group-id"))) {
+                List<OrderProductUpdateReqDto> orderProductUpdateList =
+                        Arrays.asList(objectMapper.readValue(body, OrderProductUpdateReqDto[].class));
+
+                productService.updateProductQuantity(orderProductUpdateList);
+            }
+
         } catch (JsonProcessingException e) {
             log.error("Failed to process message: {}", e.getMessage(), e);
         }
