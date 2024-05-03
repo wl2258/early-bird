@@ -5,9 +5,11 @@ import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 import com.ssonzm.productservice.service.product.ProductService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,11 +26,12 @@ import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetail
 @RestController
 @RequestMapping("/api")
 public class ProductController {
-
+    private final Environment env;
     private final MessageSource messageSource;
     private final ProductService productService;
 
-    public ProductController(MessageSource messageSource, ProductService productService) {
+    public ProductController(Environment env, MessageSource messageSource, ProductService productService) {
+        this.env = env;
         this.messageSource = messageSource;
         this.productService = productService;
     }
@@ -85,5 +88,16 @@ public class ProductController {
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @GetMapping("/health_check")
+    public String status(HttpServletRequest request) {
+        return String.format("It's Working in User Service"
+                + ", port(local.server.port)=" + env.getProperty("local.server.port")
+                + ", port(server.port)=" + request.getServerPort()
+                + ", with token secret=" + env.getProperty("token.secret")
+                + ", with token time=" + env.getProperty("token.expiration_time")
+                + "api-gateway-ip" + env.getProperty("api-gateway.ip")
+        );
     }
 }
