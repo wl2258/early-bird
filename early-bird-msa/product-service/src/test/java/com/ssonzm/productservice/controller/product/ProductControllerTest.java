@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.time.LocalDateTime;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -62,7 +64,8 @@ class ProductControllerTest extends DummyUtil {
     void saveProductTest() throws Exception {
         // given
         ProductSaveReqDto productSaveReqDto = new ProductSaveReqDto(
-                        "product1", "FASHION", "description", 1000, 20000);
+                        "product1", "FASHION", "description", 1000, 20000,
+                LocalDateTime.now());
         String requestBody = om.writeValueAsString(productSaveReqDto);
 
         // when

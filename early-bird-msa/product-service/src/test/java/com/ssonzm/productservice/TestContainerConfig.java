@@ -5,16 +5,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 
 @Slf4j
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class TestContainerConfig {
+    private static final String REDIS_IMAGE = "redis:7.0.8-alpine";
+    private static final int REDIS_PORT = 6379;
+    @Container
+    private static GenericContainer REDIS_CONTAINER = new GenericContainer(DockerImageName.parse(REDIS_IMAGE))
+            .withExposedPorts(REDIS_PORT);
 
     @Container
     static JdbcDatabaseContainer MARIADB_CONTAINER = (JdbcDatabaseContainer) new MariaDBContainer("mariadb:10.3.39")

@@ -31,4 +31,10 @@ public interface ProductService {
     int getProductQuantity(Long productId);
     
     void updateProductInfo(ProductUpdateReqDto productUpdateReqDto);
+
+    Product isAvailableOrder(OrderProductUpdateReqDto orderProductUpdateReqDto);
+
+    void decreaseProductQuantity(Product product, OrderProductUpdateReqDto orderProductUpdateReqDto);
+
+    void isLeftInStock(Product product, OrderProductUpdateReqDto orderProductUpdateReqDto);
 }
