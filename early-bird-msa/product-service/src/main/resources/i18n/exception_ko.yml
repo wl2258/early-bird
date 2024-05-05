@@ -45,3 +45,7 @@ failCancelOrder:
 failReturn:
   code: "-4009"
   msg: "반품이 불가능합니다"
+
+failOrder:
+  code: "-4013"
+  msg: "주문할 수 없는 상품입니다"
