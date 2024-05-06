@@ -56,7 +56,7 @@ class ProductServiceImplTest extends DummyUtil {
             executorService.submit(() -> {
                 try {
                     OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(beforeProduct.getId(), 1);
-                    productFacade.decreaseProductQuantity(orderProductDto);
+                    productFacade.decreaseProductQuantity(1L, orderProductDto);
                 } finally {
                     latch.countDown();
                 }
@@ -74,7 +74,7 @@ class ProductServiceImplTest extends DummyUtil {
         OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(2L, 1);
 
         Assertions.assertThrows(CommonBadRequestException.class, () -> {
-            productFacade.decreaseProductQuantity(orderProductDto);
+            productFacade.decreaseProductQuantity(1L, orderProductDto);
         }, "failOrder");
     }
 
@@ -84,7 +84,7 @@ class ProductServiceImplTest extends DummyUtil {
         OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(3L, 1);
 
         Assertions.assertThrows(CommonBadRequestException.class, () -> {
-            productFacade.decreaseProductQuantity(orderProductDto);
+            productFacade.decreaseProductQuantity(1L, orderProductDto);
         }, "failOrder");
     }
 

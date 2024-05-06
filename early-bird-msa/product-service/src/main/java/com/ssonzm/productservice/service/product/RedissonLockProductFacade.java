@@ -24,7 +24,7 @@ public class RedissonLockProductFacade {
         this.productService = productService;
     }
 
-    public void decreaseProductQuantity(OrderProductUpdateReqDto orderProductUpdateReqDto) {
+    public void decreaseProductQuantity(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
         Long productId = orderProductUpdateReqDto.getProductId();
         RLock lock = redissonClient.getLock(String.valueOf(productId));
         try {
@@ -44,7 +44,7 @@ public class RedissonLockProductFacade {
             // db 재고 감소
             Product product = productService.decreaseQuantity(orderProductUpdateReqDto);
 
-            productService.sendMessageToOrder(product, orderProductUpdateReqDto);
+            productService.sendMessageToOrder(product, userId, orderProductUpdateReqDto);
 
         } catch (InterruptedException e) {
             log.error("재고 감소 실패");
