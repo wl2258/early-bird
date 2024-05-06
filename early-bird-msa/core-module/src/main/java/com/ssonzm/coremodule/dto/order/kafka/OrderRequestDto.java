@@ -7,7 +7,7 @@ public class OrderRequestDto {
     @Data
     @AllArgsConstructor
     public static class OrderSaveKafkaReqDto {
-        private Long UserId;
+        private Long userId;
         private Integer quantity;
         private Long productId;
         private Integer productPrice;
