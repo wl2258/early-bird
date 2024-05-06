@@ -1,9 +1,9 @@
-package com.ssonzm.coremodule.dto.order.kafka;
+package com.ssonzm.coremodule.dto.product.kafka;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-public class OrderRequestDto {
+public class ProductRequestDto {
     @Data
     @AllArgsConstructor
     public static class OrderSaveKafkaReqDto {
