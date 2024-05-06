@@ -16,7 +16,7 @@ public class KafkaReceiver {
         this.redissonLockProductFacade = redissonLockProductFacade;
     }
 
-    @KafkaListener(topics = KafkaVo.KAFKA_PRODUCT_TOPIC, containerFactory = "kafkaContainerFactory")
+    @KafkaListener(topics = KafkaVo.KAFKA_PRODUCT_ROLLBACK_TOPIC, containerFactory = "kafkaContainerFactory")
     public void receiveRollback(ProductKafkaRollbackRespDto productKafkaRollbackRespDto) {
         log.error("[Product Consumer]: 상품 재고 롤백");
         redissonLockProductFacade.increaseProductQuantity(productKafkaRollbackRespDto);

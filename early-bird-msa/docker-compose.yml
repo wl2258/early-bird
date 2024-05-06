@@ -126,6 +126,3 @@ volumes:
 
 networks:
     early-bird-network:
-
-
-
