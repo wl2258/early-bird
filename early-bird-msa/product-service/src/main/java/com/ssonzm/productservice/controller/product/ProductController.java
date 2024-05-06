@@ -6,6 +6,7 @@ import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 import com.ssonzm.productservice.service.product.ProductService;
+import com.ssonzm.productservice.service.product.RedissonLockProductFacade;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -27,10 +28,13 @@ import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetail
 public class ProductController {
     private final MessageSource messageSource;
     private final ProductService productService;
+    private final RedissonLockProductFacade productFacade;
 
-    public ProductController(MessageSource messageSource, ProductService productService) {
+    public ProductController(MessageSource messageSource, ProductService productService,
+                             RedissonLockProductFacade productFacade) {
         this.messageSource = messageSource;
         this.productService = productService;
+        this.productFacade = productFacade;
     }
 
     @PostMapping("/authz/products")
@@ -89,8 +93,9 @@ public class ProductController {
 
     @PostMapping("/authz/products/resv")
     public ResponseEntity<?> orderProduct(@RequestBody @Valid OrderProductUpdateReqDto orderProductRequestDto,
-                                          BindingResult bindingResult) {
-
+                                          BindingResult bindingResult,
+                                          @RequestHeader("x_user_id") Long userId) {
+        productFacade.decreaseProductQuantity(userId, orderProductRequestDto);
 
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 

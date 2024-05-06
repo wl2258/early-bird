@@ -40,5 +40,5 @@ public interface ProductService {
 
     void increaseQuantity(Long productId, int quantity);
 
-    void sendMessageToOrder(Product product, OrderProductUpdateReqDto orderProductUpdateReqDto);
+    void sendMessageToOrder(Product product, Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto);
 }
