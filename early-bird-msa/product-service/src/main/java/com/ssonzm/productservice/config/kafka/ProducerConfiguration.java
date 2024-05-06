@@ -1,9 +1,8 @@
 package com.ssonzm.productservice.config.kafka;
 
 import com.google.common.collect.ImmutableMap;
-import com.ssonzm.coremodule.dto.order.kafka.OrderRequestDto.OrderSaveKafkaReqDto;
+import com.ssonzm.coremodule.dto.product.kafka.ProductRequestDto.OrderSaveKafkaReqDto;
 import com.ssonzm.coremodule.dto.property.KafkaProperties;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +12,8 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.Map;
+
+import static org.apache.kafka.clients.producer.ProducerConfig.*;
 
 @EnableKafka
 @Configuration
@@ -31,10 +32,10 @@ public class ProducerConfiguration {
     @Bean
     public Map<String, Object> producerConfigurations() {
         return ImmutableMap.<String, Object>builder()
-                .put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getHost())
-                .put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class)
-                .put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class)
-                .put(ProducerConfig.ACKS_CONFIG, "all") // 높은 신뢰성 설정
+                .put(BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getHost())
+                .put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class)
+                .put(VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class)
+                .put(ACKS_CONFIG, "all") // 높은 신뢰성 설정
                 .build();
     }
 
