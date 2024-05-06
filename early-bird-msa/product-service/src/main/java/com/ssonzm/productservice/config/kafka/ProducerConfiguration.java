@@ -5,7 +5,6 @@ import com.ssonzm.coremodule.dto.order.kafka.OrderRequestDto.OrderSaveKafkaReqDt
 import com.ssonzm.coremodule.dto.property.KafkaProperties;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -17,7 +16,6 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-@EnableConfigurationProperties(KafkaProperties.class)
 public class ProducerConfiguration {
     private final KafkaProperties kafkaProperties;
 
@@ -27,11 +25,11 @@ public class ProducerConfiguration {
 
     @Bean
     public ProducerFactory<String, OrderSaveKafkaReqDto> productFactory() {
-        return new DefaultKafkaProducerFactory<>(chatProducerConfigurations());
+        return new DefaultKafkaProducerFactory<>(producerConfigurations());
     }
 
     @Bean
-    public Map<String, Object> chatProducerConfigurations() {
+    public Map<String, Object> producerConfigurations() {
         return ImmutableMap.<String, Object>builder()
                 .put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getHost())
                 .put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class)
