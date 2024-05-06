@@ -34,7 +34,7 @@ public interface ProductService {
 
     Product isAvailableOrder(OrderProductUpdateReqDto orderProductUpdateReqDto);
 
-    void decreaseProductQuantity(Product product, OrderProductUpdateReqDto orderProductUpdateReqDto);
+    void isLeftInStock(OrderProductUpdateReqDto orderProductUpdateReqDto);
 
-    void isLeftInStock(Product product, OrderProductUpdateReqDto orderProductUpdateReqDto);
+    void decreaseQuantity(OrderProductUpdateReqDto orderProductUpdateReqDto);
 }

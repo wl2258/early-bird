@@ -61,8 +61,12 @@ public class Product extends BaseEntity {
         this.reservationStartTime = reservationStartTime;
     }
 
-    public void updateQuantity(int quantity) {
+    public void increaseQuantity(int quantity) {
         this.quantity += quantity;
+    }
+
+    public void decreaseQuantity(int quantity) {
+        this.quantity -= quantity;
     }
 
     public void updateProduct(ProductUpdateReqDto productUpdateReqDto) {

@@ -11,8 +11,6 @@ import com.ssonzm.productservice.domain.product.ProductStatus;
 import com.ssonzm.productservice.service.client.UserServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,15 +29,13 @@ import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListResp
 @Service
 @Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
-    private final RedissonClient redissonClient;
     private final ProductRepository productRepository;
     private final UserServiceClient userServiceClient;
     private final ProductRedisService productRedisService;
 
 
-    public ProductServiceImpl(RedissonClient redissonClient, ProductRepository productRepository,
+    public ProductServiceImpl(ProductRepository productRepository,
                               UserServiceClient userServiceClient, ProductRedisService productRedisService) {
-        this.redissonClient = redissonClient;
         this.productRepository = productRepository;
         this.userServiceClient = userServiceClient;
         this.productRedisService = productRedisService;
@@ -123,7 +119,7 @@ public class ProductServiceImpl implements ProductService {
     public void updateProductQuantity(List<OrderProductUpdateReqDto> orderProductUpdateList) {
         for (OrderProductUpdateReqDto updateDto : orderProductUpdateList) {
             Product findProduct = findProductByIdOrElseThrow(updateDto.getProductId());
-            findProduct.updateQuantity(updateDto.getQuantity());
+            findProduct.decreaseQuantity(updateDto.getQuantity());
         }
     }
 
@@ -141,29 +137,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Transactional
-    public void decreaseProductQuantity(Product product, OrderProductUpdateReqDto orderProductUpdateReqDto) {
-        RLock lock = redissonClient.getLock(String.valueOf(product.getId()));
-        try {
-            boolean isLocked = lock.tryLock(5, 1, TimeUnit.SECONDS);
-
-            if (!isLocked) {
-                log.debug("상품 재고 감소 LOCK 획득 실패");
-                return;
-            }
-
-            int quantity = orderProductUpdateReqDto.getQuantity();
-            product.updateQuantity(quantity);
-            productRedisService.decreaseProductQuantity(product.getId(), quantity);
-
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
     public Product isAvailableOrder(OrderProductUpdateReqDto orderProductUpdateReqDto) {
         Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
 
@@ -175,12 +148,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void isLeftInStock(Product product, OrderProductUpdateReqDto orderProductUpdateReqDto) {
+    public void isLeftInStock(OrderProductUpdateReqDto orderProductUpdateReqDto) {
         Long productId = orderProductUpdateReqDto.getProductId();
-        int totalQuantity = product.getQuantity();
 
         Integer leftQuantity = productRedisService.getProductQuantity(productId);
+        log.debug("left Quantity>> {}", leftQuantity);
         if (leftQuantity == null) {
+            Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
+            int totalQuantity = findProduct.getQuantity();
             productRedisService.saveProduct(productId, totalQuantity, 10, TimeUnit.SECONDS);
             leftQuantity = totalQuantity;
         }
@@ -188,5 +163,14 @@ public class ProductServiceImpl implements ProductService {
         if (leftQuantity < orderProductUpdateReqDto.getQuantity()) {
             throw new CommonBadRequestException("failOrder");
         }
+    }
+
+    @Override
+    @Transactional
+    public void decreaseQuantity(OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
+        findProduct.decreaseQuantity(orderProductUpdateReqDto.getQuantity());
+
+        productRedisService.decreaseProductQuantity(findProduct.getId(), orderProductUpdateReqDto.getQuantity());
     }
 }

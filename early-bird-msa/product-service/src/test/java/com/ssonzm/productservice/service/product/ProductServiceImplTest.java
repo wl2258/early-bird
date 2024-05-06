@@ -1,5 +1,6 @@
 package com.ssonzm.productservice.service.product;
 
+import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.productservice.common.util.DummyUtil;
 import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.domain.product.ProductRepository;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,9 +25,16 @@ class ProductServiceImplTest extends DummyUtil {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private RedissonLockProductFacade productFacade;
+
     @BeforeEach
     public void before() {
         productRepository.saveAndFlush(newMockProduct(1L, "product", ProductStatus.IN_STOCK, 1L)); // 재고 만개
+        productRepository.saveAndFlush(newMockProduct(2L, "product", ProductStatus.SOLD_OUT, 1L,
+                0, LocalDateTime.now())); // 품절
+        productRepository.saveAndFlush(newMockProduct(3L, "product", ProductStatus.SOLD_OUT, 1L,
+                0, LocalDateTime.now().plusDays(3))); // 오픈 예정 상품
     }
 
     @AfterEach
@@ -45,7 +54,7 @@ class ProductServiceImplTest extends DummyUtil {
             executorService.submit(() -> {
                 try {
                     OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(beforeProduct.getId(), 1);
-                    productService.decreaseProductQuantity(beforeProduct, orderProductDto);
+                    productFacade.decreaseProductQuantity(orderProductDto);
                 } finally {
                     latch.countDown();
                 }
@@ -53,7 +62,27 @@ class ProductServiceImplTest extends DummyUtil {
         }
         latch.await();
 
-        Product afterProduct = productRepository.findById(1L).orElseThrow();
+        Product afterProduct = productRepository.findById(beforeProduct.getId()).orElseThrow();
         Assertions.assertEquals(afterProduct.getQuantity(), beforeProduct.getQuantity() - 100);
+    }
+
+    @Test
+    @DisplayName("품절 상품 주문 시 실패")
+    public void decreaseQuantity_품절테스트() {
+        OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(2L, 1);
+
+        Assertions.assertThrows(CommonBadRequestException.class, () -> {
+            productFacade.decreaseProductQuantity(orderProductDto);
+        }, "failOrder");
+    }
+
+    @Test
+    @DisplayName("오픈 예정 상품 주문 시 실패")
+    public void decreaseQuantity_날짜테스트() {
+        OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(3L, 1);
+
+        Assertions.assertThrows(CommonBadRequestException.class, () -> {
+            productFacade.decreaseProductQuantity(orderProductDto);
+        }, "failOrder");
     }
 }
