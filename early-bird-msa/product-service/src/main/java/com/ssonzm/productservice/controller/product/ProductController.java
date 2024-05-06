@@ -5,7 +5,6 @@ import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProdu
 import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
-import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.service.product.ProductService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -91,11 +90,7 @@ public class ProductController {
     @PostMapping("/authz/products/resv")
     public ResponseEntity<?> orderProduct(@RequestBody @Valid OrderProductUpdateReqDto orderProductRequestDto,
                                           BindingResult bindingResult) {
-        Product product = productService.isAvailableOrder(orderProductRequestDto);
 
-        productService.isLeftInStock(product, orderProductRequestDto);
-
-        productService.decreaseProductQuantity(product, orderProductRequestDto);
 
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
