@@ -49,3 +49,11 @@ failReturn:
 failOrder:
   code: "-4013"
   msg: "주문할 수 없는 상품입니다"
+
+failLock:
+  code: "-4014"
+  msg: "요청이 많아 실패하였습니다"
+
+failQuantityUpdate:
+  code: "-4015"
+  msg: "재고 업데이트를 실패했습니다"

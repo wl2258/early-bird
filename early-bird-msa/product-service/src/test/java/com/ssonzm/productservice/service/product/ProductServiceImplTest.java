@@ -1,5 +1,6 @@
 package com.ssonzm.productservice.service.product;
 
+import com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRollbackRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.productservice.common.util.DummyUtil;
 import com.ssonzm.productservice.domain.product.Product;
@@ -35,6 +36,7 @@ class ProductServiceImplTest extends DummyUtil {
                 0, LocalDateTime.now())); // 품절
         productRepository.saveAndFlush(newMockProduct(3L, "product", ProductStatus.SOLD_OUT, 1L,
                 0, LocalDateTime.now().plusDays(3))); // 오픈 예정 상품
+        productRepository.saveAndFlush(newMockProduct(4L, "product", ProductStatus.IN_STOCK, 1L));
     }
 
     @AfterEach
@@ -84,5 +86,30 @@ class ProductServiceImplTest extends DummyUtil {
         Assertions.assertThrows(CommonBadRequestException.class, () -> {
             productFacade.decreaseProductQuantity(orderProductDto);
         }, "failOrder");
+    }
+
+    @Test
+    @DisplayName("동시에 100개 취소 (재고 증가)")
+    public void increaseTest() throws InterruptedException {
+        int threadCount = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        Product beforeProduct = newMockProduct(4L, "product", ProductStatus.IN_STOCK, 1L);
+        for (int i = 0; i < threadCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    ProductKafkaRollbackRespDto productKafkaRollbackRespDto =
+                            new ProductKafkaRollbackRespDto(beforeProduct.getId(), 1);
+                    productFacade.increaseProductQuantity(productKafkaRollbackRespDto);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+
+        Product afterProduct = productRepository.findById(beforeProduct.getId()).orElseThrow();
+        Assertions.assertEquals(afterProduct.getQuantity(), beforeProduct.getQuantity() + 100);
     }
 }

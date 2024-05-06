@@ -1,7 +1,7 @@
 package com.ssonzm.productservice.config.kafka;
 
 import com.google.common.collect.ImmutableMap;
-import com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRespDto;
+import com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRollbackRespDto;
 import com.ssonzm.coremodule.dto.property.KafkaProperties;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -27,15 +27,15 @@ public class ConsumerConfiguration {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ProductKafkaRespDto> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, ProductKafkaRespDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, ProductKafkaRollbackRespDto> kafkaContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, ProductKafkaRollbackRespDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
 
     @Bean
-    public ConsumerFactory<String, ProductKafkaRespDto> consumerFactory() {
-        JsonDeserializer<ProductKafkaRespDto> deserializer = new JsonDeserializer<>();
+    public ConsumerFactory<String, ProductKafkaRollbackRespDto> consumerFactory() {
+        JsonDeserializer<ProductKafkaRollbackRespDto> deserializer = new JsonDeserializer<>();
         deserializer.addTrustedPackages("*");
 
         Map<String, Object> consumerConfigurations =
