@@ -3,6 +3,7 @@ package com.ssonzm.productservice.service.product;
 import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
+import com.ssonzm.coremodule.dto.product.kafka.ProductRequestDto.OrderSaveKafkaReqDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.coremodule.vo.KafkaVo;
 import com.ssonzm.productservice.domain.product.Product;
@@ -22,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.ssonzm.coremodule.dto.order.kafka.OrderRequestDto.OrderSaveKafkaReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
 import static com.ssonzm.coremodule.dto.user.UserResponseDto.UserDetailsDto;
@@ -172,19 +172,39 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void decreaseQuantity(OrderProductUpdateReqDto orderProductUpdateReqDto) {
+    public Product decreaseQuantity(OrderProductUpdateReqDto orderProductUpdateReqDto) {
         Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
         findProduct.decreaseQuantity(orderProductUpdateReqDto.getQuantity());
 
         productRedisService.decreaseProductQuantity(findProduct.getId(), orderProductUpdateReqDto.getQuantity());
 
-        kafkaSender.sendMessage(KafkaVo.KAFKA_PRODUCT_TOPIC, createOrderSaveDto(findProduct, orderProductUpdateReqDto));
+        return findProduct;
+    }
+
+    @Override
+    public void sendMessageToOrder(Product product, OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        kafkaSender.sendMessage(KafkaVo.KAFKA_PRODUCT_TOPIC, createOrderSaveDto(product, orderProductUpdateReqDto));
     }
 
     private OrderSaveKafkaReqDto createOrderSaveDto(Product product,
                                                     OrderProductUpdateReqDto orderProductUpdateReqDto) {
         int quantity = orderProductUpdateReqDto.getQuantity();
-        return new OrderSaveKafkaReqDto(product.getUserId(), quantity,
-                product.getId(), product.getPrice() * quantity);
+        return new OrderSaveKafkaReqDto(product.getUserId(), quantity, product.getId(), product.getPrice());
+    }
+
+    @Override
+    @Transactional
+    public void increaseQuantity(Long productId, int quantity) {
+        Product product = findProductByIdOrElseThrow(productId);
+        product.increaseQuantity( quantity);
+
+        Integer totalQuantity = productRedisService.getProductQuantity(productId);
+
+        // 재고가 존재하지 않는 경우 레디스에 저장
+        if (totalQuantity == null) {
+            productRedisService.saveProduct(product.getId(), product.getQuantity(), 10, TimeUnit.SECONDS);
+        } else {
+            productRedisService.increaseProductQuantity(productId,  quantity);
+        }
     }
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 public class ProductResponseDto {
     @Data
     @AllArgsConstructor
-    public static class ProductKafkaRespDto {
+    public static class ProductKafkaRollbackRespDto {
         private Long productId;
         private Integer quantity;
     }

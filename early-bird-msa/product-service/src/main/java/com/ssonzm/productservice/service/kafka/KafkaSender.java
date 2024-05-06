@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class KafkaSender {
-    private final KafkaTemplate<String, OrderSaveKafkaReqDto> orderKafkaTemplate;
+    private final KafkaTemplate<String, OrderSaveKafkaReqDto> productKafkaTemplate;
 
-    public KafkaSender(KafkaTemplate<String, OrderSaveKafkaReqDto> orderKafkaTemplate) {
-        this.orderKafkaTemplate = orderKafkaTemplate;
+    public KafkaSender(KafkaTemplate<String, OrderSaveKafkaReqDto> productKafkaTemplate) {
+        this.productKafkaTemplate = productKafkaTemplate;
     }
 
     public void sendMessage(String topic, OrderSaveKafkaReqDto message) {
-        orderKafkaTemplate.send(topic, message);
+        productKafkaTemplate.send(topic, message);
     }
 }
