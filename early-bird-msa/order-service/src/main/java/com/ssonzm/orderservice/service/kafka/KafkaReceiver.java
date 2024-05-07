@@ -57,7 +57,7 @@ public class KafkaReceiver {
         log.error("[Order Consumer]: Rollback");
 
         // 롤백 메시지 전송
-        sendMessageToKafkaOrderRollbackTopic(orderSaveKafkaReqDto, orderSaveRespDto);
+        sendMessageToKafkaOrderRollbackTopic(orderSaveKafkaReqDto);
 
         // 주문, 배송 상태 변경
         Long orderProductId = orderSaveRespDto.getOrderProductId();
@@ -66,14 +66,12 @@ public class KafkaReceiver {
     }
 
     /**
-     * 주문 생성 실페 시 롤백 이벤트
+     * 주문 생성 실패 시 롤백 이벤트
      * @param orderSaveKafkaReqDto
-     * @param orderSaveRespDto
      */
-    private void sendMessageToKafkaOrderRollbackTopic(OrderSaveKafkaReqDto orderSaveKafkaReqDto, OrderSaveRespDto orderSaveRespDto) {
+    private void sendMessageToKafkaOrderRollbackTopic(OrderSaveKafkaReqDto orderSaveKafkaReqDto) {
         kafkaSender.sendMessage(KafkaVo.KAFKA_ORDER_ROLLBACK_TOPIC,
                 new ProductKafkaRollbackRespDto(
-                        orderSaveRespDto.getOrderId(),
                         orderSaveKafkaReqDto.getProductId(),
                         orderSaveKafkaReqDto.getQuantity())
         );
