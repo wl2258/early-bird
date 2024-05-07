@@ -5,6 +5,7 @@ import com.ssonzm.coremodule.dto.delivery.DeliveryResponseDto.DeliveryDetailsRes
 import com.ssonzm.coremodule.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,5 +19,13 @@ public class OrderResponseDto {
         private LocalDateTime createdDate;
         private List<DeliveryDetailsRespDto> deliveryStatus;
         private List<OrderProductDetailsRespDto> orderStatus;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OrderSaveRespDto {
+        private Long orderId;
+        private Long orderProductId;
     }
 }

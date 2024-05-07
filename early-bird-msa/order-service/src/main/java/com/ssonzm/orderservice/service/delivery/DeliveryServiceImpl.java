@@ -61,6 +61,32 @@ public class DeliveryServiceImpl implements DeliveryService {
         );
     }
 
+    @Override
+    @Transactional
+    public Long saveDelivery(Long orderProductId) {
+        Delivery delivery = deliveryRepository.save(createDelivery(orderProductId));
+        return delivery.getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateDeliveryStatus(Long deliveryId, DeliveryStatus deliveryStatus) {
+        Delivery findDelivery = findByIdOrElseThrow(deliveryId);
+        findDelivery.updateDeliveryStatus(deliveryStatus);
+    }
+
+    public Delivery findByIdOrElseThrow(Long deliveryId) {
+        return deliveryRepository.findById(deliveryId)
+                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
+    }
+
+    private Delivery createDelivery(Long orderProductId) {
+        return Delivery.builder()
+                .orderProductId(orderProductId)
+                .status(DeliveryStatus.READY_FOR_SHIPMENT)
+                .build();
+    }
+
     private void updateDeliveryStatus(List<Long> orderProductIds, DeliveryStatus deliveryStatus) {
         List<Delivery> deliveryList = findDeliveryByOrderProductIds(orderProductIds);
         deliveryList.forEach(d -> d.updateDeliveryStatus(deliveryStatus));
