@@ -12,4 +12,6 @@ public interface DeliveryService {
     void updateAllDeliveryStatusToShipped();
 
     void updateAllDeliveryStatusToDelivered();
+
+    void saveDelivery(Long orderProductId);
 }

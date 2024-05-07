@@ -6,8 +6,10 @@ import com.ssonzm.orderservice.domain.order.OrderRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class OrderInternalService {
     private final OrderRepository orderRepository;
     private final OrderProductRepository orderProductRepository;
@@ -17,9 +19,11 @@ public class OrderInternalService {
         this.orderProductRepository = orderProductRepository;
     }
 
-    public void saveOrder(OrderSaveKafkaReqDto orderSaveReqDto) {
+    @Transactional
+    public Long saveOrder(OrderSaveKafkaReqDto orderSaveReqDto) {
         Order order = orderRepository.save(createOrder(orderSaveReqDto));
-        orderProductRepository.save(createOrderProduct(order, orderSaveReqDto));
+        OrderProduct orderProduct = orderProductRepository.save(createOrderProduct(order, orderSaveReqDto));
+        return orderProduct.getId();
     }
 
     private OrderProduct createOrderProduct(Order order, OrderSaveKafkaReqDto orderSaveReqDto) {

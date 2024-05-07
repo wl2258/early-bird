@@ -61,6 +61,19 @@ public class DeliveryServiceImpl implements DeliveryService {
         );
     }
 
+    @Override
+    @Transactional
+    public void saveDelivery(Long orderProductId) {
+        deliveryRepository.save(createDelivery(orderProductId));
+    }
+
+    private Delivery createDelivery(Long orderProductId) {
+        return Delivery.builder()
+                .orderProductId(orderProductId)
+                .status(DeliveryStatus.READY_FOR_SHIPMENT)
+                .build();
+    }
+
     private void updateDeliveryStatus(List<Long> orderProductIds, DeliveryStatus deliveryStatus) {
         List<Delivery> deliveryList = findDeliveryByOrderProductIds(orderProductIds);
         deliveryList.forEach(d -> d.updateDeliveryStatus(deliveryStatus));
