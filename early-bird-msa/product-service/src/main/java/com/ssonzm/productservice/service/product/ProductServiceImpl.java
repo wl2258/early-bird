@@ -183,7 +183,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void sendMessageToOrder(Product product, Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
-        kafkaSender.sendMessage(KafkaVo.KAFKA_PRODUCT_TOPIC, createOrderSaveDto(product, userId, orderProductUpdateReqDto));
+        kafkaSender.sendMessage(KafkaVo.KAFKA_ORDER_TOPIC, createOrderSaveDto(product, userId, orderProductUpdateReqDto));
     }
 
     private OrderSaveKafkaReqDto createOrderSaveDto(Product product, Long userId,

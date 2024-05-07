@@ -1,5 +1,6 @@
 package com.ssonzm.orderservice.service.order;
 
+import com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderSaveRespDto;
 import com.ssonzm.coremodule.dto.product.kafka.ProductRequestDto.OrderSaveKafkaReqDto;
 import com.ssonzm.orderservice.domain.order.Order;
 import com.ssonzm.orderservice.domain.order.OrderRepository;
@@ -20,10 +21,10 @@ public class OrderInternalService {
     }
 
     @Transactional
-    public Long saveOrder(OrderSaveKafkaReqDto orderSaveReqDto) {
+    public OrderSaveRespDto saveOrder(OrderSaveKafkaReqDto orderSaveReqDto) {
         Order order = orderRepository.save(createOrder(orderSaveReqDto));
         OrderProduct orderProduct = orderProductRepository.save(createOrderProduct(order, orderSaveReqDto));
-        return orderProduct.getId();
+        return new OrderSaveRespDto(order.getId(), orderProduct.getId());
     }
 
     private OrderProduct createOrderProduct(Order order, OrderSaveKafkaReqDto orderSaveReqDto) {

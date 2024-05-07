@@ -198,4 +198,17 @@ public class OrderServiceImpl implements OrderService {
         return new OrderDetailsRespDto(findOrder.getTotalPrice(), findOrder.getCreatedDate(),
                 deliveryRespDtos, orderDetailsRespDtos);
     }
+
+    @Override
+    @Transactional
+    public void updateOrderStatus(Long orderProductId, OrderStatus orderStatus) {
+        OrderProduct findOrderProduct = findOrderProductByIdOrElseThrow(orderProductId);
+        findOrderProduct.updateOrderStatus(OrderStatus.CANCELED);
+    }
+
+    @Override
+    public OrderProduct findOrderProductByIdOrElseThrow(Long orderProductId) {
+        return orderProductRepository.findById(orderProductId)
+                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
+    }
 }

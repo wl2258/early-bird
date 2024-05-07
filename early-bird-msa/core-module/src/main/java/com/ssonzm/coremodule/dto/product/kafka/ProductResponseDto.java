@@ -7,6 +7,7 @@ public class ProductResponseDto {
     @Data
     @AllArgsConstructor
     public static class ProductKafkaRollbackRespDto {
+        private Long orderId;
         private Long productId;
         private Integer quantity;
     }
