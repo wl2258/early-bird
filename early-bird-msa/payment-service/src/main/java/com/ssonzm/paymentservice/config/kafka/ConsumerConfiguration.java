@@ -1,8 +1,8 @@
 package com.ssonzm.paymentservice.config.kafka;
 
-import com.google.common.collect.ImmutableMap;
 import com.ssonzm.coremodule.dto.payment.kafka.PaymentRequestDto.PaymentSaveKafkaReqDto;
 import com.ssonzm.coremodule.dto.property.KafkaProperties;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +12,8 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 
 @EnableKafka
 @Configuration
@@ -37,15 +36,16 @@ public class ConsumerConfiguration {
         JsonDeserializer<PaymentSaveKafkaReqDto> deserializer = new JsonDeserializer<>();
         deserializer.addTrustedPackages("*");
 
-        Map<String, Object> consumerConfigurations =
-                ImmutableMap.<String, Object>builder()
-                        .put(BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getHost())
-                        .put(GROUP_ID_CONFIG, kafkaProperties.getGroup_id())
-                        .put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
-                        .put(VALUE_DESERIALIZER_CLASS_CONFIG, deserializer)
-                        .put(AUTO_OFFSET_RESET_CONFIG, "latest")
-                        .build();
+        return new DefaultKafkaConsumerFactory<>(consumerConfigurations(deserializer), new StringDeserializer(), deserializer);
+    }
 
-        return new DefaultKafkaConsumerFactory<>(consumerConfigurations, new StringDeserializer(), deserializer);
+    private Map<String, Object> consumerConfigurations(JsonDeserializer<?> deserializer) {
+        Map<String, Object> consumerConfigurations = new HashMap<>();
+        consumerConfigurations.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getHost());
+        consumerConfigurations.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getGroup_id());
+        consumerConfigurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        consumerConfigurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer.getClass());
+        consumerConfigurations.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        return consumerConfigurations;
     }
 }

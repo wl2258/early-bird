@@ -55,7 +55,6 @@ dependencies {
 
     /* kafka */
     implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'com.google.guava:guava:31.1-jre'
 
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
