@@ -33,7 +33,15 @@ eureka:
 
 logging:
   level:
-    com.ssonzm.paymentservice: DEBUG
+    org:
+      springframework:
+        transaction:
+          interceptor:
+            TransactionInterceptor: TRACE
+        kafka:
+          core:
+            KafkaTemplate: TRACE
+            DefaultKafkaProducerFactory: TRACE
 
 management:
   endpoints:

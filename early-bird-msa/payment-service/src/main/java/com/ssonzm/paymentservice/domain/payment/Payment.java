@@ -23,23 +23,20 @@ public class Payment extends BaseEntity {
     @Column(nullable = false)
     private Long orderId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus status;
 
     @Column(nullable = false)
     private Integer amount;
 
-    @Column(nullable = false)
-    private String orderName;
-
     @Builder
-    public Payment(Long id, Long userId, Long orderId, PaymentStatus status, Integer amount, String orderName) {
+    public Payment(Long id, Long userId, Long orderId, PaymentStatus status, Integer amount) {
         this.id = id;
         this.userId = userId;
         this.orderId = orderId;
         this.status = status;
         this.amount = amount;
-        this.orderName = orderName;
     }
 
     public void updatePaymentStatus(PaymentStatus status) {

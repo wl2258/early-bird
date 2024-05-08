@@ -23,9 +23,6 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-    redis:
-      host: localhost
-      port: 6380
 
 eureka:
   client:
@@ -46,7 +43,15 @@ cloud:
 
 logging:
   level:
-    com.ssonzm.orderservice: DEBUG
+    org:
+      springframework:
+        transaction:
+          interceptor:
+            TransactionInterceptor: TRACE
+        kafka:
+          core:
+            KafkaTemplate: TRACE
+            DefaultKafkaProducerFactory: TRACE
 
 resilience4j:
   circuitbreaker:

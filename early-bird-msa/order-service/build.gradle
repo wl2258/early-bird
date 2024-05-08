@@ -25,7 +25,6 @@ dependencies {
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
     implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 
@@ -52,7 +51,6 @@ dependencies {
 
     /* kafka */
     implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'com.google.guava:guava:31.1-jre'
 
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     testImplementation 'org.springframework.security:spring-security-test'
