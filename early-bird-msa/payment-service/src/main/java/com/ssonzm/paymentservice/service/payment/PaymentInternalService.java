@@ -26,7 +26,9 @@ public class PaymentInternalService {
 
     private Payment createPayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
         PaymentStatus status = PaymentStatus.SUCCESS;
-        if (isPaymentCancellation()) {
+        if (isCanceled()) {
+            status = PaymentStatus.CANCELLED;
+        } else if (isFailed()) {
             status = PaymentStatus.FAILED;
         }
         return Payment.builder()
@@ -36,9 +38,21 @@ public class PaymentInternalService {
                 .amount(paymentSaveKafkaReqDto.getAmount())
                 .build();
     }
+    private boolean isCanceled() {
+        return Math.random() < 0.2;
+    }
 
-    private boolean isPaymentCancellation() {
-        return Math.random() < 0.36;
+    private boolean isFailed() {
+        return Math.random() < 0.2;
+    }
+
+    private boolean isPaymentFailure() {
+        double randomValue = Math.random();
+        if (randomValue < 0.4) {
+            return true; // 40% 확률로 결제 실패
+        } else {
+            return false;
+        }
     }
 
     @Transactional
