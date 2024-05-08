@@ -25,12 +25,20 @@ public class PaymentInternalService {
     }
 
     private Payment createPayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
+        PaymentStatus status = PaymentStatus.SUCCESS;
+        if (isPaymentCancellation()) {
+            status = PaymentStatus.FAILED;
+        }
         return Payment.builder()
-//                .status(PaymentStatus.NOT_PAY)
+                .status(status)
                 .userId(paymentSaveKafkaReqDto.getUserId())
                 .orderId(paymentSaveKafkaReqDto.getOrderId())
                 .amount(paymentSaveKafkaReqDto.getAmount())
                 .build();
+    }
+
+    private boolean isPaymentCancellation() {
+        return Math.random() < 0.36;
     }
 
     @Transactional
