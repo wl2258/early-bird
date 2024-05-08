@@ -46,15 +46,6 @@ public class PaymentInternalService {
         return Math.random() < 0.2;
     }
 
-    private boolean isPaymentFailure() {
-        double randomValue = Math.random();
-        if (randomValue < 0.4) {
-            return true; // 40% 확률로 결제 실패
-        } else {
-            return false;
-        }
-    }
-
     @Transactional
     public void updatePaymentStatus(Long paymentId, PaymentStatus paymentStatus) {
         Payment findPayment = findPaymentByIdOrElseThrow(paymentId);
