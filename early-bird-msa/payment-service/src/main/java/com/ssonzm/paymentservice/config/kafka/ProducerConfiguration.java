@@ -1,8 +1,7 @@
-package com.ssonzm.orderservice.config.kafka;
+package com.ssonzm.paymentservice.config.kafka;
 
 import com.google.common.collect.ImmutableMap;
-import com.ssonzm.coremodule.dto.payment.kafka.PaymentRequestDto.PaymentSaveKafkaReqDto;
-import com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRollbackRespDto;
+import com.ssonzm.coremodule.dto.payment.kafka.PaymentResponseDto.PaymentKafkaRollbackRespDto;
 import com.ssonzm.coremodule.dto.property.KafkaProperties;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -37,22 +36,12 @@ public class ProducerConfiguration {
     }
 
     @Bean
-    public ProducerFactory<String, ProductKafkaRollbackRespDto > productFactory() {
+    public ProducerFactory<String, PaymentKafkaRollbackRespDto> paymentFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigurations());
     }
 
     @Bean
-    public KafkaTemplate<String, ProductKafkaRollbackRespDto> productKafkaTemplate() {
-        return new KafkaTemplate<>(productFactory());
-    }
-
-    @Bean
-    public ProducerFactory<String, PaymentSaveKafkaReqDto> paymentFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigurations());
-    }
-
-    @Bean
-    public KafkaTemplate<String, PaymentSaveKafkaReqDto> paymentKafkaTemplate() {
+    public KafkaTemplate<String, PaymentKafkaRollbackRespDto> paymentKafkaTemplate() {
         return new KafkaTemplate<>(paymentFactory());
     }
 }
