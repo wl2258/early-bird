@@ -202,13 +202,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void updateOrderStatus(Long orderProductId, OrderStatus orderStatus) {
-        OrderProduct findOrderProduct = findOrderProductByIdOrElseThrow(orderProductId);
+        OrderProduct findOrderProduct = orderProductService.findOrderProductByIdOrElseThrow(orderProductId);
         findOrderProduct.updateOrderStatus(OrderStatus.CANCELED);
     }
 
     @Override
-    public OrderProduct findOrderProductByIdOrElseThrow(Long orderProductId) {
-        return orderProductRepository.findById(orderProductId)
-                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
+    @Transactional
+    public void updateOrderStatusByOrderId(Long orderId, OrderStatus orderStatus) {
+        orderProductService.findAllByOrderIdOrElseThrow(orderId)
+                .forEach(op -> op.updateOrderStatus(orderStatus));
     }
 }

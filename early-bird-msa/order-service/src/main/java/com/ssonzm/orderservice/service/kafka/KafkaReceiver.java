@@ -1,5 +1,6 @@
 package com.ssonzm.orderservice.service.kafka;
 
+import com.ssonzm.coremodule.dto.payment.kafka.PaymentResponseDto.PaymentKafkaRollbackRespDto;
 import com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRollbackRespDto;
 import com.ssonzm.coremodule.vo.KafkaVo;
 import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;
@@ -31,6 +32,11 @@ public class KafkaReceiver {
         this.deliveryService = deliveryService;
     }
 
+    /**
+     * [receive] 주문 엔티티 생성
+     * product -> order
+     * @param orderSaveKafkaReqDto
+     */
     @KafkaListener(topics = KafkaVo.KAFKA_ORDER_TOPIC, containerFactory = "orderKafkaContainerFactory")
     public void receiveOrderSaveMessage(OrderSaveKafkaReqDto orderSaveKafkaReqDto) {
         log.debug("[Order Consumer]: 주문 엔티티 생성");
@@ -66,7 +72,8 @@ public class KafkaReceiver {
     }
 
     /**
-     * 주문 생성 실패 시 롤백 이벤트
+     * [send] 주문 생성 실패 시 롤백 이벤트
+     * order -> product
      * @param orderSaveKafkaReqDto
      */
     private void sendMessageToKafkaOrderRollbackTopic(OrderSaveKafkaReqDto orderSaveKafkaReqDto) {
@@ -78,7 +85,8 @@ public class KafkaReceiver {
     }
 
     /**
-     * 결제 엔티티 생성 이벤트
+     * [send] 결제 엔티티 생성 이벤트
+     * order -> payment
      * @param orderSaveKafkaReqDto
      * @param orderSaveRespDto
      */
@@ -89,5 +97,19 @@ public class KafkaReceiver {
                         orderSaveRespDto.getOrderId(),
                         orderSaveKafkaReqDto.getProductPrice() * orderSaveKafkaReqDto.getQuantity()
                 ));
+    }
+
+    /**
+     * [receive] 결제 엔티티 생성 롤백
+     * payment -> order
+     * @param paymentKafkaRollbackRespDto
+     */
+    @KafkaListener(topics = KafkaVo.KAFKA_PAYMENT_ROLLBACK_TOPIC, containerFactory = "paymentRollbackKafkaContainerFactory")
+    public void receivePaymentSaveRollbackMessage(PaymentKafkaRollbackRespDto paymentKafkaRollbackRespDto) {
+        Long orderId = paymentKafkaRollbackRespDto.getOrderId();
+        log.error("[Order Consumer(orderId = {})]: 결제 엔티티 생성 롤백", orderId);
+
+        // 주문 취소
+        orderService.updateOrderStatusByOrderId(orderId, OrderStatus.CANCELED);
     }
 }

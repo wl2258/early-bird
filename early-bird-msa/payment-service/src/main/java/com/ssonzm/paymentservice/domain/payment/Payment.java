@@ -21,7 +21,7 @@ public class Payment extends BaseEntity {
     private Long userId;
 
     @Column(nullable = false)
-    private String orderId;
+    private Long orderId;
 
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus status;
@@ -33,12 +33,16 @@ public class Payment extends BaseEntity {
     private String orderName;
 
     @Builder
-    public Payment(Long id, Long userId, String orderId, PaymentStatus status, Integer amount, String orderName) {
+    public Payment(Long id, Long userId, Long orderId, PaymentStatus status, Integer amount, String orderName) {
         this.id = id;
         this.userId = userId;
         this.orderId = orderId;
         this.status = status;
         this.amount = amount;
         this.orderName = orderName;
+    }
+
+    public void updatePaymentStatus(PaymentStatus status) {
+        this.status = status;
     }
 }

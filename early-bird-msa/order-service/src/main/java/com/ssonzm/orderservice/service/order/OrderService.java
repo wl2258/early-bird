@@ -1,13 +1,12 @@
 package com.ssonzm.orderservice.service.order;
 
-import com.ssonzm.orderservice.domain.order.Order;
 import com.ssonzm.coremodule.dto.order.OrderRequestDto.OrderSaveReqDto;
-import com.ssonzm.orderservice.domain.order_product.OrderProduct;
+import com.ssonzm.orderservice.domain.order.Order;
 import com.ssonzm.orderservice.domain.order_product.OrderStatus;
 
 import java.util.List;
 
-import static com.ssonzm.coremodule.dto.order.OrderResponseDto.*;
+import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespDto;
 
 public interface OrderService {
     Long saveOrder(Long userId, List<OrderSaveReqDto> orderSaveReqDtoList);
@@ -18,5 +17,5 @@ public interface OrderService {
 
     void updateOrderStatus(Long orderProductId, OrderStatus orderStatus);
 
-    OrderProduct findOrderProductByIdOrElseThrow(Long orderProductId);
+    void updateOrderStatusByOrderId(Long orderId, OrderStatus orderStatus);
 }
