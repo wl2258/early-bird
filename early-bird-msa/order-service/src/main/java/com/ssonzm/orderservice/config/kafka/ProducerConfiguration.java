@@ -36,13 +36,13 @@ public class ProducerConfiguration {
     }
 
     @Bean
-    public ProducerFactory<String, ProductKafkaRollbackRespDto > productFactory() {
+    public ProducerFactory<String, ProductKafkaRollbackRespDto > orderFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigurations());
     }
 
     @Bean
-    public KafkaTemplate<String, ProductKafkaRollbackRespDto> productKafkaTemplate() {
-        return new KafkaTemplate<>(productFactory());
+    public KafkaTemplate<String, ProductKafkaRollbackRespDto> orderKafkaTemplate() {
+        return new KafkaTemplate<>(orderFactory());
     }
 
     @Bean

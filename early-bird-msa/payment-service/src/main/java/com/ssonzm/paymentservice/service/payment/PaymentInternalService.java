@@ -17,6 +17,7 @@ public class PaymentInternalService {
         this.paymentRepository = paymentRepository;
     }
 
+
     @Transactional
     public Long savePayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
         Payment payment = paymentRepository.save(createPayment(paymentSaveKafkaReqDto));
@@ -25,9 +26,10 @@ public class PaymentInternalService {
 
     private Payment createPayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
         return Payment.builder()
-                .status(PaymentStatus.NOT_PAY)
+//                .status(PaymentStatus.NOT_PAY)
                 .userId(paymentSaveKafkaReqDto.getUserId())
                 .orderId(paymentSaveKafkaReqDto.getOrderId())
+                .amount(paymentSaveKafkaReqDto.getAmount())
                 .build();
     }
 

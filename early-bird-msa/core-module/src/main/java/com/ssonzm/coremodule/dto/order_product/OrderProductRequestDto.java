@@ -14,7 +14,6 @@ public class OrderProductRequestDto {
         @NotNull(message = "상품 아이디를 입력해 주세요")
         private Long productId;
         @NotNull(message = "구매 수량을 입력해 주세요")
-        @Size(min = 1)
         private Integer quantity;
     }
 }

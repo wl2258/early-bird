@@ -6,6 +6,7 @@ import com.ssonzm.orderservice.domain.order.Order;
 import com.ssonzm.orderservice.domain.order.OrderRepository;
 import com.ssonzm.orderservice.domain.order_product.OrderProduct;
 import com.ssonzm.orderservice.domain.order_product.OrderProductRepository;
+import com.ssonzm.orderservice.domain.order_product.OrderStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +33,10 @@ public class OrderInternalService {
         return OrderProduct.builder()
                 .userId(orderSaveReqDto.getUserId())
                 .productId(orderSaveReqDto.getProductId())
-                .price(orderSaveReqDto.getProductPrice() * quantity)
-                .quantity(quantity)
                 .order(order)
+                .quantity(quantity)
+                .price(orderSaveReqDto.getProductPrice() * quantity)
+                .status(OrderStatus.CREATED)
                 .build();
     }
 
