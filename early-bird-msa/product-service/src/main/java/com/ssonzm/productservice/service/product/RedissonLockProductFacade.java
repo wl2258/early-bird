@@ -2,6 +2,8 @@ package com.ssonzm.productservice.service.product;
 
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.productservice.domain.product.Product;
+import com.ssonzm.productservice.service.event.ProductEvent;
+import com.ssonzm.productservice.service.event.ProductEventListener;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -17,10 +19,14 @@ import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.Ord
 public class RedissonLockProductFacade {
     private final RedissonClient redissonClient;
     private final ProductService productService;
+    private final ProductEventListener productEventListener;
 
-    public RedissonLockProductFacade(RedissonClient redissonClient, ProductService productService) {
+
+    public RedissonLockProductFacade(RedissonClient redissonClient, ProductService productService,
+                                     ProductEventListener productEventListener) {
         this.redissonClient = redissonClient;
         this.productService = productService;
+        this.productEventListener = productEventListener;
     }
 
     public void decreaseProductQuantity(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
@@ -41,9 +47,10 @@ public class RedissonLockProductFacade {
             productService.isAvailableOrder(orderProductUpdateReqDto);
 
             // db 재고 감소
-            Product product = productService.decreaseQuantity(orderProductUpdateReqDto);
+            Product product = productService.decreaseQuantity(userId, orderProductUpdateReqDto);
 
-            productService.sendMessageToOrder(product, userId, orderProductUpdateReqDto);
+            productEventListener.onProductSuccess(
+                    new ProductEvent(this, userId, product, orderProductUpdateReqDto));
 
         } catch (InterruptedException e) {
             log.error("재고 감소 실패");

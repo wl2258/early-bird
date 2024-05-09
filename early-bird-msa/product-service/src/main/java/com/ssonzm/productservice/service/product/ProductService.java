@@ -36,9 +36,7 @@ public interface ProductService {
 
     void isLeftInStock(OrderProductUpdateReqDto orderProductUpdateReqDto);
 
-    Product decreaseQuantity(OrderProductUpdateReqDto orderProductUpdateReqDto);
+    Product decreaseQuantity(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto);
 
     void increaseQuantity(Long productId, int quantity);
-
-    void sendMessageToOrder(Product product, Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto);
 }
