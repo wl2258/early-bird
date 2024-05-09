@@ -1,35 +1,32 @@
 package com.ssonzm.orderservice.service.kafka;
 
 import com.ssonzm.coremodule.dto.payment.kafka.PaymentResponseDto.PaymentKafkaRollbackRespDto;
-import com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRollbackRespDto;
 import com.ssonzm.coremodule.vo.KafkaVo;
-import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;
 import com.ssonzm.orderservice.domain.order_product.OrderStatus;
 import com.ssonzm.orderservice.service.delivery.DeliveryService;
+import com.ssonzm.orderservice.service.event.OrderEventListener;
 import com.ssonzm.orderservice.service.order.OrderInternalService;
 import com.ssonzm.orderservice.service.order.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderSaveRespDto;
-import static com.ssonzm.coremodule.dto.payment.kafka.PaymentRequestDto.PaymentSaveKafkaReqDto;
 import static com.ssonzm.coremodule.dto.product.kafka.ProductRequestDto.OrderSaveKafkaReqDto;
 
 @Slf4j
 @Service
 public class KafkaReceiver {
-    private final KafkaSender kafkaSender;
     private final OrderService orderService;
     private final DeliveryService deliveryService;
+    private final OrderEventListener orderEventListener;
     private final OrderInternalService orderInternalService;
 
-    public KafkaReceiver(KafkaSender kafkaSender, OrderService orderService,
-                         OrderInternalService orderInternalService, DeliveryService deliveryService) {
-        this.kafkaSender = kafkaSender;
+    public KafkaReceiver(OrderService orderService, OrderInternalService orderInternalService,
+                         DeliveryService deliveryService, OrderEventListener orderEventListener) {
         this.orderService = orderService;
         this.orderInternalService = orderInternalService;
         this.deliveryService = deliveryService;
+        this.orderEventListener = orderEventListener;
     }
 
     /**
@@ -41,64 +38,7 @@ public class KafkaReceiver {
     public void receiveOrderSaveMessage(OrderSaveKafkaReqDto orderSaveKafkaReqDto) {
         log.debug("[Order Consumer]: 주문 엔티티 생성");
 
-        Long deliveryId = null;
-        boolean isSuccess = false;
-        OrderSaveRespDto orderSaveRespDto = new OrderSaveRespDto();
-        try {
-            isSuccess = true;
-            orderSaveRespDto = orderInternalService.saveOrder(orderSaveKafkaReqDto);
-            deliveryId = deliveryService.saveDelivery(orderSaveRespDto.getOrderProductId());
-        } catch (Exception e) {
-            isSuccess = false;
-            handleException(orderSaveKafkaReqDto, orderSaveRespDto, deliveryId);
-        }
-
-        // 주문, 배송 엔티티 저장 성공
-        if (isSuccess) {
-            sendMessageToKafkaPaymentTopic(orderSaveKafkaReqDto, orderSaveRespDto);
-        }
-    }
-
-    private void handleException(OrderSaveKafkaReqDto orderSaveKafkaReqDto, OrderSaveRespDto orderSaveRespDto, Long deliveryId) {
-        log.error("[Order Consumer]: Rollback");
-
-        // 롤백 메시지 전송
-        sendMessageToKafkaOrderRollbackTopic(orderSaveKafkaReqDto);
-
-        // 주문, 배송 상태 변경
-        Long orderProductId = orderSaveRespDto.getOrderProductId();
-        if (orderProductId != null) orderService.updateOrderStatus(orderProductId, OrderStatus.CANCELED);
-        if (deliveryId != null) deliveryService.updateDeliveryStatus(deliveryId, DeliveryStatus.CANCELED);
-    }
-
-    /**
-     * [send] 주문 생성 실패 시 롤백 이벤트
-     * order -> product
-     * @param orderSaveKafkaReqDto
-     */
-    private void sendMessageToKafkaOrderRollbackTopic(OrderSaveKafkaReqDto orderSaveKafkaReqDto) {
-        kafkaSender.sendMessage(KafkaVo.KAFKA_ORDER_ROLLBACK_TOPIC,
-                new ProductKafkaRollbackRespDto(
-                        orderSaveKafkaReqDto.getProductId(),
-                        orderSaveKafkaReqDto.getQuantity())
-        );
-    }
-
-    /**
-     * [send] 결제 엔티티 생성 이벤트
-     * order -> payment
-     * @param orderSaveKafkaReqDto
-     * @param orderSaveRespDto
-     */
-    private void sendMessageToKafkaPaymentTopic(OrderSaveKafkaReqDto orderSaveKafkaReqDto, OrderSaveRespDto orderSaveRespDto) {
-        kafkaSender.sendMessage(KafkaVo.KAFKA_PAYMENT_TOPIC,
-                new PaymentSaveKafkaReqDto(
-                        orderSaveKafkaReqDto.getUserId(),
-                        orderSaveRespDto.getOrderId(),
-                        orderSaveKafkaReqDto.getProductId(),
-                        orderSaveKafkaReqDto.getQuantity(),
-                        orderSaveKafkaReqDto.getProductPrice()
-                ));
+        orderInternalService.saveOrder(orderSaveKafkaReqDto);
     }
 
     /**

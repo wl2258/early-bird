@@ -157,7 +157,6 @@ public class ProductServiceImpl implements ProductService {
         Long productId = orderProductUpdateReqDto.getProductId();
 
         Integer leftQuantity = productRedisService.getProductQuantity(productId);
-        log.debug("left Quantity>> {}", leftQuantity);
         if (leftQuantity == null) {
             Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
             int totalQuantity = findProduct.getQuantity();
