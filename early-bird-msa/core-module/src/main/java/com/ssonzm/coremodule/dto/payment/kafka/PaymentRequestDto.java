@@ -11,6 +11,8 @@ public class PaymentRequestDto {
     public static class PaymentSaveKafkaReqDto {
         private Long userId;
         private Long orderId;
-        private Integer amount;
+        private Long productId;
+        private Integer quantity;
+        private Integer price;
     }
 }

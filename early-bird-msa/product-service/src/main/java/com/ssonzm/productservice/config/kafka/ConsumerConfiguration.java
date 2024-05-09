@@ -1,5 +1,6 @@
 package com.ssonzm.productservice.config.kafka;
 
+import com.ssonzm.coremodule.dto.payment.kafka.PaymentResponseDto.PaymentKafkaRollbackRespDto;
 import com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRollbackRespDto;
 import com.ssonzm.coremodule.dto.property.KafkaProperties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -35,6 +36,21 @@ public class ConsumerConfiguration {
     @Bean
     public ConsumerFactory<String, ProductKafkaRollbackRespDto> consumerFactory() {
         JsonDeserializer<ProductKafkaRollbackRespDto> deserializer = new JsonDeserializer<>();
+        deserializer.addTrustedPackages("*");
+
+        return new DefaultKafkaConsumerFactory<>(consumerConfigurations(deserializer), new StringDeserializer(), deserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, PaymentKafkaRollbackRespDto> paymentRollbackKafkaContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, PaymentKafkaRollbackRespDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(paymentRollbackConsumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, PaymentKafkaRollbackRespDto> paymentRollbackConsumerFactory() {
+        JsonDeserializer<PaymentKafkaRollbackRespDto> deserializer = new JsonDeserializer<>();
         deserializer.addTrustedPackages("*");
 
         return new DefaultKafkaConsumerFactory<>(consumerConfigurations(deserializer), new StringDeserializer(), deserializer);
