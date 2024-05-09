@@ -99,9 +99,7 @@ class ProductServiceImplTest extends DummyUtil {
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
-                    ProductKafkaRollbackRespDto productKafkaRollbackRespDto =
-                            new ProductKafkaRollbackRespDto(beforeProduct.getId(), 1);
-                    productFacade.increaseProductQuantity(productKafkaRollbackRespDto);
+                    productFacade.increaseProductQuantity(beforeProduct.getId(), 1);
                 } finally {
                     latch.countDown();
                 }

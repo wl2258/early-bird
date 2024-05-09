@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
-import static com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRollbackRespDto;
 
 
 @Slf4j
@@ -54,8 +53,7 @@ public class RedissonLockProductFacade {
         }
     }
 
-    public void increaseProductQuantity(ProductKafkaRollbackRespDto productKafkaRollbackRespDto) {
-        Long productId = productKafkaRollbackRespDto.getProductId();
+    public void increaseProductQuantity(Long productId, int quantity) {
         RLock lock = redissonClient.getLock(String.valueOf(productId));
         try {
             boolean isLocked = lock.tryLock(5, 1, TimeUnit.SECONDS);
@@ -65,8 +63,7 @@ public class RedissonLockProductFacade {
                 throw new CommonBadRequestException("failLock");
             }
 
-            productService.increaseQuantity(productKafkaRollbackRespDto.getProductId(),
-                    productKafkaRollbackRespDto.getQuantity());
+            productService.increaseQuantity(productId, quantity);
         } catch (InterruptedException e) {
             log.error("재고 증가 실패");
             throw new CommonBadRequestException("failQuantityUpdate");

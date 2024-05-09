@@ -10,5 +10,7 @@ public class PaymentResponseDto {
     @AllArgsConstructor
     public static class PaymentKafkaRollbackRespDto {
         private Long orderId;
+        private Long productId;
+        private Integer quantity;
     }
 }

@@ -95,7 +95,9 @@ public class KafkaReceiver {
                 new PaymentSaveKafkaReqDto(
                         orderSaveKafkaReqDto.getUserId(),
                         orderSaveRespDto.getOrderId(),
-                        orderSaveKafkaReqDto.getProductPrice() * orderSaveKafkaReqDto.getQuantity()
+                        orderSaveKafkaReqDto.getProductId(),
+                        orderSaveKafkaReqDto.getQuantity(),
+                        orderSaveKafkaReqDto.getProductPrice()
                 ));
     }
 

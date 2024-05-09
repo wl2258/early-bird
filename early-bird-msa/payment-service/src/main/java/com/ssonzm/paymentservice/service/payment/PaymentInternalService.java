@@ -5,6 +5,7 @@ import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.paymentservice.domain.payment.Payment;
 import com.ssonzm.paymentservice.domain.payment.PaymentRepository;
 import com.ssonzm.paymentservice.domain.payment.PaymentStatus;
+import com.ssonzm.paymentservice.dto.PaymentResponseDto.PaymentSaveRespDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +20,9 @@ public class PaymentInternalService {
 
 
     @Transactional
-    public Long savePayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
+    public PaymentSaveRespDto savePayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
         Payment payment = paymentRepository.save(createPayment(paymentSaveKafkaReqDto));
-        return payment.getId();
+        return new PaymentSaveRespDto(payment.getId(), payment.getStatus());
     }
 
     private Payment createPayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
@@ -35,7 +36,7 @@ public class PaymentInternalService {
                 .status(status)
                 .userId(paymentSaveKafkaReqDto.getUserId())
                 .orderId(paymentSaveKafkaReqDto.getOrderId())
-                .amount(paymentSaveKafkaReqDto.getAmount())
+                .amount(paymentSaveKafkaReqDto.getQuantity() * paymentSaveKafkaReqDto.getPrice())
                 .build();
     }
     private boolean isCanceled() {
