@@ -3,15 +3,12 @@ package com.ssonzm.productservice.service.product;
 import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
-import com.ssonzm.coremodule.dto.product.kafka.ProductRequestDto.OrderSaveKafkaReqDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
-import com.ssonzm.coremodule.vo.KafkaVo;
 import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.domain.product.ProductCategory;
 import com.ssonzm.productservice.domain.product.ProductRepository;
 import com.ssonzm.productservice.domain.product.ProductStatus;
 import com.ssonzm.productservice.service.client.UserServiceClient;
-import com.ssonzm.productservice.service.kafka.KafkaSender;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -32,15 +29,12 @@ import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListResp
 @Service
 @Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
-    private final KafkaSender kafkaSender;
     private final ProductRepository productRepository;
     private final UserServiceClient userServiceClient;
     private final ProductRedisService productRedisService;
 
-
-    public ProductServiceImpl(KafkaSender kafkaSender, ProductRepository productRepository,
-                              UserServiceClient userServiceClient, ProductRedisService productRedisService) {
-        this.kafkaSender = kafkaSender;
+    public ProductServiceImpl(ProductRepository productRepository, UserServiceClient userServiceClient,
+                              ProductRedisService productRedisService) {
         this.productRepository = productRepository;
         this.userServiceClient = userServiceClient;
         this.productRedisService = productRedisService;
@@ -157,7 +151,6 @@ public class ProductServiceImpl implements ProductService {
         Long productId = orderProductUpdateReqDto.getProductId();
 
         Integer leftQuantity = productRedisService.getProductQuantity(productId);
-        log.debug("left Quantity>> {}", leftQuantity);
         if (leftQuantity == null) {
             Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
             int totalQuantity = findProduct.getQuantity();
@@ -172,24 +165,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product decreaseQuantity(OrderProductUpdateReqDto orderProductUpdateReqDto) {
+    public Product decreaseQuantity(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
         Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
         findProduct.decreaseQuantity(orderProductUpdateReqDto.getQuantity());
 
         productRedisService.decreaseProductQuantity(findProduct.getId(), orderProductUpdateReqDto.getQuantity());
 
         return findProduct;
-    }
-
-    @Override
-    public void sendMessageToOrder(Product product, Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
-        kafkaSender.sendMessage(KafkaVo.KAFKA_ORDER_TOPIC, createOrderSaveDto(product, userId, orderProductUpdateReqDto));
-    }
-
-    private OrderSaveKafkaReqDto createOrderSaveDto(Product product, Long userId,
-                                                    OrderProductUpdateReqDto orderProductUpdateReqDto) {
-        int quantity = orderProductUpdateReqDto.getQuantity();
-        return new OrderSaveKafkaReqDto(userId, quantity, product.getId(), product.getPrice());
     }
 
     @Override

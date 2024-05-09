@@ -32,7 +32,6 @@ public class PaymentInternalService {
         if (isFailedSaveEntity(payment.getStatus())) {
             log.debug("[Payment service] 결제 중 고객 이탈");
             paymentEventListener.publishPaymentEvent(new PaymentEvent(this, paymentSaveKafkaReqDto));
-            if (paymentId != null) updatePaymentStatus(paymentId, PaymentStatus.FAILED);
         }
     }
 

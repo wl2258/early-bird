@@ -20,12 +20,4 @@ public class OrderResponseDto {
         private List<DeliveryDetailsRespDto> deliveryStatus;
         private List<OrderProductDetailsRespDto> orderStatus;
     }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class OrderSaveRespDto {
-        private Long orderId;
-        private Long orderProductId;
-    }
 }
