@@ -5,24 +5,39 @@ import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.paymentservice.domain.payment.Payment;
 import com.ssonzm.paymentservice.domain.payment.PaymentRepository;
 import com.ssonzm.paymentservice.domain.payment.PaymentStatus;
-import com.ssonzm.paymentservice.dto.PaymentResponseDto.PaymentSaveRespDto;
+import com.ssonzm.paymentservice.event.PaymentEvent;
+import com.ssonzm.paymentservice.event.PaymentEventListener;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class PaymentInternalService {
     private final PaymentRepository paymentRepository;
+    private final PaymentEventListener paymentEventListener;
 
-    public PaymentInternalService(PaymentRepository paymentRepository) {
+    public PaymentInternalService(PaymentRepository paymentRepository, PaymentEventListener paymentEventListener) {
         this.paymentRepository = paymentRepository;
+        this.paymentEventListener = paymentEventListener;
     }
 
 
     @Transactional
-    public PaymentSaveRespDto savePayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
+    public void savePayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
         Payment payment = paymentRepository.save(createPayment(paymentSaveKafkaReqDto));
-        return new PaymentSaveRespDto(payment.getId(), payment.getStatus());
+
+        Long paymentId = payment.getId();
+        if (isFailedSaveEntity(payment.getStatus())) {
+            log.debug("[Payment service] 결제 중 고객 이탈");
+            paymentEventListener.publishPaymentEvent(new PaymentEvent(this, paymentSaveKafkaReqDto));
+            if (paymentId != null) updatePaymentStatus(paymentId, PaymentStatus.FAILED);
+        }
+    }
+
+    private static boolean isFailedSaveEntity(PaymentStatus paymentStatus) {
+        return paymentStatus != null && !paymentStatus.equals(PaymentStatus.SUCCESS);
     }
 
     private Payment createPayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
