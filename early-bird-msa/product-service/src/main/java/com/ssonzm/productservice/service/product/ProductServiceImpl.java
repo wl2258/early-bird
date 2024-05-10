@@ -104,7 +104,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product findProductByIdOrElseThrow(Long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new CommonBadRequestException("notFoundData"));
+                .orElseThrow(() ->   new CommonBadRequestException("notFoundData"));
     }
 
     @Override
@@ -124,8 +124,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public int getProductQuantity(Long productId) {
-        Product findProduct = findProductByIdOrElseThrow(productId);
-        return findProduct.getQuantity();
+        Integer productQuantity = productRedisService.getProductQuantity(productId);
+        if (productQuantity == null) {
+            Product findProduct = findProductByIdOrElseThrow(productId);
+            productQuantity = findProduct.getQuantity();
+        }
+
+        return productQuantity;
     }
 
     @Override
@@ -154,7 +159,7 @@ public class ProductServiceImpl implements ProductService {
         if (leftQuantity == null) {
             Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
             int totalQuantity = findProduct.getQuantity();
-            productRedisService.saveProduct(productId, totalQuantity, 10, TimeUnit.SECONDS);
+            productRedisService.saveProduct(productId, totalQuantity, 1, TimeUnit.HOURS);
             leftQuantity = totalQuantity;
         }
 
@@ -184,7 +189,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 재고가 존재하지 않는 경우 레디스에 저장
         if (totalQuantity == null) {
-            productRedisService.saveProduct(product.getId(), product.getQuantity(), 10, TimeUnit.SECONDS);
+            productRedisService.saveProduct(product.getId(), product.getQuantity(), 1, TimeUnit.HOURS);
         } else {
             productRedisService.increaseProductQuantity(productId,  quantity);
         }
