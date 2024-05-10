@@ -164,7 +164,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         if (leftQuantity < orderProductUpdateReqDto.getQuantity()) {
-            throw new CommonBadRequestException("failOrder");
+            throw new CommonBadRequestException("outOfStock");
         }
     }
 
