@@ -20,9 +20,9 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         String host = env.getProperty("spring.data.redis.host");
-        int post = Integer.parseInt(env.getProperty("spring.data.redis.port"));
+        int port = Integer.parseInt(env.getProperty("spring.data.redis.port"));
 
-        return new LettuceConnectionFactory(host, post);
+        return new LettuceConnectionFactory(host, port);
     }
 
     @Bean
