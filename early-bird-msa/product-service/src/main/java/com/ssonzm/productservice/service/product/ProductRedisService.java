@@ -21,7 +21,7 @@ public class ProductRedisService {
 
     public void saveProduct(Long productId, int quantity, long timeout, TimeUnit unit) {
         String key = REDIS_PREFIX + productId;
-        valueOperations.set(key, quantity, timeout, unit);
+        valueOperations.setIfAbsent(key, quantity, timeout, unit); // 존재하지 않는 경우에 저장
         log.debug("상품이 등록되었습니다. 상품 ID: {}, 총 재고: {}", productId, quantity);
     }
 
