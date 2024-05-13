@@ -69,6 +69,10 @@ public class Product extends BaseEntity {
         this.quantity -= quantity;
     }
 
+    public void updateQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     public void updateProduct(ProductUpdateReqDto productUpdateReqDto) {
         Optional.ofNullable(productUpdateReqDto.getCategory())
                 .map(ProductCategory::valueOf)
