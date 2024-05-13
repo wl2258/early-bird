@@ -11,7 +11,6 @@ import com.ssonzm.productservice.domain.product.ProductRepository;
 import com.ssonzm.productservice.domain.product.ProductStatus;
 import com.ssonzm.productservice.service.client.UserServiceClient;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,6 +51,10 @@ public class ProductServiceImpl implements ProductService {
     private Product createProduct(ProductSaveReqDto productSaveReqDto, Long userId) {
         int quantity = productSaveReqDto.getQuantity();
         ProductStatus status = quantity > 0 ? ProductStatus.IN_STOCK : ProductStatus.SOLD_OUT;
+        return createProduct(productSaveReqDto, userId, status, quantity);
+    }
+
+    private static Product createProduct(ProductSaveReqDto productSaveReqDto, Long userId, ProductStatus status, int quantity) {
         return Product.builder()
                 .userId(userId)
                 .name(productSaveReqDto.getProductName())
@@ -98,8 +101,17 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDetailsFeignClientRespDto> getProductDetailsByIds(List<Long> productIds) {
         List<Product> productList = productRepository.findAllByIds(productIds);
         return productList.stream()
-                .map(p -> new ModelMapper().map(p, ProductDetailsFeignClientRespDto.class))
+                .map(this::mapToProductDetailRespDto)
                 .toList();
+    }
+
+    public ProductDetailsFeignClientRespDto mapToProductDetailRespDto(Product product) {
+        return new ProductDetailsFeignClientRespDto(
+                product.getId(),
+                product.getPrice(),
+                product.getName(),
+                product.getReservationStartTime()
+        );
     }
 
     @Override
@@ -120,11 +132,6 @@ public class ProductServiceImpl implements ProductService {
             Product findProduct = findProductByIdOrElseThrow(updateDto.getProductId());
             findProduct.decreaseQuantity(updateDto.getQuantity());
         }
-    }
-
-    @Override
-    public Long getProductQuantityByLua(Long productId) {
-        return productRedisService.getQuantityInRedisByLua(productId);
     }
 
     @Override
@@ -183,11 +190,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void decreaseQuantityByLua(OrderProductUpdateReqDto orderProductUpdateReqDto) {
-        productRedisService.decreaseQuantityInRedisByLua(orderProductUpdateReqDto);
-    }
-
-    @Override
     public void increaseQuantity(Long productId, int quantity) {
         // write-through
         Product product = findProductByIdOrElseThrow(productId);
@@ -203,6 +205,19 @@ public class ProductServiceImpl implements ProductService {
         } else {
             productRedisService.increaseProductQuantity(productId,  quantity);
         }
+    }
+
+    /**
+     * 루아 스크립트 적용
+     */
+    @Override
+    public Long getProductQuantityByLua(Long productId) {
+        return productRedisService.getQuantityInRedisByLua(productId);
+    }
+
+    @Override
+    public void decreaseQuantityByLua(OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        productRedisService.decreaseQuantityInRedisByLua(orderProductUpdateReqDto);
     }
 
     @Override
