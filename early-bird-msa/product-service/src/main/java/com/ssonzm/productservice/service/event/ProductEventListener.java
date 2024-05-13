@@ -4,6 +4,7 @@ import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProdu
 import com.ssonzm.coremodule.dto.product.kafka.ProductRequestDto.OrderSaveKafkaReqDto;
 import com.ssonzm.coremodule.vo.KafkaVo;
 import com.ssonzm.productservice.service.kafka.KafkaSender;
+import com.ssonzm.productservice.service.product.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -13,9 +14,11 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class ProductEventListener {
     private final KafkaSender kafkaSender;
+    private final ProductService productService;
 
-    public ProductEventListener(KafkaSender kafkaSender) {
+    public ProductEventListener(KafkaSender kafkaSender, ProductService productService) {
         this.kafkaSender = kafkaSender;
+        this.productService = productService;
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -23,10 +26,17 @@ public class ProductEventListener {
         Long userId = event.getUserId();
         OrderProductUpdateReqDto orderProductUpdateReqDto = event.getOrderProductUpdateReqDto();
 
-        log.debug("[Product producer(productId = {})] 주문 엔티티 생성 이벤트 발행",
-                event.getOrderProductUpdateReqDto().getProductId());
-        kafkaSender.sendMessage(KafkaVo.KAFKA_ORDER_TOPIC,
-                createOrderSaveDto(userId, orderProductUpdateReqDto));
+        Long productId = event.getOrderProductUpdateReqDto().getProductId();
+        try {
+            log.debug("[Product producer(productId = {})] 주문 엔티티 생성 이벤트 발행",
+                    productId);
+            kafkaSender.sendMessage(KafkaVo.KAFKA_ORDER_TOPIC,
+                    createOrderSaveDto(userId, orderProductUpdateReqDto));
+        } catch (Exception e) {
+            log.error("[Product producer(productId = {})] 카프카 이벤트 발행 중 에러 발생",
+                    productId);
+            productService.increaseQuantityByLua(productId, orderProductUpdateReqDto.getQuantity());
+        }
     }
 
     private OrderSaveKafkaReqDto createOrderSaveDto(Long userId,
