@@ -2,6 +2,7 @@ package com.ssonzm.productservice.service.product;
 
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.coremodule.vo.KafkaVo;
+import com.ssonzm.productservice.service.event.ProductEvent;
 import com.ssonzm.productservice.service.event.ProductEventListener;
 import com.ssonzm.productservice.service.kafka.KafkaSender;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +45,8 @@ public class RedissonLockProductFacade {
                 "상품 재고 조회 LOCK 획득 실패");*/
     }
 
-    public void decreaseProductQuantity(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
-/*        Long productId = orderProductUpdateReqDto.getProductId();
+    public void decreaseQuantityWithLock(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        Long productId = orderProductUpdateReqDto.getProductId();
         executeWithLock(productId, () -> {
             // 재고 확인
             productService.isLeftInStock(orderProductUpdateReqDto);
@@ -58,7 +59,10 @@ public class RedissonLockProductFacade {
 
             productEventListener.onProductSuccess(new ProductEvent(this, userId, orderProductUpdateReqDto));
             return null;
-        }, "상품 재고 감소 LOCK 획득 실패");*/
+        }, "상품 재고 감소 LOCK 획득 실패");
+    }
+
+    public void decreaseProductQuantity(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
 
         // 주문 날짜 확인
         productService.isAvailableOrder(orderProductUpdateReqDto);
@@ -87,11 +91,13 @@ public class RedissonLockProductFacade {
 
     public void increaseProductQuantity(Long productId, int quantity) {
         productService.increaseQuantityByLua(productId, quantity);
+    }
 
-/*        executeWithLock(productId, () -> {
+    public void increaseQuantityByLock(Long productId, int quantity) {
+        executeWithLock(productId, () -> {
                     productService.increaseQuantity(productId, quantity);
                     return null;
-                }, "상품 재고 증가 LOCK 획득 실패");*/
+                }, "상품 재고 증가 LOCK 획득 실패");
     }
 
     private <T> T executeWithLock(Long productId, LockCallback<T> lockCallback, String logMsg) {
