@@ -56,6 +56,7 @@ logging:
           core:
             KafkaTemplate: TRACE
             DefaultKafkaProducerFactory: TRACE
+    com.ssonzm.productservice: DEBUG
 
 resilience4j:
   circuitbreaker:

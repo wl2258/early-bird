@@ -2,6 +2,7 @@ package com.ssonzm.orderservice.service.order_product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.ProductUpdateAfterOrderReqDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.orderservice.domain.delivery.Delivery;
 import com.ssonzm.orderservice.domain.delivery.DeliveryRepository;
@@ -19,8 +20,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
-import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 
 @Slf4j
 @Service
@@ -88,12 +87,12 @@ public class OrderProductServiceImpl implements OrderProductService {
 
     // TODO sqs 사용
     private void restoreProductQuantity(OrderProduct orderProduct) {
-        OrderProductUpdateReqDto orderProductUpdateReqDto = new OrderProductUpdateReqDto(
+        ProductUpdateAfterOrderReqDto orderProductUpdateReqDto = new ProductUpdateAfterOrderReqDto(
                 orderProduct.getProductId(), orderProduct.getQuantity());
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            List<OrderProductUpdateReqDto> orderProductList = List.of(orderProductUpdateReqDto);
+            List<ProductUpdateAfterOrderReqDto> orderProductList = List.of(orderProductUpdateReqDto);
             String message = objectMapper.writeValueAsString(orderProductList);
 
             sqsSender.sendMessage(env.getProperty("sqs.product.group-id"), message);

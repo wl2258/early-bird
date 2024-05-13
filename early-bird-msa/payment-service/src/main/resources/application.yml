@@ -42,6 +42,7 @@ logging:
           core:
             KafkaTemplate: TRACE
             DefaultKafkaProducerFactory: TRACE
+    com.ssonzm.paymentservice: DEBUG
 
 management:
   endpoints:

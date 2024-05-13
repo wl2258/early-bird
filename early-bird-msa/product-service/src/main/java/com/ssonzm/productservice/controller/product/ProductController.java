@@ -73,9 +73,9 @@ public class ProductController {
 
     @GetMapping("/products/quantity/{productId}")
     public ResponseEntity<?> getProductQuantity(@PathVariable("productId") Long productId) {
-        int quantity = productFacade.getProductQuantity(productId);
+        Long quantity = productFacade.getProductQuantity(productId);
 
-        ResponseDto<Integer> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+        ResponseDto<Long> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(quantity);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);

@@ -1,9 +1,8 @@
 package com.ssonzm.productservice.service.event;
 
 import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
-import com.ssonzm.coremodule.dto.product.kafka.ProductRequestDto;
+import com.ssonzm.coremodule.dto.product.kafka.ProductRequestDto.OrderSaveKafkaReqDto;
 import com.ssonzm.coremodule.vo.KafkaVo;
-import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.service.kafka.KafkaSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,17 +21,20 @@ public class ProductEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onProductSuccess(ProductEvent event) {
         Long userId = event.getUserId();
-        Product product = event.getProduct();
         OrderProductUpdateReqDto orderProductUpdateReqDto = event.getOrderProductUpdateReqDto();
 
-        log.debug("[Product producer(productId = {})] 주문 엔티티 생성 이벤트 발행", product.getId());
+        log.debug("[Product producer(productId = {})] 주문 엔티티 생성 이벤트 발행",
+                event.getOrderProductUpdateReqDto().getProductId());
         kafkaSender.sendMessage(KafkaVo.KAFKA_ORDER_TOPIC,
-                createOrderSaveDto(userId, product,orderProductUpdateReqDto));
+                createOrderSaveDto(userId, orderProductUpdateReqDto));
     }
 
-    private ProductRequestDto.OrderSaveKafkaReqDto createOrderSaveDto(Long userId, Product product,
-                                                                      OrderProductUpdateReqDto orderProductUpdateReqDto) {
-        int quantity = orderProductUpdateReqDto.getQuantity();
-        return new ProductRequestDto.OrderSaveKafkaReqDto(userId, quantity, product.getId(), product.getPrice());
+    private OrderSaveKafkaReqDto createOrderSaveDto(Long userId,
+                                                    OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        return new OrderSaveKafkaReqDto(
+                userId,
+                orderProductUpdateReqDto.getQuantity(),
+                orderProductUpdateReqDto.getProductId(),
+                orderProductUpdateReqDto.getPrice());
     }
 }

@@ -3,6 +3,7 @@ package com.ssonzm.orderservice.service.order;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonzm.coremodule.dto.order.OrderRequestDto.OrderSaveReqDto;
+import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.orderservice.domain.delivery.Delivery;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 
 import static com.ssonzm.coremodule.dto.delivery.DeliveryResponseDto.DeliveryDetailsRespDto;
 import static com.ssonzm.coremodule.dto.order.OrderResponseDto.OrderDetailsRespDto;
-import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
+import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.*;
 import static com.ssonzm.coremodule.dto.order_product.OrderProductResponseDto.OrderProductDetailsRespDto;
 
 @Slf4j
@@ -75,8 +76,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void updateQuantity(List<OrderProduct> orderProductList) {
-        List<OrderProductUpdateReqDto> orderProductUpdateReqDtoList = orderProductList.stream()
-                .map(op -> new OrderProductUpdateReqDto(op.getProductId(), -op.getQuantity()))
+        List<ProductUpdateAfterOrderReqDto> orderProductUpdateReqDtoList = orderProductList.stream()
+                .map(op -> new ProductUpdateAfterOrderReqDto(op.getProductId(), -op.getQuantity()))
                 .toList();
 
         try {

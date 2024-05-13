@@ -57,3 +57,7 @@ failLock:
 failQuantityUpdate:
   code: "-4015"
   msg: "재고 업데이트를 실패했습니다"
+
+outOfStock:
+  code: "-4016"
+  msg: "품절되었습니다"

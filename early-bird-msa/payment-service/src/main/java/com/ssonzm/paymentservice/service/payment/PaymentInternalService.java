@@ -28,7 +28,6 @@ public class PaymentInternalService {
     public void savePayment(PaymentSaveKafkaReqDto paymentSaveKafkaReqDto) {
         Payment payment = paymentRepository.save(createPayment(paymentSaveKafkaReqDto));
 
-        Long paymentId = payment.getId();
         if (isFailedSaveEntity(payment.getStatus())) {
             log.debug("[Payment service] 결제 중 고객 이탈");
             paymentEventListener.publishPaymentEvent(new PaymentEvent(this, paymentSaveKafkaReqDto));

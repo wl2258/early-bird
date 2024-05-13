@@ -1,10 +1,14 @@
 package com.ssonzm.productservice.service.product;
 
+import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
+import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -46,5 +50,91 @@ public class ProductRedisService {
         String key = REDIS_PREFIX + productId;
         redisTemplate.delete(key);
         log.debug("상품이 삭제되었습니다. 상품 ID: {}", productId);
+    }
+
+
+    public void decreaseQuantityInRedisByLua(OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        Long productId = orderProductUpdateReqDto.getProductId();
+        Integer quantity = orderProductUpdateReqDto.getQuantity();
+
+        String script = """
+                local productKey = KEYS[1]
+                local quantity = tonumber(ARGV[1])
+                        
+                local currentQuantity = tonumber(redis.call('GET', productKey))
+                if currentQuantity == nil then
+                    return -2
+                end
+                if currentQuantity < quantity then
+                    return -1 -- 재고 부족
+                end
+                        
+                redis.call('DECRBY', productKey, quantity)
+                return 1 -- 재고 감소 성공
+                        """;
+
+        Long result = (Long) redisTemplate.execute(
+                new DefaultRedisScript<>(script, Long.class),
+                Collections.singletonList(REDIS_PREFIX + productId.toString()), quantity);
+
+        if (result == -1) {
+            throw new CommonBadRequestException("outOfStock");
+        } else if (result == -2) {
+            throw new CommonBadRequestException("notFoundData");
+        }
+
+        log.debug("[상품 재고 감소 성공] productId = {}", productId);
+    }
+
+
+    public void increaseQuantityInRedisByLua(Long productId, Integer quantity) {
+        String script = """
+                local productKey = KEYS[1]
+                local quantity = tonumber(ARGV[1])
+                                
+                local currentQuantity = tonumber(redis.call('GET', productKey))
+                if currentQuantity == nil then
+                    return -1
+                else
+                    redis.call('INCRBY', productKey, quantity)
+                end
+                                
+                return 1
+                        """;
+
+        Long result = (Long) redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),
+                Collections.singletonList(REDIS_PREFIX + productId.toString()), quantity);
+
+        if (result == -1) {
+            throw new CommonBadRequestException("notFoundData");
+        }
+
+        log.debug("[상품 재고 증가 성공] productId = {}", productId);
+    }
+
+
+    public Long getQuantityInRedisByLua(Long productId) {
+        String script = """
+                local productKey = KEYS[1]
+
+                -- 재고 확인
+                local currentQuantity = tonumber(redis.call('GET', productKey))
+                if currentQuantity == nil then
+                    return -1
+                end
+                                
+                -- 재고 반환
+                return currentQuantity
+                """;
+
+        Long result = (Long) redisTemplate.execute(
+                new DefaultRedisScript<>(script, Long.class),
+                Collections.singletonList(REDIS_PREFIX + productId.toString()));
+
+        if (result == -1) {
+            throw new CommonBadRequestException("notFoundData");
+        }
+
+        return result;
     }
 }
