@@ -1,7 +1,6 @@
 package com.ssonzm.productservice.service.product;
 
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
-import com.ssonzm.coremodule.vo.KafkaVo;
 import com.ssonzm.productservice.service.event.ProductEvent;
 import com.ssonzm.productservice.service.event.ProductEventListener;
 import com.ssonzm.productservice.service.kafka.KafkaSender;
@@ -77,8 +76,7 @@ public class RedissonLockProductFacade {
          * write back 전략을 사용하면서 굳이 커밋될 때까지 기다릴 필요 없으므로
          * 트랜잭션 리스너 사용해서 이벤트 발행할 필요 없음
          */
-        kafkaSender.sendMessage(KafkaVo.KAFKA_ORDER_TOPIC,
-                createOrderSaveDto(userId, orderProductUpdateReqDto));
+        productEventListener.sendMessageToProductConsumer(userId, orderProductUpdateReqDto);
     }
 
     private OrderSaveKafkaReqDto createOrderSaveDto(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {

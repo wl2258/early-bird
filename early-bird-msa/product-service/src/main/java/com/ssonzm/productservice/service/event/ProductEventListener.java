@@ -25,8 +25,11 @@ public class ProductEventListener {
     public void onProductSuccess(ProductEvent event) {
         Long userId = event.getUserId();
         OrderProductUpdateReqDto orderProductUpdateReqDto = event.getOrderProductUpdateReqDto();
+        sendMessageToProductConsumer(userId, orderProductUpdateReqDto);
+    }
 
-        Long productId = event.getOrderProductUpdateReqDto().getProductId();
+    public void sendMessageToProductConsumer(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        Long productId = orderProductUpdateReqDto.getProductId();
         try {
             log.debug("[Product producer(productId = {})] 주문 엔티티 생성 이벤트 발행",
                     productId);
