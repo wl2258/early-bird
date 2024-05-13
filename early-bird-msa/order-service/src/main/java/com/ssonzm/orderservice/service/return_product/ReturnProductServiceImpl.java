@@ -2,7 +2,6 @@ package com.ssonzm.orderservice.service.return_product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.orderservice.domain.delivery.Delivery;
 import com.ssonzm.orderservice.domain.delivery.DeliveryStatus;
@@ -23,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.ProductUpdateAfterOrderReqDto;
 import static com.ssonzm.coremodule.dto.return_product.ReturnProductRequestDto.ReturnProductSaveReqDto;
 
 @Slf4j
@@ -89,10 +89,10 @@ public class ReturnProductServiceImpl implements ReturnProductService {
     }
 
     private void restoreProductQuantity(List<ReturnProduct> returnProductList) {
-        List<OrderProductUpdateReqDto> orderProductList = returnProductList.stream()
+        List<ProductUpdateAfterOrderReqDto> orderProductList = returnProductList.stream()
                 .map(rp -> {
                     rp.updateStatus(ReturnStatus.APPROVED);
-                    return new OrderProductUpdateReqDto(rp.getId(), rp.getOrderProduct().getQuantity());
+                    return new ProductUpdateAfterOrderReqDto(rp.getId(), rp.getOrderProduct().getQuantity());
                 })
                 .toList();
 
