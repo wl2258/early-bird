@@ -1,6 +1,7 @@
 package com.ssonzm.productservice.service.product;
 
 import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
+import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.ProductUpdateAfterOrderReqDto;
 import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
@@ -112,14 +113,18 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.getProductListByUser(pageable, userId);
     }
 
-    // TODO 동시성 제어 lock 걸기
     @Override
     @Transactional
-    public void updateProductQuantity(List<OrderProductUpdateReqDto> orderProductUpdateList) {
-        for (OrderProductUpdateReqDto updateDto : orderProductUpdateList) {
+    public void updateProductQuantity(List<ProductUpdateAfterOrderReqDto> orderProductUpdateList) {
+        for (ProductUpdateAfterOrderReqDto updateDto : orderProductUpdateList) {
             Product findProduct = findProductByIdOrElseThrow(updateDto.getProductId());
             findProduct.decreaseQuantity(updateDto.getQuantity());
         }
+    }
+
+    @Override
+    public Long getProductQuantityByLua(Long productId) {
+        return productRedisService.getQuantityInRedisByLua(productId);
     }
 
     @Override
@@ -141,14 +146,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product isAvailableOrder(OrderProductUpdateReqDto orderProductUpdateReqDto) {
+    public void isAvailableOrder(OrderProductUpdateReqDto orderProductUpdateReqDto) {
         Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
 
         if (findProduct.getReservationStartTime().isAfter(LocalDateTime.now())) {
             throw new CommonBadRequestException("failOrder");
         }
 
-        return findProduct;
     }
 
     @Override
@@ -170,28 +174,39 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product decreaseQuantity(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
+    public void decreaseQuantity(Long userId, OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        // write-through
         Product findProduct = findProductByIdOrElseThrow(orderProductUpdateReqDto.getProductId());
         findProduct.decreaseQuantity(orderProductUpdateReqDto.getQuantity());
 
-        productRedisService.decreaseProductQuantity(findProduct.getId(), orderProductUpdateReqDto.getQuantity());
-
-        return findProduct;
+        productRedisService.decreaseProductQuantity(orderProductUpdateReqDto.getProductId(), orderProductUpdateReqDto.getQuantity());
     }
 
     @Override
-    @Transactional
+    public void decreaseQuantityByLua(OrderProductUpdateReqDto orderProductUpdateReqDto) {
+        productRedisService.decreaseQuantityInRedisByLua(orderProductUpdateReqDto);
+    }
+
+    @Override
     public void increaseQuantity(Long productId, int quantity) {
+        // write-through
         Product product = findProductByIdOrElseThrow(productId);
-        product.increaseQuantity( quantity);
+        product.increaseQuantity(quantity);
 
         Integer totalQuantity = productRedisService.getProductQuantity(productId);
 
         // 재고가 존재하지 않는 경우 레디스에 저장
         if (totalQuantity == null) {
+            // write-back (not used lua)
+//            Product product = findProductByIdOrElseThrow(productId);
             productRedisService.saveProduct(product.getId(), product.getQuantity(), 1, TimeUnit.HOURS);
         } else {
             productRedisService.increaseProductQuantity(productId,  quantity);
         }
+    }
+
+    @Override
+    public void increaseQuantityByLua(Long productId, Integer quantity) {
+        productRedisService.increaseQuantityInRedisByLua(productId, quantity);
     }
 }
