@@ -2,6 +2,7 @@ package com.ssonzm.coremodule.exception.handler;
 
 import com.ssonzm.coremodule.dto.ResponseDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
+import com.ssonzm.coremodule.exception.CommonRuntimeException;
 import com.ssonzm.coremodule.exception.CommonValidationException;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,6 @@ public class CustomExceptionHandler {
     public ResponseEntity<?> commonBadRequestException(CommonBadRequestException e) {
 
         log.error(e.getMessage());
-
         return new ResponseEntity<>(ResponseUtil.setResponseDto(messageSource, e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
@@ -44,5 +44,12 @@ public class CustomExceptionHandler {
 
         log.error(e.getMessage());
         return new ResponseEntity<>(ResponseUtil.setResponseDto(messageSource, false), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CommonRuntimeException.class)
+    public ResponseEntity<?> commonRuntimeException(CommonRuntimeException e) {
+
+        log.error(e.getMessage());
+        return new ResponseEntity<>(ResponseUtil.setResponseDto(messageSource, e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

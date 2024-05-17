@@ -2,8 +2,16 @@ server:
   port: 8081
 
 spring:
-  profiles:
-    include: secret
+  data:
+    redis:
+      master:
+        host: localhost
+        port: 6381
+      slaves:
+        - host: localhost
+          port: 6998
+        - host: localhost
+          port: 6999
   application:
     name: product-service
   cloud:
@@ -23,10 +31,6 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-  data:
-    redis:
-      host: localhost
-      port: 6381
 
 eureka:
   client:
@@ -47,15 +51,6 @@ cloud:
 
 logging:
   level:
-    org:
-      springframework:
-        transaction:
-          interceptor:
-            TransactionInterceptor: TRACE
-        kafka:
-          core:
-            KafkaTemplate: TRACE
-            DefaultKafkaProducerFactory: TRACE
     com.ssonzm.productservice: DEBUG
 
 resilience4j:

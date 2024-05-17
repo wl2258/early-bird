@@ -9,5 +9,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "kafka")
 public class KafkaProperties {
     private String host;
-    private String group_id;
+    private String order_group_id;
+    private String product_group_id;
+    private String payment_group_id;
 }

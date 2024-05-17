@@ -74,7 +74,7 @@ public class SecurityConfig {
     }
 
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new AuthenticationFilter(authenticationManager, env);
+        return new AuthenticationFilter(authenticationManager, env, messageSource);
     }
 
     private AuthorizationFilter getAuthorizationFilter(AuthenticationManager authenticationManager) {

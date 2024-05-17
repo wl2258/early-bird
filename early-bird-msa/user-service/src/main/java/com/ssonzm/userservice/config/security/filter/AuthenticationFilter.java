@@ -1,6 +1,7 @@
 package com.ssonzm.userservice.config.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.userservice.config.security.PrincipalDetails;
 import com.ssonzm.userservice.domain.user.User;
 import com.ssonzm.coremodule.dto.user.UserRequestDto.UserLoginReqDto;
@@ -10,6 +11,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,14 +29,18 @@ import java.util.Date;
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final Environment env;
+    private final MessageSource messageSource;
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager, Environment env) {
+    public AuthenticationFilter(AuthenticationManager authenticationManager,
+                                Environment env, MessageSource messageSource) {
         super(authenticationManager);
         this.env = env;
+        this.messageSource = messageSource;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        Authentication authenticate = null;
         try {
             UserLoginReqDto userLoginReqDto = new ObjectMapper().readValue(request.getInputStream(), UserLoginReqDto.class);
 
@@ -42,11 +48,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                     userLoginReqDto.getEmail(), userLoginReqDto.getPassword()
             );
 
-            return getAuthenticationManager().authenticate(authenticationToken);
+            authenticate = getAuthenticationManager().authenticate(authenticationToken);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            ResponseUtil.failAuth(response, messageSource, "failAuth");
         }
+
+        return authenticate;
     }
 
     @Override
