@@ -1,0 +1,160 @@
+version: '3.1'
+
+services:
+  msa_user_mariadb:
+    container_name: msa_user_mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_user
+      TZ: Asia/Seoul
+    ports:
+        - "3308:3306"
+    volumes:
+      - msa_early_bird_user_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
+  msa_order_mariadb:
+    container_name: msa_order_mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_order
+      TZ: Asia/Seoul
+    ports:
+      - "3309:3306"
+    volumes:
+      - msa_early_bird_order_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
+  msa_product_mariadb:
+    container_name: msa_product_mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_product
+      TZ: Asia/Seoul
+    ports:
+      - "3310:3306"
+    volumes:
+      - msa_early_bird_product_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
+  msa_payment_mariadb:
+    container_name: msa_payment_mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb1234
+      MYSQL_DATABASE: early_bird_payment
+      TZ: Asia/Seoul
+    ports:
+      - "3311:3306"
+    volumes:
+      - msa_early_bird_payment_data:/var/lib/mysql
+    networks:
+      - early-bird-network
+
+  msa_user_redis:
+    container_name: msa_user_redis
+    image: redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - msa_redis_user_data:/data
+    networks:
+      - early-bird-network
+
+  product_redis_master:
+    container_name: product_redis_master
+    image: redis
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_product_master_data:/data
+    networks:
+      - early-bird-network
+
+  product_redis_replica1:
+    container_name: product_redis_replica1
+    image: redis
+    ports:
+      - "6998:6379"
+    volumes:
+      - redis_product_replica_data1:/data
+    command: redis-server --slaveof product_redis_master 6379
+    networks:
+      - early-bird-network
+    depends_on:
+      - product_redis_master
+
+  product_redis_replica2:
+    container_name: product_redis_replica2
+    image: redis
+    ports:
+      - "6999:6379"
+    volumes:
+      - redis_product_replica_data2:/data
+    command: redis-server --slaveof product_redis_master 6379
+    networks:
+      - early-bird-network
+    depends_on:
+      - product_redis_master
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+      - 15671:15671
+      - 5671:5671
+      - 4369:4369
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - early-bird-network
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - early-bird-network
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_CREATE_TOPICS: "Topic:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - /var/run/docker.sock
+    depends_on:
+      - zookeeper
+    networks:
+      - early-bird-network
+
+volumes:
+    msa_early_bird_user_data:
+    msa_early_bird_order_data:
+    msa_early_bird_product_data:
+    msa_early_bird_payment_data:
+    msa_redis_user_data:
+    redis_product_master_data:
+    redis_product_replica_data1:
+    redis_product_replica_data2:
+
+networks:
+    early-bird-network:

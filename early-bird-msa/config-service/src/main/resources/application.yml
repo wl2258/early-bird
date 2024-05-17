@@ -1,0 +1,27 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file://${user.home}/Documents/hangha/early-bird-config
+#        git:
+#          uri: file:///Users/jimin/Documents/hangha/early-bird-config
+#          uri: file:///Users/jimin/Documents/study_project/msa_work
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, bean, httpexchanges, busrefresh

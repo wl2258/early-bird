@@ -1,0 +1,10 @@
+set FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE users;
+TRUNCATE TABLE products;
+TRUNCATE TABLE order_products;
+TRUNCATE TABLE orders;
+TRUNCATE TABLE deliveries;
+TRUNCATE TABLE payments;
+TRUNCATE TABLE returns;
+TRUNCATE TABLE wish_products;
+set FOREIGN_KEY_CHECKS = 1;

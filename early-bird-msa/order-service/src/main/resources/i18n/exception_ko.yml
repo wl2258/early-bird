@@ -1,0 +1,63 @@
+successResult:
+  code: "0"
+  msg: "성공하였습니다"
+
+failResult:
+  code: "-1"
+  msg: "실패하였습니다"
+
+notFoundUser:
+  code: "-4000"
+  msg: "일치하는 회원정보가 없습니다"
+
+failValidTest:
+  code: "-4001"
+  msg: "유효성 검사에 실패했습니다"
+
+duplicationUser:
+  code: "-4002"
+  msg: "이미 가입된 아이디(이메일)입니다"
+
+invalidLoginInfo:
+  code: "-4003"
+  msg: "잘못된 아이디 또는 비밀번호입니다"
+
+failSendEmail:
+  code: "-4004"
+  msg: "이메일 발송에 실패하였습니다"
+
+notValidVerifyCode:
+  code: "-4005"
+  msg: "유효하지 않은 인증 코드입니다"
+
+failValidation:
+  code: "-4006"
+  msg: "유효성 검사를 실패했습니다"
+
+notFoundData:
+  code: "-4007"
+  msg: "등록되지 않은 데이터입니다"
+
+failCancelOrder:
+  code: "-4008"
+  msg: "취소할 수 없는 주문입니다"
+
+failReturn:
+  code: "-4009"
+  msg: "반품이 불가능합니다"
+
+failSqsSender:
+  code: "-4010"
+  msg: "SQS 메시지 전송을 실패했습니다"
+
+failSqsListener:
+  code: "-4011"
+  msg: "SQS 메시지 수신을 실패했습니다"
+
+tryAgain:
+  code: "-4012"
+  msg: "잠시 후 다시 시도해 주세요"
+
+failOrder:
+  code: "-4013"
+  msg: "주문할 수 없는 상품입니다"

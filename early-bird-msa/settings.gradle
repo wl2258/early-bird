@@ -1,0 +1,7 @@
+rootProject.name = 'early-bird-msa'
+
+include 'core-module'
+include 'user-service'
+include 'order-service'
+include 'product-service'
+include 'payment-service'

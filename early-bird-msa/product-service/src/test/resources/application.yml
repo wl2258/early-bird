@@ -1,0 +1,23 @@
+spring:
+  test:
+    database:
+      replace: none
+  datasource:
+    url: jdbc:tc:mariadb:10.3.39:///earlybird?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  output:
+    ansi:
+      enabled: always
+  messages:
+    encoding: UTF-8
+    basename: i18n/exception
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6381}
