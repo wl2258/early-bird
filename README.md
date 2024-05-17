@@ -6,6 +6,9 @@
 프로젝트 기간: 2024.04.17 - 2024.05.14
 
 ## 시스템 구조
+<p align="center">
+    <img width="800" alt="image" src="https://github.com/wl2258/early-bird/assets/77067383/e452f2d9-19af-4dfa-9e76-596c8e43cde0">
+</p>
 
 ## 개발 환경
 - Java 21
