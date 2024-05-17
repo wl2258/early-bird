@@ -50,17 +50,17 @@
 [API 문서 바로가기](https://documenter.getpostman.com/view/19468204/2sA3JRaf81)
 
 ## 🌟 주요 기능
-- JWT를 사용한 로그인
-- Google SMTP를 사용한 이메일 인증
-- Spring Security를 사용한 인증 및 인가
-- 한정 판매 상품 구매 기능
-- 스케줄러를 통한 주문 및 배송 상태 관리
 - Redis Caching을 통한 상품 재고 관리
 - Api Gateway를 통한 마이크로서비스 아키텍처 구축
 - Kafka를 통한 이벤트 기반 아키텍처 구축
 - Redis Replication을 통한 분산 처리
 - Open Feign을 활용한 마이크로서비스 간 통신
 - Circuit Breaker를 활용한 회복탄력성 증대
+- 한정 판매 상품 구매 기능
+- 스케줄러를 통한 주문 및 배송 상태 관리
+- JWT를 사용한 로그인
+- Google SMTP를 사용한 이메일 인증
+- Spring Security를 사용한 인증 및 인가
 
 ## 📈 성능 최적화 및 트러블 슈팅
 
