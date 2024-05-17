@@ -6,6 +6,10 @@ failResult:
   code: "-1"
   msg: "실패하였습니다"
 
+failAuth:
+  code: "-3000"
+  msg: "인증을 실패하였습니다"
+
 notFoundUser:
   code: "-4000"
   msg: "일치하는 회원정보가 없습니다"

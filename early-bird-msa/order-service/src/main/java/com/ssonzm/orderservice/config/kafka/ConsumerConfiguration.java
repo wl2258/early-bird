@@ -59,7 +59,7 @@ public class ConsumerConfiguration {
     private Map<String, Object> consumerConfigurations(JsonDeserializer<?> deserializer) {
         Map<String, Object> consumerConfigurations = new HashMap<>();
         consumerConfigurations.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getHost());
-        consumerConfigurations.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getGroup_id());
+        consumerConfigurations.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getOrder_group_id());
         consumerConfigurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerConfigurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer.getClass());
         consumerConfigurations.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");

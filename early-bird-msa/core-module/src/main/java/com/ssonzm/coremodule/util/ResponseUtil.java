@@ -57,4 +57,17 @@ public class ResponseUtil {
             log.error("서버 파싱 에러");
         }
     }
+
+    public static void failAuth(HttpServletResponse response, MessageSource messageSource, String exception) {
+        try {
+            ObjectMapper om = new ObjectMapper();
+            ResponseDto<String> responseDto = setResponseDto(messageSource, exception);
+            String responseBody = om.writeValueAsString(responseDto);
+            response.setContentType("application/json; charset=utf-8");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().println(responseBody);
+        } catch (Exception e) {
+            log.error("서버 파싱 에러");
+        }
+    }
 }

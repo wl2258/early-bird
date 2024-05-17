@@ -1,9 +1,16 @@
 package com.ssonzm.productservice.config;
 
+import com.ssonzm.coremodule.dto.property.RedisProperties;
+import io.lettuce.core.ReadFrom;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.redisson.config.MasterSlaveServersConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
@@ -11,18 +18,27 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
-    private final Environment env;
+    private final RedisProperties redisProperties;
 
-    public RedisConfig(Environment env) {
-        this.env = env;
+    public RedisConfig(RedisProperties redisProperties) {
+        this.redisProperties = redisProperties;
     }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        String host = env.getProperty("spring.data.redis.host");
-        int port = Integer.parseInt(env.getProperty("spring.data.redis.port"));
+        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+                .readFrom(ReadFrom.REPLICA_PREFERRED)
+                .build();
 
-        return new LettuceConnectionFactory(host, port);
+        RedisStaticMasterReplicaConfiguration masterReplicaConfig
+                = new RedisStaticMasterReplicaConfiguration(redisProperties.getMaster().getHost(),
+                redisProperties.getMaster().getPort());
+
+        redisProperties.getSlaves().forEach(slave -> {
+            masterReplicaConfig.addNode(slave.getHost(), slave.getPort());
+        });
+
+        return new LettuceConnectionFactory(masterReplicaConfig, clientConfig);
     }
 
     @Bean
@@ -35,4 +51,19 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+
+        MasterSlaveServersConfig masterSlaveServersConfig = config.useMasterSlaveServers()
+                .setMasterAddress("redis://" + redisProperties.getMaster().getHost() + ":" + redisProperties.getMaster().getPort());
+
+        redisProperties.getSlaves().forEach(slave -> {
+            masterSlaveServersConfig.addSlaveAddress("redis://" + slave.getHost() + ":" + slave.getPort());
+        });
+
+        return Redisson.create(config);
+    }
+
 }

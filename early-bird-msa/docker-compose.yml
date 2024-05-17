@@ -71,15 +71,41 @@ services:
     networks:
       - early-bird-network
 
-  msa_product_redis:
-    container_name: msa_product_redis
+  product_redis_master:
+    container_name: product_redis_master
     image: redis
     ports:
       - "6381:6379"
     volumes:
-      - msa_redis_product_data:/data
+      - redis_product_master_data:/data
     networks:
       - early-bird-network
+
+  product_redis_replica1:
+    container_name: product_redis_replica1
+    image: redis
+    ports:
+      - "6998:6379"
+    volumes:
+      - redis_product_replica_data1:/data
+    command: redis-server --slaveof product_redis_master 6379
+    networks:
+      - early-bird-network
+    depends_on:
+      - product_redis_master
+
+  product_redis_replica2:
+    container_name: product_redis_replica2
+    image: redis
+    ports:
+      - "6999:6379"
+    volumes:
+      - redis_product_replica_data2:/data
+    command: redis-server --slaveof product_redis_master 6379
+    networks:
+      - early-bird-network
+    depends_on:
+      - product_redis_master
 
   rabbitmq:
     image: rabbitmq:management
@@ -101,6 +127,8 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+    networks:
+      - early-bird-network
 
   kafka:
     image: wurstmeister/kafka
@@ -115,6 +143,8 @@ services:
       - /var/run/docker.sock
     depends_on:
       - zookeeper
+    networks:
+      - early-bird-network
 
 volumes:
     msa_early_bird_user_data:
@@ -122,7 +152,9 @@ volumes:
     msa_early_bird_product_data:
     msa_early_bird_payment_data:
     msa_redis_user_data:
-    msa_redis_product_data:
+    redis_product_master_data:
+    redis_product_replica_data1:
+    redis_product_replica_data2:
 
 networks:
     early-bird-network:

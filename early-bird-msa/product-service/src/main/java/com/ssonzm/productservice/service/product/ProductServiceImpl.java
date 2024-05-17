@@ -45,6 +45,8 @@ public class ProductServiceImpl implements ProductService {
     public Long saveProduct(Long userId, ProductSaveReqDto productSaveReqDto) {
         Product product = createProduct(productSaveReqDto, userId);
         productRepository.save(product);
+
+        productRedisService.saveProduct(product.getId(), product.getQuantity(), 1, TimeUnit.HOURS);
         return product.getId();
     }
 

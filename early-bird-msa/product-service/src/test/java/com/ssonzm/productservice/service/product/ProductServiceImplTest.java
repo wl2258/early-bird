@@ -1,6 +1,5 @@
 package com.ssonzm.productservice.service.product;
 
-import com.ssonzm.coremodule.dto.product.kafka.ProductResponseDto.ProductKafkaRollbackRespDto;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
 import com.ssonzm.productservice.common.util.DummyUtil;
 import com.ssonzm.productservice.domain.product.Product;
@@ -55,7 +54,7 @@ class ProductServiceImplTest extends DummyUtil {
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
-                    OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(beforeProduct.getId(), 1);
+                    OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(beforeProduct.getId(), beforeProduct.getPrice(), 1);
                     productFacade.decreaseProductQuantity(1L, orderProductDto);
                 } finally {
                     latch.countDown();
@@ -71,7 +70,7 @@ class ProductServiceImplTest extends DummyUtil {
     @Test
     @DisplayName("품절 상품 주문 시 실패")
     public void decreaseQuantity_품절테스트() {
-        OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(2L, 1);
+        OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(2L, 10000, 1);
 
         Assertions.assertThrows(CommonBadRequestException.class, () -> {
             productFacade.decreaseProductQuantity(1L, orderProductDto);
@@ -81,7 +80,7 @@ class ProductServiceImplTest extends DummyUtil {
     @Test
     @DisplayName("오픈 예정 상품 주문 시 실패")
     public void decreaseQuantity_날짜테스트() {
-        OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(3L, 1);
+        OrderProductUpdateReqDto orderProductDto = new OrderProductUpdateReqDto(3L, 10000, 1);
 
         Assertions.assertThrows(CommonBadRequestException.class, () -> {
             productFacade.decreaseProductQuantity(1L, orderProductDto);
