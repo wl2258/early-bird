@@ -70,5 +70,6 @@
 - [Redis Caching을 활용해 상품 주문 성능 개선: write-back & Lua script 사용](https://ssonzm.tistory.com/114)
 
 ### 트러블슈팅 경험
+- Kafka 트랜잭션과 Spring 트랜잭션의 시점 차이로 인한 문제 발생
 - [Kafka 2개의 Consumer가 하나의 토픽을 구독할 때 문제 발생](https://ssonzm.tistory.com/117)
 - 재고 관리 동시성 문제 
