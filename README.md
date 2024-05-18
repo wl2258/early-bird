@@ -66,8 +66,6 @@
 ## 📈 성능 최적화 및 트러블 슈팅
 
 ### 성능 최적화 사례
-- MSA 도입
-- API Gateway 추가
 - [Redis Caching을 활용해 상품 주문 성능 개선: write-back & Lua script 사용](https://ssonzm.tistory.com/114)
 
 ### 트러블슈팅 경험
