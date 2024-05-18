@@ -14,6 +14,7 @@
 - Java 21
 - Gradle
 - Spring Boot 3.2.5
+- MariaDB
 
 ## 🛠 기술 스택
 **프레임워크 & 라이브러리**
