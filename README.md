@@ -57,7 +57,7 @@
 - Redis Replication을 통한 분산 처리
 - Open Feign을 활용한 마이크로서비스 간 통신
 - Circuit Breaker를 활용한 회복탄력성 증대
-- 한정 판매 상품 구매 기능
+- 한정 수량 상품 구매 기능
 - 스케줄러를 통한 주문 및 배송 상태 관리
 - JWT를 사용한 로그인
 - Google SMTP를 사용한 이메일 인증
@@ -73,4 +73,3 @@
 ### 트러블슈팅 경험
 - Kafka 트랜잭션과 Spring 트랜잭션의 시점 차이로 인한 문제 발생
 - [Kafka 2개의 Consumer가 하나의 토픽을 구독할 때 문제 발생](https://ssonzm.tistory.com/117)
-- 재고 관리 동시성 문제 
