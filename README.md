@@ -57,7 +57,7 @@
 - Redis Replication을 통한 분산 처리
 - Open Feign을 활용한 마이크로서비스 간 통신
 - Circuit Breaker를 활용한 회복탄력성 증대
-- 한정 판매 상품 구매 기능
+- 한정 수량 상품 구매 기능
 - 스케줄러를 통한 주문 및 배송 상태 관리
 - JWT를 사용한 로그인
 - Google SMTP를 사용한 이메일 인증
