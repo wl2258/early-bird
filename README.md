@@ -74,8 +74,7 @@
 - Redis Replication을 통한 분산 처리
 - Open Feign을 활용한 마이크로서비스 간 통신
   - 마이크로서비스 간 동기 통신 구현 
-- Resilience4J를 통한
-  - Circuit Breaker를 활용해 회복탄력성 향상
+- Resilience4J의 Circuit Breaker를 활용해 회복탄력성 향상
 - 한정 수량 상품 구매 기능
 - 스케줄러를 통한 주문 및 배송 상태 관리
 - JWT를 사용한 로그인
