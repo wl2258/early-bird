@@ -70,11 +70,10 @@
 - Redis Caching을 통한 상품 재고 관리
 - Api Gateway를 통한 마이크로서비스 아키텍처 구축
 - Kafka를 통한 이벤트 기반 아키텍처 구축
-  - Kafka를 통해 마이크로서비스 간 비동기 통신 구현
+  - Kafka를 통해 마이크로서비스 간 비동기 통신 구현(데이터 조작 작업)
 - Redis Replication을 통한 분산 처리
 - Open Feign을 활용한 마이크로서비스 간 통신
-  - 마이크로서비스 간 동기 통신 구현 
-- Resilience4J의 Circuit Breaker를 활용해 회복탄력성 향상
+  - 마이크로서비스 간 동기 통신 구현(단순 조회)
 - 한정 수량 상품 구매 기능
 - 스케줄러를 통한 주문 및 배송 상태 관리
 - JWT를 사용한 로그인
@@ -85,6 +84,6 @@
 
 ## 📈 성능 최적화 및 트러블슈팅
 - Redis 캐시를 활용하여 상품 주문 처리 성능 개선: write-back & Lua script 사용
-- Kafka 트랜잭션과 Spring 트랜잭션의 시점 차이로 인한 문제 발생
+- Kafka 트랜잭션과 Spring 트랜잭션 시점 차이로 인한 데이터 일관성 문제 해결
 - Kafka Consumer 그룹 관리를 통한 메시지 처리 최적화
-- Circuit Breaker를 활용한 회복탄력성 향상
+- Resilience4J의 Circuit Breaker를 활용한 회복탄력성 향상: OpenFeign 사용 시 마이크로서비스 간 장애 전파 문제 해결
