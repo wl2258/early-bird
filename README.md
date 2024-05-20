@@ -29,7 +29,6 @@
     <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=white"/>
     <img src="https://img.shields.io/badge/Spring Cloud Gateway-6DB33F?style=for-the-badge&logo=Spring Cloud Gateway&logoColor=white"/>
     <img src="https://img.shields.io/badge/Spring Cloud Netflix Eureka-6DB33F?style=for-the-badge&logo=Spring Cloud Netflix Eureka&logoColor=white"/>
-    <img src="https://img.shields.io/badge/Spring Cloud Config-6DB33F?style=for-the-badge&logo=Spring Cloud Config&logoColor=white"/>
     <img src="https://img.shields.io/badge/Spring Cloud Bus-6DB33F?style=for-the-badge&logo=Spring Cloud Bus&logoColor=white"/>
     <img src="https://img.shields.io/badge/Spring Cloud OpenFeign-6DB33F?style=for-the-badge&logo=OpenFeign&logoColor=white"/>
     <img src="https://img.shields.io/badge/Spring Cloud Circuit Breaker-6DB33F?style=for-the-badge&logo=CircuitBreaker&logoColor=white"/>
@@ -37,10 +36,15 @@
     <img src="https://img.shields.io/badge/QueryDSL-59666C?style=for-the-badge&logo=QueryDSL&logoColor=white"/>
 </div>
 
+**DB**
+<div>
+    <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"/>
+    <img src="https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white"/>
+</div>
+
 **메시지 큐 시스템**
 <div>
     <img src="https://img.shields.io/badge/Apache Kafka-231F20?style=for-the-badge&logo=Apache Kafka&logoColor=white"/>
-    <img src="https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=RabbitMQ&logoColor=white"/>
 </div>
 
 **인프라**
@@ -66,9 +70,12 @@
 - Redis Caching을 통한 상품 재고 관리
 - Api Gateway를 통한 마이크로서비스 아키텍처 구축
 - Kafka를 통한 이벤트 기반 아키텍처 구축
+  - Kafka를 통해 마이크로서비스 간 비동기 통신 구현
 - Redis Replication을 통한 분산 처리
 - Open Feign을 활용한 마이크로서비스 간 통신
-- Circuit Breaker를 활용해 회복탄력성 향상
+  - 마이크로서비스 간 동기 통신 구현 
+- Resilience4J를 통한
+  - Circuit Breaker를 활용해 회복탄력성 향상
 - 한정 수량 상품 구매 기능
 - 스케줄러를 통한 주문 및 배송 상태 관리
 - JWT를 사용한 로그인
