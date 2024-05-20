@@ -5,16 +5,22 @@
 
 프로젝트 기간: 2024.04.17 - 2024.05.14
 
+<br>
+
 ## 시스템 구조
 <p align="center">
-    <img width="800" alt="image" src="https://github.com/wl2258/early-bird/assets/77067383/e452f2d9-19af-4dfa-9e76-596c8e43cde0">
+    <img width="800" alt="image" src="https://github.com/wl2258/early-bird/assets/77067383/a145d58e-9f60-4413-845d-770f23d3ee53">
 </p>
+
+<br>
 
 ## 개발 환경
 - Java 21
 - Gradle
 - Spring Boot 3.2.5
 - MariaDB
+  
+<br>
 
 ## 🛠 기술 스택
 **프레임워크 & 라이브러리**
@@ -42,13 +48,19 @@
     <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white"/>
 </div>
 
+<br>
+
 ## 📌 ERD
 <p align="center">
   <img src="https://github.com/wl2258/early-bird/assets/77067383/28379645-6ea6-49ab-8c25-54b6c0166ac9" width="500" />
 </p>
 
+<br>
+
 ## 📜 API 문서
 [API 문서 바로가기](https://documenter.getpostman.com/view/19468204/2sA3JRaf81)
+
+<br>
 
 ## 🌟 주요 기능
 - Redis Caching을 통한 상품 재고 관리
@@ -56,18 +68,17 @@
 - Kafka를 통한 이벤트 기반 아키텍처 구축
 - Redis Replication을 통한 분산 처리
 - Open Feign을 활용한 마이크로서비스 간 통신
-- Circuit Breaker를 활용한 회복탄력성 증대
+- Circuit Breaker를 활용해 회복탄력성 향상
 - 한정 수량 상품 구매 기능
 - 스케줄러를 통한 주문 및 배송 상태 관리
 - JWT를 사용한 로그인
 - Google SMTP를 사용한 이메일 인증
 - Spring Security를 사용한 인증 및 인가
+  
+<br>
 
-## 📈 성능 최적화 및 트러블 슈팅
-
-### 성능 최적화 사례
-- [Redis Caching을 활용해 상품 주문 성능 개선: write-back & Lua script 사용](https://ssonzm.tistory.com/114)
-
-### 트러블슈팅 경험
+## 📈 성능 최적화 및 트러블슈팅
+- Redis 캐시를 활용하여 상품 주문 처리 성능 개선: write-back & Lua script 사용
 - Kafka 트랜잭션과 Spring 트랜잭션의 시점 차이로 인한 문제 발생
-- [Kafka 2개의 Consumer가 하나의 토픽을 구독할 때 문제 발생](https://ssonzm.tistory.com/117)
+- Kafka Consumer 그룹 관리를 통한 메시지 처리 최적화
+- Circuit Breaker를 활용한 회복탄력성 향상
