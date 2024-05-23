@@ -64,6 +64,9 @@ dependencies {
 
     implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
 
+    // s3
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.725'
+
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     runtimeOnly 'com.h2database:h2'
 

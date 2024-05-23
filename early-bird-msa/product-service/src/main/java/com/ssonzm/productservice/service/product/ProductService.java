@@ -6,6 +6,7 @@ import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignC
 import com.ssonzm.productservice.domain.product.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,7 +16,9 @@ import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetail
 import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
 
 public interface ProductService {
-    Long saveProduct(Long userId, ProductSaveReqDto productSaveReqDto);
+    Product saveProduct(Long userId, ProductSaveReqDto productSaveReqDto);
+
+    void saveProduct(Long userId, ProductSaveReqDto productSaveReqDto, MultipartFile file);
 
     Page<ProductListRespVo> getProductList(Pageable pageable);
 
