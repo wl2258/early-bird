@@ -31,7 +31,7 @@ public class AmazonSQSConfig {
                         return env.getProperty("cloud.aws.credentials.secret-key");
                     }
                 })
-                .region(Region.of(env.getProperty("cloud.aws.region.static")))
+                .region(Region.of(env.getProperty("cloud.aws.region")))
                 .build();
     }
 

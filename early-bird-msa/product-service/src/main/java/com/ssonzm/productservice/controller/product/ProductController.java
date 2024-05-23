@@ -5,6 +5,7 @@ import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProdu
 import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.util.ResponseUtil;
 import com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListRespVo;
+import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.service.product.ProductService;
 import com.ssonzm.productservice.service.product.RedissonLockProductFacade;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductSaveReqDto;
 import static com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsRespDto;
@@ -42,7 +44,7 @@ public class ProductController {
                                          BindingResult bindingResult,
                                          @RequestHeader("x_user_id") Long userId) {
 
-        Long productId = productService.saveProduct(userId, productSaveReqDto);
+        Long productId = productService.saveProduct(userId, productSaveReqDto).getId();
 
         ResponseDto<Long> responseDto = ResponseUtil.setResponseDto(messageSource, true);
         responseDto.setBody(productId);
@@ -100,5 +102,19 @@ public class ProductController {
         ResponseDto<ProductDetailsRespDto> responseDto = ResponseUtil.setResponseDto(messageSource, true);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+
+    @PostMapping("/authz/products/v2")
+    public ResponseEntity<?> saveProduct(@RequestPart("product") @Valid ProductSaveReqDto productSaveReqDto,
+                                         BindingResult bindingResult,
+                                         @RequestPart(value = "file", required = false) MultipartFile file,
+                                         @RequestHeader("x_user_id") Long userId) {
+
+        productService.saveProduct(userId, productSaveReqDto, file);
+
+        ResponseDto<?> responseDto = ResponseUtil.setResponseDto(messageSource, true);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }
