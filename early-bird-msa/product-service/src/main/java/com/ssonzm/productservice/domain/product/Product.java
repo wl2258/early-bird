@@ -1,6 +1,7 @@
 package com.ssonzm.productservice.domain.product;
 
 import com.ssonzm.coremodule.domain.BaseEntity;
+import com.ssonzm.coremodule.domain.ImageFile;
 import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -46,10 +47,12 @@ public class Product extends BaseEntity {
 
     private LocalDateTime reservationStartTime;
 
+    @Embedded
+    private ImageFile imageFile;
+
     @Builder
-    public Product(Long id, Long userId, String name, ProductCategory category,
-                   String description, ProductStatus status, int quantity, int price,
-                   LocalDateTime reservationStartTime) {
+    public Product(Long id, Long userId, String name, ProductCategory category, String description,
+                   ProductStatus status, int quantity, int price, LocalDateTime reservationStartTime, ImageFile imageFile) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -59,6 +62,7 @@ public class Product extends BaseEntity {
         this.quantity = quantity;
         this.price = price;
         this.reservationStartTime = reservationStartTime;
+        this.imageFile = imageFile;
     }
 
     public void increaseQuantity(int quantity) {
@@ -93,5 +97,9 @@ public class Product extends BaseEntity {
 
         Optional.ofNullable(productUpdateReqDto.getReservationStartTime())
                 .ifPresent(reservationStartTime -> this.reservationStartTime = reservationStartTime);
+    }
+
+    public void uploadImageFile(ImageFile imageFile) {
+        this.imageFile = imageFile;
     }
 }

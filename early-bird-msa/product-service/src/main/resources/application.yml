@@ -41,13 +41,14 @@ eureka:
 
 cloud:
   aws:
-    region:
-      static: ap-northeast-2
+    region: ap-northeast-2
     credentials:
       access-key: ${sqs.access-key}
       secret-key: ${sqs.secret-key}
     sqs:
       queue-name: ${sqs.queue-name}
+    stack:
+      auto: false
 
 logging:
   level:

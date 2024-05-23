@@ -1,21 +1,28 @@
 package com.ssonzm.productservice.service.product;
 
+import com.ssonzm.coremodule.domain.ImageFile;
 import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.OrderProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.order_product.OrderProductRequestDto.ProductUpdateAfterOrderReqDto;
 import com.ssonzm.coremodule.dto.product.ProductRequestDto.ProductUpdateReqDto;
 import com.ssonzm.coremodule.dto.product.ProductResponseDto.ProductDetailsFeignClientRespDto;
+import com.ssonzm.coremodule.dto.property.CloudFrontProperties;
 import com.ssonzm.coremodule.exception.CommonBadRequestException;
+import com.ssonzm.coremodule.vo.FileRootPathVO;
 import com.ssonzm.productservice.domain.product.Product;
 import com.ssonzm.productservice.domain.product.ProductCategory;
 import com.ssonzm.productservice.domain.product.ProductRepository;
 import com.ssonzm.productservice.domain.product.ProductStatus;
+import com.ssonzm.productservice.common.util.CloudFrontUtil;
+import com.ssonzm.productservice.service.aws_s3.S3Service;
 import com.ssonzm.productservice.service.client.UserServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -29,25 +36,55 @@ import static com.ssonzm.coremodule.vo.product.ProductResponseVo.ProductListResp
 @Service
 @Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
+    private final S3Service s3Service;
     private final ProductRepository productRepository;
     private final UserServiceClient userServiceClient;
     private final ProductRedisService productRedisService;
+    private final CloudFrontProperties cloudFrontProperties;
 
-    public ProductServiceImpl(ProductRepository productRepository, UserServiceClient userServiceClient,
-                              ProductRedisService productRedisService) {
+    public ProductServiceImpl(S3Service s3Service, ProductRepository productRepository, UserServiceClient userServiceClient,
+                              ProductRedisService productRedisService, CloudFrontProperties cloudFrontProperties) {
+        this.s3Service = s3Service;
         this.productRepository = productRepository;
         this.userServiceClient = userServiceClient;
         this.productRedisService = productRedisService;
+        this.cloudFrontProperties = cloudFrontProperties;
     }
 
+    /**
+     * 엔티티만 저장
+     */
     @Override
     @Transactional
-    public Long saveProduct(Long userId, ProductSaveReqDto productSaveReqDto) {
+    public Product saveProduct(Long userId, ProductSaveReqDto productSaveReqDto) {
         Product product = createProduct(productSaveReqDto, userId);
         productRepository.save(product);
 
         productRedisService.saveProduct(product.getId(), product.getQuantity(), 1, TimeUnit.HOURS);
-        return product.getId();
+        return product;
+    }
+
+    /**
+     * 이미지, 엔티티 같이 저장
+     */
+    @Transactional
+    public void saveProduct(Long userId, ProductSaveReqDto productSaveReqDto, MultipartFile file) {
+        Product product = saveProduct(userId, productSaveReqDto);
+
+        ImageFile imageFile = null;
+        try {
+            imageFile = saveFile(file);
+        } catch (IOException e) {
+            log.error("AWS S3 파일 업로드 실패");
+            throw new RuntimeException(e);
+        }
+        product.uploadImageFile(imageFile);
+
+        productRepository.save(product);
+    }
+
+    private ImageFile saveFile(MultipartFile file) throws IOException {
+        return s3Service.upload(file, FileRootPathVO.PRODUCT_PATH);
     }
 
     private Product createProduct(ProductSaveReqDto productSaveReqDto, Long userId) {
@@ -95,7 +132,9 @@ public class ProductServiceImpl implements ProductService {
                 product.getQuantity(),
                 product.getPrice(),
                 product.getCreatedDate(),
-                product.getReservationStartTime()
+                product.getReservationStartTime(),
+                s3Service.getS3ImageUrl(product.getImageFile().getStoreFileName())
+//                product.getImageFile().getStoreFileUrl()
         );
     }
 
@@ -161,7 +200,6 @@ public class ProductServiceImpl implements ProductService {
         if (findProduct.getReservationStartTime().isAfter(LocalDateTime.now())) {
             throw new CommonBadRequestException("failOrder");
         }
-
     }
 
     @Override

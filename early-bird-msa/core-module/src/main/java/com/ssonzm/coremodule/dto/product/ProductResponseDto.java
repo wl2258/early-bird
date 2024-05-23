@@ -24,6 +24,7 @@ public class ProductResponseDto {
         private LocalDateTime createdDate;
         @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime reservationStartTime;
+        private String imageUrl;
     }
 
     @Data
